@@ -177,51 +177,60 @@ class XMLBuilder:
         if outcome.text:
             self._add_element(event, "text", outcome.text)
 
-        # Auto-reward section
-        auto = None
+        # Auto-reward with proper FTL format
         if any([outcome.scrap, outcome.fuel, outcome.missiles, outcome.drones]):
-            auto = self._add_element(event, "autoReward", level="LOW")
+            # Determine reward level based on amounts
+            level = "LOW"
+            max_reward = max(
+                abs(outcome.scrap or 0),
+                abs(outcome.fuel or 0) * 5,
+                abs(outcome.missiles or 0) * 3,
+                abs(outcome.drones or 0) * 5,
+            )
+            if max_reward > 50:
+                level = "HIGH"
+            elif max_reward > 25:
+                level = "MED"
+            self._add_element(event, "autoReward", "standard", level=level)
 
-        # Item section
-        if outcome.scrap:
-            item = self._add_element(event, "item", type="scrap")
-            item.set("min", str(max(0, outcome.scrap - 10)))
-            item.set("max", str(outcome.scrap + 10))
-
-        if outcome.fuel:
-            self._add_element(event, "modifyPursuit", amount=str(-outcome.fuel) if outcome.fuel < 0 else str(outcome.fuel))
-
+        # Hull damage/repair
         if outcome.hull:
-            dmg = self._add_element(event, "damage", amount=str(-outcome.hull))
-            dmg.set("effect", "random")
+            if outcome.hull < 0:
+                # Damage the player's ship
+                dmg = etree.SubElement(event, "damage", amount=str(-outcome.hull))
+                dmg.set("effect", "random")
+            else:
+                # Repair - not directly supported, use autoReward instead
+                pass
 
-        # Items
+        # Item rewards
         if outcome.weapon:
-            self._add_element(event, "weapon", name=outcome.weapon)
+            etree.SubElement(event, "weapon", name=outcome.weapon)
         if outcome.drone:
-            self._add_element(event, "drone", name=outcome.drone)
+            etree.SubElement(event, "drone", name=outcome.drone)
         if outcome.augment:
-            self._add_element(event, "augment", name=outcome.augment)
+            etree.SubElement(event, "augment", name=outcome.augment)
 
         # Crew
         if outcome.add_crew:
-            self._add_element(event, "crewMember", amount="1", class_=outcome.add_crew)
+            crew_elem = etree.SubElement(event, "crewMember", amount="1")
+            crew_elem.set("class", outcome.add_crew)
         if outcome.remove_crew:
-            self._add_element(event, "removeCrew")
+            etree.SubElement(event, "removeCrew")
 
         # System damage
         if outcome.damage_system:
-            dmg = self._add_element(event, "damage")
+            dmg = etree.SubElement(event, "damage")
             dmg.set("system", outcome.damage_system)
             dmg.set("amount", str(outcome.damage_amount or 1))
 
         # Chain
         if outcome.load_event:
-            self._add_element(event, "event", load=outcome.load_event)
+            etree.SubElement(event, "event", load=outcome.load_event)
 
         # Store
         if outcome.store:
-            self._add_element(event, "store")
+            etree.SubElement(event, "store")
 
         return event
 

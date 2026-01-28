@@ -107,22 +107,46 @@ class SlipstreamManager:
                 output="",
             )
 
+        # Slipstream expects mods to be in its mods/ directory
+        # Copy the mod there for validation
+        if not self.install_mod(mod_path):
+            return ValidationResult(
+                valid=False,
+                errors=["Failed to copy mod to Slipstream mods directory"],
+                warnings=[],
+                output="",
+            )
+
+        # Use just the filename since it's now in the mods directory
+        mod_name = mod_path.name
+
         try:
-            result = self._run_command("--validate", str(mod_path))
+            result = self._run_command("--validate", mod_name)
             output = result.stdout + result.stderr
 
             # Parse output for errors/warnings
+            # Slipstream uses these prefixes:
+            # ~ warning (e.g., line endings)
+            # ! error
             errors = []
             warnings = []
 
             for line in output.split("\n"):
-                line_lower = line.lower()
-                if "error" in line_lower:
-                    errors.append(line.strip())
-                elif "warning" in line_lower:
-                    warnings.append(line.strip())
+                line_stripped = line.strip()
+                line_lower = line_stripped.lower()
 
-            valid = result.returncode == 0 and not errors
+                # Check for actual errors (! prefix or ERROR in message)
+                if line_stripped.startswith("!") or "error" in line_lower:
+                    # Skip the generic "An error occurred" message if we have specifics
+                    if "an error occurred" not in line_lower:
+                        errors.append(line_stripped)
+                # Check for warnings (~ prefix or explicit warning)
+                elif line_stripped.startswith("~") or "warning" in line_lower:
+                    warnings.append(line_stripped)
+
+            # Validation passes if there are no actual errors
+            # (warnings like "LF line endings" are acceptable)
+            valid = not errors
 
             return ValidationResult(
                 valid=valid,
@@ -162,7 +186,7 @@ class SlipstreamManager:
                 output="",
             )
 
-        # Build argument list
+        # Copy mods to Slipstream's mods directory and use just filenames
         args = ["--patch"]
         for mod_path in mod_paths:
             if not mod_path.exists():
@@ -171,7 +195,15 @@ class SlipstreamManager:
                     message=f"Mod file not found: {mod_path}",
                     output="",
                 )
-            args.append(str(mod_path))
+            # Install mod to Slipstream's mods directory
+            if not self.install_mod(mod_path):
+                return PatchResult(
+                    success=False,
+                    message=f"Failed to copy mod to Slipstream mods directory: {mod_path}",
+                    output="",
+                )
+            # Use just the filename since Slipstream expects mods in its mods/ directory
+            args.append(mod_path.name)
 
         try:
             result = self._run_command(*args, timeout=120)
