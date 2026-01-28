@@ -1,0 +1,257 @@
+{
+  "weapons": {
+    "lasers": {
+      "BASIC_LASER": {
+        "title": "Burst Laser I",
+        "damage": 1,
+        "shots": 2,
+        "fireChance": 0,
+        "breachChance": 0,
+        "cooldown": 11,
+        "power": 2,
+        "cost": 50,
+        "rarity": 0
+      },
+      "BURST_LASER_2": {
+        "title": "Burst Laser II",
+        "damage": 1,
+        "shots": 3,
+        "fireChance": 0,
+        "breachChance": 0,
+        "cooldown": 12,
+        "power": 2,
+        "cost": 80,
+        "rarity": 3
+      },
+      "BURST_LASER_3": {
+        "title": "Burst Laser III",
+        "damage": 1,
+        "shots": 5,
+        "fireChance": 0,
+        "breachChance": 0,
+        "cooldown": 19,
+        "power": 4,
+        "cost": 95,
+        "rarity": 5
+      },
+      "HEAVY_LASER": {
+        "title": "Heavy Laser I",
+        "damage": 2,
+        "shots": 1,
+        "fireChance": 3,
+        "breachChance": 3,
+        "cooldown": 9,
+        "power": 1,
+        "cost": 50,
+        "rarity": 1
+      },
+      "HEAVY_LASER_2": {
+        "title": "Heavy Laser II",
+        "damage": 2,
+        "shots": 2,
+        "fireChance": 3,
+        "breachChance": 3,
+        "cooldown": 13,
+        "power": 3,
+        "cost": 65,
+        "rarity": 4
+      }
+    },
+    "beams": {
+      "BEAM_1": {
+        "title": "Pike Beam",
+        "damage": 1,
+        "length": 60,
+        "cooldown": 16,
+        "power": 2,
+        "cost": 60,
+        "rarity": 2
+      },
+      "BEAM_2": {
+        "title": "Halberd Beam",
+        "damage": 2,
+        "length": 40,
+        "cooldown": 17,
+        "power": 3,
+        "cost": 65,
+        "rarity": 3
+      },
+      "BEAM_HULL": {
+        "title": "Hull Beam",
+        "damage": 2,
+        "length": 35,
+        "cooldown": 14,
+        "power": 2,
+        "cost": 60,
+        "rarity": 4,
+        "hullBust": true
+      },
+      "BEAM_GLAIVE": {
+        "title": "Glaive Beam",
+        "damage": 3,
+        "length": 50,
+        "cooldown": 25,
+        "power": 4,
+        "cost": 95,
+        "rarity": 5
+      }
+    },
+    "missiles": {
+      "MISSILES": {
+        "title": "Artemis",
+        "damage": 2,
+        "missiles": 1,
+        "breachChance": 3,
+        "fireChance": 1,
+        "cooldown": 11,
+        "power": 1,
+        "cost": 38,
+        "rarity": 0
+      },
+      "MISSILES_2": {
+        "title": "Leto",
+        "damage": 1,
+        "missiles": 1,
+        "breachChance": 1,
+        "fireChance": 1,
+        "cooldown": 9,
+        "power": 1,
+        "cost": 20,
+        "rarity": 1
+      },
+      "MISSILES_BREACH": {
+        "title": "Breach Missile",
+        "damage": 4,
+        "missiles": 1,
+        "breachChance": 8,
+        "fireChance": 0,
+        "cooldown": 22,
+        "power": 3,
+        "cost": 65,
+        "rarity": 3
+      }
+    },
+    "bombs": {
+      "BOMB_ION": {
+        "title": "Ion Bomb",
+        "damage": 0,
+        "ion": 4,
+        "missiles": 1,
+        "cooldown": 22,
+        "power": 1,
+        "cost": 55,
+        "rarity": 3
+      },
+      "BOMB_FIRE": {
+        "title": "Fire Bomb",
+        "damage": 0,
+        "missiles": 1,
+        "fireChance": 10,
+        "cooldown": 15,
+        "power": 2,
+        "cost": 40,
+        "rarity": 2
+      },
+      "BOMB_BREACH_2": {
+        "title": "Breach Bomb II",
+        "damage": 3,
+        "missiles": 1,
+        "breachChance": 8,
+        "cooldown": 17,
+        "power": 2,
+        "cost": 60,
+        "rarity": 4
+      }
+    },
+    "ions": {
+      "ION_BLAST": {
+        "title": "Ion Blast I",
+        "ion": 1,
+        "shots": 1,
+        "cooldown": 8,
+        "power": 1,
+        "cost": 30,
+        "rarity": 0
+      },
+      "ION_BLAST_2": {
+        "title": "Ion Blast II",
+        "ion": 3,
+        "shots": 1,
+        "cooldown": 14,
+        "power": 3,
+        "cost": 70,
+        "rarity": 3
+      },
+      "CHAIN_ION": {
+        "title": "Chain Ion",
+        "ion": 1,
+        "shots": 1,
+        "cooldown": 14,
+        "cooldownMultiplier": 0.85,
+        "power": 2,
+        "cost": 55,
+        "rarity": 4
+      }
+    }
+  },
+  "balance_ranges": {
+    "damage": {"min": 0, "max": 10},
+    "shots": {"min": 1, "max": 10},
+    "fireChance": {"min": 0, "max": 10},
+    "breachChance": {"min": 0, "max": 10},
+    "cooldown": {"min": 1, "max": 30},
+    "power": {"min": 1, "max": 5},
+    "cost": {"min": 10, "max": 200},
+    "rarity": {"min": 0, "max": 5},
+    "ion": {"min": 1, "max": 10}
+  },
+  "crew_races": [
+    "human",
+    "engi",
+    "mantis",
+    "rockmen",
+    "crystal",
+    "zoltan",
+    "slug",
+    "ghost",
+    "anaerobic"
+  ],
+  "systems": [
+    "shields",
+    "engines",
+    "weapons",
+    "medbay",
+    "clonebay",
+    "oxygen",
+    "teleporter",
+    "cloaking",
+    "artillery",
+    "drone_ctrl",
+    "hacking",
+    "mind",
+    "battery",
+    "pilot",
+    "sensors",
+    "doors"
+  ],
+  "sectors": [
+    "CIVILIAN_SECTOR",
+    "PIRATE_SECTOR",
+    "ENGI_SECTOR",
+    "ENGI_HOME",
+    "REBEL_SECTOR",
+    "REBEL_STRONGHOLD",
+    "MANTIS_SECTOR",
+    "MANTIS_HOME",
+    "NEBULA_SECTOR",
+    "SLUG_SECTOR",
+    "SLUG_HOME",
+    "ROCK_SECTOR",
+    "ROCK_HOME",
+    "ZOLTAN_SECTOR",
+    "ZOLTAN_HOME",
+    "CRYSTAL_HOME",
+    "LANIUS_SECTOR",
+    "FINAL_BOSS"
+  ]
+}
