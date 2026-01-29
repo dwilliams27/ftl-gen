@@ -2,6 +2,8 @@
 
 LLM-powered tool that generates themed FTL: Faster Than Light mods from a text prompt.
 
+**Note to Claude:** Keep this file up to date. When you add features, fix bugs, or learn important context, update the relevant sections. Keep it concise - this is a reference, not documentation.
+
 ## What it does
 
 ```
@@ -19,19 +21,23 @@ src/ftl_gen/
 ├── cli.py              # Typer CLI commands
 ├── config.py           # Settings, env vars
 ├── core/
-│   ├── generator.py    # Main orchestrator
+│   ├── generator.py    # Main orchestrator (incremental saves)
 │   ├── mod_builder.py  # .ftl packaging
 │   └── slipstream.py   # Slipstream integration
 ├── llm/
 │   ├── client.py       # Claude/OpenAI client
-│   ├── prompts.py      # Generation prompts
-│   └── parsers.py      # JSON response parsing
+│   ├── prompts.py      # Generation prompts (constrained for valid mechanics)
+│   └── parsers.py      # JSON parsing + description validation
 ├── images/
-│   ├── client.py       # Gemini image generation
-│   └── sprites.py      # Sprite sheet processing
-└── xml/
-    ├── schemas.py      # Pydantic models
-    └── builders.py     # XML generation
+│   ├── client.py       # Gemini image generation + cost tracking
+│   ├── prompts.py      # Sprite generation prompts (green screen)
+│   └── sprites.py      # Sprite sheets (weapons: 16x60x12, drones: 50x20x4)
+├── xml/
+│   ├── schemas.py      # Pydantic models
+│   ├── builders.py     # XML generation
+│   └── validators.py   # XML validation
+├── balance/            # Balance constraints
+└── data/               # Vanilla reference data
 ```
 
 ## Key dependencies
@@ -43,11 +49,14 @@ src/ftl_gen/
 
 ## What works
 
-- Weapon/drone/augment generation with valid XML
+- Weapon/drone/augment/crew generation with valid XML
 - Event generation with choices and outcomes
-- Weapon sprite generation (12-frame sheets)
+- Weapon sprites (12 frames, 16x60) and drone sprites (4 frames, 50x20)
+- Green screen background removal for Gemini-generated images
+- Description validation (catches impossible mechanics like "heals hull")
 - Slipstream validation and patching
 - Items appear in stores in-game
+- Image caching (`--cache-images`) and cost tracking
 
 ## What's limited
 
@@ -80,7 +89,7 @@ ftl-gen mod "space pirates"
 2. **Ship layout generation** - Generate room layouts and sprites, not just blueprints
 3. **Crew spawn integration** - Add custom races to enemy ships and hiring events
 4. **Hyperspace support** - Enable advanced features (custom systems, lua scripting)
-5. **Better sprite generation** - Drone sprites, crew sprites, ship hulls
+5. **More sprites** - Crew sprites (~100 frames, complex), ship hulls
 6. **Balance testing** - Automated playtest simulation to catch OP/useless items
 7. **Mod conflict detection** - Warn when generated content conflicts with popular mods
 
