@@ -47,6 +47,7 @@ class WeaponBlueprint(BaseModel):
 
     # Missile/bomb specific
     missiles: int | None = Field(None, ge=1, le=3, description="Missiles consumed per shot")
+    explosion: str | None = Field(None, description="Explosion animation for bombs/missiles")
 
     # Timing
     cooldown: float = Field(..., ge=1, le=30, description="Recharge time in seconds")

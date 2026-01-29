@@ -90,6 +90,7 @@ def mod(
     augments: Annotated[Optional[int], typer.Option("--augments", "-a", help="Number of augments")] = None,
     crew: Annotated[Optional[int], typer.Option("--crew", "-c", help="Number of crew races")] = None,
     sprites: Annotated[bool, typer.Option("--sprites/--no-sprites", help="Generate sprites")] = True,
+    cache_images: Annotated[bool, typer.Option("--cache-images", help="Use cached images if available")] = False,
     validate: Annotated[bool, typer.Option("--validate", help="Validate with Slipstream")] = False,
     patch: Annotated[bool, typer.Option("--patch", help="Apply mod to game")] = False,
     run: Annotated[bool, typer.Option("--run", help="Launch FTL after patching")] = False,
@@ -139,6 +140,7 @@ def mod(
             num_augments=augments,
             num_crew=crew,
             generate_sprites=sprites,
+            use_cached_images=cache_images,
         )
 
         if validate:

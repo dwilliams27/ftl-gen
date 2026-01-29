@@ -1,12 +1,28 @@
 """Gemini image generation client for FTL sprites."""
 
 import base64
+from dataclasses import dataclass, field
 from io import BytesIO
 
 from PIL import Image
 
 from ftl_gen.config import Settings
 from ftl_gen.images.prompts import weapon_sprite_prompt
+
+
+@dataclass
+class ImageUsage:
+    """Track image generation usage and costs."""
+
+    images_generated: int = 0
+    cost_per_image: float = 0.039  # Gemini 2.0 Flash image pricing
+
+    @property
+    def total_cost(self) -> float:
+        return self.images_generated * self.cost_per_image
+
+    def record_generation(self):
+        self.images_generated += 1
 
 
 class GeminiImageClient:
@@ -16,6 +32,7 @@ class GeminiImageClient:
         self.settings = settings or Settings()
         self._client = None
         self._types = None
+        self.usage = ImageUsage()
 
     def _get_client(self):
         """Lazily initialize the Gemini client."""
@@ -56,6 +73,9 @@ class GeminiImageClient:
         # Extract image from response
         for part in response.candidates[0].content.parts:
             if hasattr(part, "inline_data") and part.inline_data:
+                # Track usage
+                self.usage.record_generation()
+
                 # Handle both base64 string and raw bytes
                 data = part.inline_data.data
                 if isinstance(data, str):
@@ -98,6 +118,9 @@ class GeminiImageClient:
 
 class MockImageClient:
     """Mock image client for testing without API calls."""
+
+    def __init__(self):
+        self.usage = ImageUsage(cost_per_image=0.0)  # Free for mock
 
     def generate_image(self, prompt: str) -> bytes:
         """Generate a placeholder image."""

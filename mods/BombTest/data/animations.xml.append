@@ -1,0 +1,20 @@
+<FTL>
+  <animSheet name="crystal_shard_bomb" w="192" h="60" fw="16" fh="60">weapons/crystal_shard_bomb_strip12.png</animSheet>
+  <weaponAnim name="crystal_shard_bomb">
+    <sheet>crystal_shard_bomb</sheet>
+    <desc length="12" x="0" y="0"/>
+    <chargedFrame>5</chargedFrame>
+    <fireFrame>7</fireFrame>
+    <firePoint x="11" y="30"/>
+    <mountPoint x="0" y="30"/>
+  </weaponAnim>
+  <animSheet name="crystal_resonance_bomb" w="192" h="60" fw="16" fh="60">weapons/crystal_resonance_bomb_strip12.png</animSheet>
+  <weaponAnim name="crystal_resonance_bomb">
+    <sheet>crystal_resonance_bomb</sheet>
+    <desc length="12" x="0" y="0"/>
+    <chargedFrame>5</chargedFrame>
+    <fireFrame>7</fireFrame>
+    <firePoint x="11" y="30"/>
+    <mountPoint x="0" y="30"/>
+  </weaponAnim>
+</FTL>

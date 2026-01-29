@@ -1,5 +1,6 @@
 """Full mod generation orchestrator."""
 
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -63,6 +64,7 @@ class ModGenerator:
         num_augments: int = 2,
         num_crew: int = 0,
         generate_sprites: bool = True,
+        use_cached_images: bool = False,
     ) -> Path:
         """Generate a complete mod from a theme.
 
@@ -146,7 +148,7 @@ class ModGenerator:
             sprite_files: dict[str, bytes] = {}
             if generate_sprites and weapons:
                 task = progress.add_task("Generating weapon sprites...", total=None)
-                sprite_files = self._generate_sprites(weapons)
+                sprite_files = self._generate_sprites(weapons, use_cached_images)
                 progress.update(task, completed=True)
                 console.print(f"  [green]Generated {len(sprite_files)} sprite sheets[/]")
 
@@ -171,12 +173,18 @@ class ModGenerator:
         console.print(f"\n[bold green]Mod generated:[/] {ftl_path}")
 
         # Show LLM usage and cost
-        usage = self.llm.usage.total
-        if usage.total_tokens > 0:
-            console.print(
-                f"[dim]LLM usage: {usage.input_tokens:,} in / {usage.output_tokens:,} out "
-                f"({usage.total_tokens:,} total) · ${usage.cost:.4f}[/]"
-            )
+        llm_usage = self.llm.usage.total
+        img_usage = self.image_client.usage
+
+        costs = []
+        if llm_usage.total_tokens > 0:
+            costs.append(f"LLM: {llm_usage.total_tokens:,} tokens · ${llm_usage.cost:.4f}")
+        if img_usage.images_generated > 0:
+            costs.append(f"Images: {img_usage.images_generated} · ${img_usage.total_cost:.4f}")
+
+        total_cost = llm_usage.cost + img_usage.total_cost
+        if costs:
+            console.print(f"[dim]{' | '.join(costs)} | Total: ${total_cost:.4f}[/]")
 
         return ftl_path
 
@@ -275,14 +283,40 @@ class ModGenerator:
         response = self.llm.generate(prompt, system=SYSTEM_PROMPT, max_tokens=4096)
         return parse_crew_races_response(response)
 
+    def _get_cache_dir(self) -> Path:
+        """Get the image cache directory."""
+        cache_dir = self.settings.output_dir / ".image_cache"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        return cache_dir
+
+    def _get_cache_key(self, weapon: WeaponBlueprint) -> str:
+        """Generate a cache key for a weapon sprite.
+
+        Uses weapon type only so cache can be reused across different weapon names.
+        This allows faster iteration when testing sprite processing.
+        """
+        return f"weapon_{weapon.type.lower()}"
+
     def _generate_sprites(
         self,
         weapons: list[WeaponBlueprint],
+        use_cache: bool = False,
     ) -> dict[str, bytes]:
         """Generate sprite sheets for weapons."""
         sprite_files = {}
+        cache_dir = self._get_cache_dir() if use_cache else None
 
         for weapon in weapons:
+            filename = f"{weapon.name.lower()}_strip12.png"
+            cache_key = self._get_cache_key(weapon) if use_cache else None
+            cached_path = cache_dir / f"{cache_key}.png" if cache_dir and cache_key else None
+
+            # Check cache first
+            if cached_path and cached_path.exists():
+                console.print(f"  [dim]Using cached sprite for {weapon.name}[/]")
+                sprite_files[filename] = cached_path.read_bytes()
+                continue
+
             try:
                 # Generate base image
                 image_data = self.image_client.generate_weapon_sprite(
@@ -294,15 +328,16 @@ class ModGenerator:
                 # Create sprite sheet
                 sheet_data = self.sprite_processor.create_weapon_sprite_sheet(image_data)
 
-                # Store with FTL naming convention
-                filename = f"{weapon.name.lower()}_strip12.png"
+                # Cache the result
+                if cached_path:
+                    cached_path.write_bytes(sheet_data)
+
                 sprite_files[filename] = sheet_data
 
             except Exception as e:
                 console.print(f"[yellow]Warning: Could not generate sprite for {weapon.name}: {e}[/]")
                 # Use placeholder
                 sheet_data = self.sprite_processor.create_placeholder_sprite_sheet(weapon.name)
-                filename = f"{weapon.name.lower()}_strip12.png"
                 sprite_files[filename] = sheet_data
 
         return sprite_files

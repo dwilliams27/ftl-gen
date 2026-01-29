@@ -26,7 +26,7 @@ def weapon_sprite_prompt(
 CRITICAL REQUIREMENTS:
 - BACKGROUND: Solid bright green (#00FF00) - like a green screen
 - ORIENTATION: Weapon should be HORIZONTAL, pointing RIGHT (like a side-view turret)
-- SIZE: Weapon should fill most of the image width
+- SIZE: Weapon must be LARGE and fill 90-95% of the image. No small centered objects - the weapon should nearly touch the edges.
 - STYLE: Clean pixel art, 2-4 colors max, no gradients, retro game style
 - EDGES: Sharp edges, no anti-aliasing or blur into background
 
@@ -35,6 +35,7 @@ Type: {weapon_type} - {base_shape}
 Description: {visual_desc}
 
 This is a spaceship-mounted weapon shown from the side. The barrel/emitter points to the RIGHT.
+Make the weapon BIG - it should dominate the frame, not be a small icon.
 Output a single weapon image, not a sprite sheet or animation."""
 
 
@@ -47,11 +48,12 @@ Theme: {theme}
 CRITICAL REQUIREMENTS:
 - BACKGROUND: Solid bright green (#00FF00) - like a green screen
 - ORIENTATION: Weapon should be HORIZONTAL, pointing RIGHT (like a side-view turret)
-- SIZE: Weapon should fill most of the image width
+- SIZE: Weapon must be LARGE and fill 90-95% of the image. No small centered objects - the weapon should nearly touch the edges.
 - STYLE: Clean pixel art, 2-4 colors max, no gradients, retro game style
 - EDGES: Sharp edges, no anti-aliasing or blur into background
 
 This is a spaceship-mounted weapon shown from the side. The barrel/emitter points to the RIGHT.
+Make the weapon BIG - it should dominate the frame, not be a small icon.
 Output a single weapon image, not a sprite sheet or animation."""
 
 

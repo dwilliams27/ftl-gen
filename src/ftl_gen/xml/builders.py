@@ -135,6 +135,14 @@ class XMLBuilder:
         if weapon.missiles:
             self._add_element(bp, "missiles", str(weapon.missiles))
 
+        # Bombs and missiles need explosion animation and shots
+        if weapon.type in ("BOMB", "MISSILES"):
+            self._add_element(bp, "shots", "1")
+            if not weapon.sp:  # Only add sp=0 if not already set
+                self._add_element(bp, "sp", "0")
+            explosion = weapon.explosion if weapon.explosion else "explosion_random"
+            self._add_element(bp, "explosion", explosion)
+
         # Timing and resources
         # Format cooldown as int if it's a whole number
         cooldown_str = str(int(weapon.cooldown)) if weapon.cooldown == int(weapon.cooldown) else str(weapon.cooldown)
@@ -405,7 +413,7 @@ class XMLBuilder:
 
         # Weapons: keep Burst Laser II, replace Artemis with custom weapon
         weapon_list = etree.SubElement(ship, "weaponList", missiles="8", count="2")
-        etree.SubElement(weapon_list, "weapon", name="BASIC_LASER")
+        etree.SubElement(weapon_list, "weapon", name="LASER_BURST_3")
         etree.SubElement(weapon_list, "weapon", name=weapon_name)
 
         etree.SubElement(ship, "droneList", drones="0", count="0")
@@ -458,9 +466,19 @@ class XMLBuilder:
 
         return etree.tostring(root, pretty_print=True, encoding="unicode", xml_declaration=False)
 
+    # FTL weapon sprite frame dimensions (must match sprites.py)
+    # Vanilla: 16x60 frames, weapon points DOWN
+    FRAME_WIDTH = 16
+    FRAME_HEIGHT = 60
+    FRAME_COUNT = 12
+
     def build_animations_append(self, weapon_names: list[str]) -> str:
         """Build animations.xml.append for weapon sprites."""
         root = self._create_root()
+
+        # Calculate sheet dimensions
+        sheet_width = self.FRAME_WIDTH * self.FRAME_COUNT  # 660
+        sheet_height = self.FRAME_HEIGHT  # 28
 
         for name in weapon_names:
             name_lower = name.lower()
@@ -469,8 +487,8 @@ class XMLBuilder:
             sheet = etree.SubElement(
                 root, "animSheet",
                 name=name_lower,
-                w="192", h="60",
-                fw="16", fh="60"
+                w=str(sheet_width), h=str(sheet_height),
+                fw=str(self.FRAME_WIDTH), fh=str(self.FRAME_HEIGHT)
             )
             sheet.text = f"weapons/{name_lower}_strip12.png"
 
@@ -480,8 +498,10 @@ class XMLBuilder:
             etree.SubElement(anim, "desc", length="12", x="0", y="0")
             self._add_element(anim, "chargedFrame", "5")
             self._add_element(anim, "fireFrame", "7")
-            etree.SubElement(anim, "firePoint", x="8", y="30")
-            etree.SubElement(anim, "mountPoint", x="0", y="30")
+            # firePoint: where projectiles spawn (right edge, vertically centered)
+            etree.SubElement(anim, "firePoint", x=str(self.FRAME_WIDTH - 5), y=str(self.FRAME_HEIGHT // 2))
+            # mountPoint: where weapon attaches to ship (left edge, vertically centered)
+            etree.SubElement(anim, "mountPoint", x="0", y=str(self.FRAME_HEIGHT // 2))
 
         return etree.tostring(root, pretty_print=True, encoding="unicode", xml_declaration=False)
 

@@ -10,9 +10,9 @@ class SpriteProcessor:
     """Process images into FTL-compatible sprite sheets."""
 
     # FTL weapon sprite dimensions (per frame)
-    # Weapons are horizontal, pointing right
-    FRAME_WIDTH = 55
-    FRAME_HEIGHT = 28
+    # Vanilla weapons: 16x60 frames, weapon points DOWN
+    FRAME_WIDTH = 16
+    FRAME_HEIGHT = 60
     FRAME_COUNT = 12
 
     def __init__(self):
@@ -52,7 +52,11 @@ class SpriteProcessor:
         # Crop to content (remove empty space)
         source = self._crop_to_content(source)
 
-        # Resize to fill frame width
+        # Rotate 90° counter-clockwise - Gemini generates horizontal weapons (pointing right)
+        # but FTL sprites have weapons pointing UP
+        source = source.rotate(90, expand=True)
+
+        # Resize to fill frame
         frame = self._resize_to_frame(source)
 
         # Create sprite sheet
@@ -125,14 +129,14 @@ class SpriteProcessor:
         return image
 
     def _resize_to_frame(self, image: Image.Image) -> Image.Image:
-        """Resize horizontal weapon to fill frame.
+        """Resize vertical weapon to fill tall frame.
 
-        Frame is 55x28 (wide, short) - weapon is horizontal pointing right.
-        Scale to fill ~90% of frame while maintaining aspect ratio.
+        Frame is 16x60 (narrow, tall) - weapon points DOWN after rotation.
+        Scale to fill ~90% of frame height while fitting within width.
         """
-        # Target ~90% of frame dimensions
-        target_width = int(self.FRAME_WIDTH * 0.9)  # ~50 pixels
-        target_height = int(self.FRAME_HEIGHT * 0.9)  # ~25 pixels
+        # Target ~90% of frame height (weapon is vertical)
+        target_height = int(self.FRAME_HEIGHT * 0.9)  # ~54 pixels
+        target_width = int(self.FRAME_WIDTH * 0.9)  # ~14 pixels
 
         # Scale to fit within target bounds while maintaining aspect ratio
         width_scale = target_width / image.width
