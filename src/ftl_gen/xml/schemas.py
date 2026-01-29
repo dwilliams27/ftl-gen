@@ -92,6 +92,9 @@ class DroneBlueprint(BaseModel):
     cooldown: float | None = Field(None, ge=1, le=30, description="Attack cooldown")
     speed: int | None = Field(None, ge=1, le=50, description="Movement speed")
 
+    # Visual (set by sprite generator)
+    drone_image: str | None = Field(None, description="Drone image/animation name")
+
     @field_validator("name")
     @classmethod
     def validate_name(cls, v: str) -> str:

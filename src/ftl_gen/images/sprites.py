@@ -10,10 +10,16 @@ class SpriteProcessor:
     """Process images into FTL-compatible sprite sheets."""
 
     # FTL weapon sprite dimensions (per frame)
-    # Vanilla weapons: 16x60 frames, weapon points DOWN
+    # Vanilla weapons: 16x60 frames, weapon points UP
     FRAME_WIDTH = 16
     FRAME_HEIGHT = 60
     FRAME_COUNT = 12
+
+    # FTL drone sprite dimensions (per frame)
+    # Vanilla drones: 50x20 frames, 4 frames, drone faces right
+    DRONE_FRAME_WIDTH = 50
+    DRONE_FRAME_HEIGHT = 20
+    DRONE_FRAME_COUNT = 4
 
     def __init__(self):
         pass
@@ -73,6 +79,141 @@ class SpriteProcessor:
         buffer = BytesIO()
         sheet.save(buffer, format="PNG")
         return buffer.getvalue()
+
+    def create_drone_sprite_sheet(
+        self,
+        image_data: bytes,
+        frames: int = 4,
+    ) -> bytes:
+        """Convert a single image to a drone sprite sheet.
+
+        Pipeline:
+        1. Remove green background (#00FF00) -> transparent
+        2. Crop to content bounds
+        3. Resize to fill frame (50x20)
+        4. Create 4 animation frames
+
+        Args:
+            image_data: Source PNG image data
+            frames: Number of animation frames (default 4)
+
+        Returns:
+            PNG data for the sprite sheet
+        """
+        # Load source image
+        source = Image.open(BytesIO(image_data)).convert("RGBA")
+
+        # Remove green background
+        source = self._remove_green_background(source)
+
+        # Crop to content (remove empty space)
+        source = self._crop_to_content(source)
+
+        # Resize to fill drone frame (no rotation - drones are already horizontal)
+        frame = self._resize_to_drone_frame(source)
+
+        # Create sprite sheet
+        sheet_width = self.DRONE_FRAME_WIDTH * frames
+        sheet_height = self.DRONE_FRAME_HEIGHT
+        sheet = Image.new("RGBA", (sheet_width, sheet_height), (0, 0, 0, 0))
+
+        # Generate animation frames (simple brightness variation for drones)
+        for i in range(frames):
+            animated_frame = self._create_drone_animation_frame(frame, i, frames)
+            sheet.paste(animated_frame, (i * self.DRONE_FRAME_WIDTH, 0))
+
+        # Save to bytes
+        buffer = BytesIO()
+        sheet.save(buffer, format="PNG")
+        return buffer.getvalue()
+
+    def _resize_to_drone_frame(self, image: Image.Image) -> Image.Image:
+        """Resize drone image to fill frame.
+
+        Frame is 50x20 (wide, short) - drone faces right.
+        Scale to fill ~90% of frame width while fitting height.
+        """
+        target_width = int(self.DRONE_FRAME_WIDTH * 0.9)  # ~45 pixels
+        target_height = int(self.DRONE_FRAME_HEIGHT * 0.9)  # ~18 pixels
+
+        # Scale to fit within target bounds while maintaining aspect ratio
+        width_scale = target_width / image.width
+        height_scale = target_height / image.height
+        scale = min(width_scale, height_scale)
+
+        new_width = int(image.width * scale)
+        new_height = int(image.height * scale)
+
+        # Ensure minimum dimensions
+        new_width = max(1, new_width)
+        new_height = max(1, new_height)
+
+        # Resize using high-quality resampling
+        resized = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+        # Center on transparent frame
+        frame = Image.new("RGBA", (self.DRONE_FRAME_WIDTH, self.DRONE_FRAME_HEIGHT), (0, 0, 0, 0))
+        x_offset = (self.DRONE_FRAME_WIDTH - new_width) // 2
+        y_offset = (self.DRONE_FRAME_HEIGHT - new_height) // 2
+        frame.paste(resized, (x_offset, y_offset), resized)
+
+        return frame
+
+    def _create_drone_animation_frame(
+        self,
+        base_frame: Image.Image,
+        frame_index: int,
+        total_frames: int,
+    ) -> Image.Image:
+        """Create a drone animation frame with subtle variations.
+
+        Drone animation is subtle - just engine glow variations.
+        """
+        frame = base_frame.copy()
+
+        # Simple pulsing brightness
+        pulse = 1.0 + 0.1 * ((frame_index % 2) * 2 - 1)  # Alternates 0.9 and 1.1
+        frame = self._adjust_brightness(frame, pulse)
+
+        return frame
+
+    def create_placeholder_drone_sprite_sheet(self, drone_name: str) -> bytes:
+        """Create a simple placeholder drone sprite sheet for testing."""
+        sheet_width = self.DRONE_FRAME_WIDTH * self.DRONE_FRAME_COUNT
+        sheet_height = self.DRONE_FRAME_HEIGHT
+        sheet = Image.new("RGBA", (sheet_width, sheet_height), (0, 0, 0, 0))
+
+        # Draw a simple drone shape on each frame
+        for i in range(self.DRONE_FRAME_COUNT):
+            frame = self._create_placeholder_drone_frame(i)
+            sheet.paste(frame, (i * self.DRONE_FRAME_WIDTH, 0))
+
+        buffer = BytesIO()
+        sheet.save(buffer, format="PNG")
+        return buffer.getvalue()
+
+    def _create_placeholder_drone_frame(self, frame_index: int) -> Image.Image:
+        """Create a single placeholder drone frame."""
+        frame = Image.new("RGBA", (self.DRONE_FRAME_WIDTH, self.DRONE_FRAME_HEIGHT), (0, 0, 0, 0))
+        pixels = frame.load()
+
+        # Brightness varies by frame
+        brightness = 80 + (frame_index * 15) % 40
+
+        # Draw simple drone shape (horizontal, facing right)
+        center_y = self.DRONE_FRAME_HEIGHT // 2
+        for y in range(self.DRONE_FRAME_HEIGHT):
+            for x in range(self.DRONE_FRAME_WIDTH):
+                # Main body (horizontal oval in center)
+                if center_y - 6 < y < center_y + 6:
+                    if 8 < x < 42:
+                        pixels[x, y] = (brightness, brightness, brightness + 20, 255)
+                # Nose (pointing right)
+                if center_y - 3 < y < center_y + 3:
+                    if x >= 38:
+                        pixels[x, y] = (brightness - 20, brightness - 20, brightness, 255)
+
+        return frame
 
     def _remove_green_background(self, image: Image.Image) -> Image.Image:
         """Remove green background, replacing with transparency.

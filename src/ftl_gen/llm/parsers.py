@@ -17,9 +17,123 @@ from ftl_gen.xml.schemas import (
     WeaponBlueprint,
 )
 
+# Patterns that indicate impossible/hallucinated mechanics in descriptions
+IMPOSSIBLE_MECHANIC_PATTERNS = [
+    # Healing/repair effects on weapons (weapons can't heal)
+    (r"\b(heal|repair|restore|regenerate)s?\b.*\b(hull|health|HP|crew|system)", "healing effects"),
+    (r"\b\d+%?\s*chance\s+to\s+(heal|repair|restore)", "probability-based healing"),
+    # Custom probability effects not in stats
+    (r"\b\d+%\s*chance\s+to\s+(?!start\s+a?\s*fire|cause\s+a?\s*breach|stun)", "custom probability effects"),
+    # Damage over time (doesn't exist for weapons)
+    (r"\b(damage|drain|burn)s?\b.*(over\s+time|per\s+second|gradually)", "damage over time"),
+    # Chain/combo effects
+    (r"\b(chain|spread|jump)s?\s+to\s+(adjacent|nearby|other)", "chain effects"),
+    # Resource generation
+    (r"\b(generate|produce|create|spawn)s?\s+\d*\s*(scrap|fuel|missiles|drone)", "resource generation"),
+    # Self-replication/spawning
+    (r"\b(spawn|summon|create|deploy)s?\s+\d*\s*(drone|unit|copy|clone)", "spawning effects"),
+    # Permanent effects
+    (r"\bpermanent(ly)?\s+(disable|destroy|remove)", "permanent effects"),
+    # Turn-based or jump-based effects
+    (r"\bevery\s+\d+\s*(turn|jump|sector)", "periodic effects"),
+]
+
+
+def validate_description(desc: str, item_type: str = "weapon") -> tuple[bool, list[str]]:
+    """Check description for impossible/hallucinated mechanics.
+
+    Returns:
+        Tuple of (is_valid, list_of_issues)
+    """
+    issues = []
+    desc_lower = desc.lower()
+
+    for pattern, issue_name in IMPOSSIBLE_MECHANIC_PATTERNS:
+        if re.search(pattern, desc_lower, re.IGNORECASE):
+            issues.append(f"Description contains impossible mechanic: {issue_name}")
+
+    return len(issues) == 0, issues
+
+
+def sanitize_weapon_description(weapon: dict[str, Any]) -> dict[str, Any]:
+    """Sanitize weapon description to match actual stats.
+
+    If the description claims mechanics not supported by the stats,
+    generate a more accurate description.
+    """
+    desc = weapon.get("desc", "")
+    is_valid, issues = validate_description(desc, "weapon")
+
+    if not is_valid:
+        # Generate a more accurate description based on actual stats
+        weapon["desc"] = _generate_accurate_weapon_desc(weapon)
+        weapon["_sanitized"] = True
+        weapon["_original_desc"] = desc
+        weapon["_issues"] = issues
+
+    return weapon
+
+
+def _generate_accurate_weapon_desc(weapon: dict[str, Any]) -> str:
+    """Generate an accurate description based on weapon stats."""
+    parts = []
+    weapon_type = weapon.get("type", "LASER")
+
+    # Damage
+    damage = weapon.get("damage", 1)
+    shots = weapon.get("shots", 1)
+
+    if weapon_type == "BEAM":
+        length = weapon.get("length", 40)
+        parts.append(f"A {length}-pixel beam dealing {damage} damage per room")
+    elif weapon_type in ("LASER", "BURST", "ION"):
+        if shots > 1:
+            parts.append(f"Fires {shots} shots dealing {damage} damage each")
+        else:
+            parts.append(f"Fires a shot dealing {damage} damage")
+    elif weapon_type == "MISSILES":
+        parts.append(f"Launches a missile dealing {damage} damage")
+    elif weapon_type == "BOMB":
+        parts.append(f"Teleports a bomb dealing {damage} damage")
+
+    # Special effects
+    effects = []
+    if weapon.get("fireChance", 0) > 0:
+        effects.append("can start fires")
+    if weapon.get("breachChance", 0) > 0:
+        effects.append("can cause breaches")
+    if weapon.get("ion", 0) > 0:
+        effects.append(f"deals {weapon['ion']} ion damage")
+    if weapon.get("sp", 0) > 0:
+        effects.append(f"pierces {weapon['sp']} shield{'s' if weapon['sp'] > 1 else ''}")
+    if weapon.get("stun", 0) > 0:
+        effects.append(f"stuns crew for {weapon['stun']}s")
+    if weapon.get("persDamage", 0) > 0:
+        effects.append("deals bonus crew damage")
+    if weapon.get("sysDamage", 0) > 0:
+        effects.append("deals bonus system damage")
+    if weapon.get("hullBust"):
+        effects.append("deals bonus hull damage")
+
+    if effects:
+        parts.append("; ".join(effects).capitalize())
+
+    return ". ".join(parts) + "."
+
+
+class LLMResponseError(Exception):
+    """Error parsing LLM response."""
+    pass
+
 
 def extract_json(text: str) -> dict[str, Any]:
     """Extract JSON object from LLM response text."""
+    if not text or not text.strip():
+        raise LLMResponseError(
+            "LLM returned empty response. This may be due to content moderation - "
+            "try a different theme."
+        )
+
     text = text.strip()
 
     # Remove markdown code blocks
@@ -34,8 +148,19 @@ def extract_json(text: str) -> dict[str, Any]:
     json_match = re.search(r'\{[\s\S]*\}', text)
     if json_match:
         text = json_match.group(0)
+    else:
+        # No JSON found - might be a refusal message
+        if any(word in text.lower() for word in ["sorry", "cannot", "can't", "inappropriate", "apologize"]):
+            raise LLMResponseError(
+                f"LLM refused to generate content for this theme. Try a different theme.\n"
+                f"Response: {text[:200]}..."
+            )
+        raise LLMResponseError(f"No JSON found in LLM response: {text[:200]}...")
 
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        raise LLMResponseError(f"Invalid JSON in LLM response: {e}\nText: {text[:200]}...")
 
 
 def extract_json_list(text: str, key: str = "items") -> list[dict[str, Any]]:
@@ -57,6 +182,9 @@ def extract_json_list(text: str, key: str = "items") -> list[dict[str, Any]]:
 def parse_weapon_response(text: str) -> WeaponBlueprint:
     """Parse a single weapon from LLM response."""
     data = extract_json(text)
+    data = sanitize_weapon_description(data)
+    if data.get("_sanitized"):
+        print(f"Warning: Sanitized description for {data.get('name', 'weapon')}: {data.get('_issues', [])}")
     return WeaponBlueprint.model_validate(data)
 
 
@@ -67,11 +195,17 @@ def parse_weapons_response(text: str) -> list[WeaponBlueprint]:
 
     for item in items:
         try:
+            # Sanitize description before validation
+            item = sanitize_weapon_description(item)
+            if item.get("_sanitized"):
+                print(f"Warning: Sanitized description for {item.get('name', 'weapon')}: {item.get('_issues', [])}")
+
             weapon = WeaponBlueprint.model_validate(item)
             weapons.append(weapon)
         except ValidationError as e:
             # Try to fix common issues
             fixed = _fix_weapon_data(item)
+            fixed = sanitize_weapon_description(fixed)
             try:
                 weapon = WeaponBlueprint.model_validate(fixed)
                 weapons.append(weapon)

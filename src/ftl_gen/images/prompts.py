@@ -57,6 +57,41 @@ Make the weapon BIG - it should dominate the frame, not be a small icon.
 Output a single weapon image, not a sprite sheet or animation."""
 
 
+def drone_sprite_prompt(
+    drone_name: str,
+    drone_type: str,
+    description: str,
+) -> str:
+    """Generate prompt for drone sprite image."""
+    type_details = {
+        "COMBAT": "a small attack drone with visible weapons",
+        "DEFENSE": "a defensive drone with shield projector",
+        "REPAIR": "a repair drone with tools and manipulators",
+        "BOARDER": "an infiltration drone with breaching equipment",
+        "SHIELD": "a shield drone projecting protective field",
+        "BATTLE": "an aggressive combat drone",
+    }
+
+    base_shape = type_details.get(drone_type, "a futuristic drone")
+
+    return f"""Create a pixel art drone sprite for a spaceship game.
+
+CRITICAL REQUIREMENTS:
+- BACKGROUND: Solid bright green (#00FF00) - like a green screen
+- ORIENTATION: Drone shown from TOP-DOWN view (bird's eye), facing RIGHT
+- SIZE: Drone must be LARGE and fill 90% of the image width. No small centered objects.
+- STYLE: Clean pixel art, 2-4 colors max, no gradients, retro game style
+- EDGES: Sharp edges, no anti-aliasing or blur into background
+
+Drone: {drone_name}
+Type: {drone_type} - {base_shape}
+Description: {description}
+
+This is a small autonomous drone viewed from above. It faces RIGHT (moving right).
+Make the drone BIG - it should nearly fill the frame horizontally.
+Output a single drone image, not a sprite sheet or animation."""
+
+
 def crew_sprite_prompt(race_name: str, description: str) -> str:
     """Generate prompt for crew race sprite."""
     return f"""Create a pixel art character sprite for a sci-fi spaceship game crew member.

@@ -99,7 +99,7 @@ For each weapon, generate a complete blueprint with:
 - name: UPPERCASE_WITH_UNDERSCORES (e.g., PLASMA_BURST_LASER)
 - type: One of LASER, BEAM, MISSILES, BOMB, ION, BURST
 - title: Display name (e.g., "Plasma Burst Laser")
-- desc: 1-2 sentence description for the player
+- desc: 1-2 sentence description for the player (SEE DESCRIPTION RULES BELOW)
 - damage: 0-10 (most weapons: 1-3)
 - shots: 1-10 (for LASER/BURST/ION)
 - fireChance: 0-10 (10 = 100% fire chance)
@@ -119,6 +119,15 @@ Special fields (include only if relevant):
 - hullBust: true (bonus hull damage)
 - stun: 1-5 (stun duration)
 - lockdown: true (crystal lockdown)
+
+CRITICAL - DESCRIPTION RULES:
+The "desc" field MUST only describe effects that are mechanically implemented by the stats above.
+- DO NOT invent mechanics that don't exist (healing, repair, probability-based special effects, damage over time, chain reactions, etc.)
+- DO NOT describe percentage chances for effects not in the stats (only fireChance and breachChance exist)
+- The description should accurately reflect what the weapon ACTUALLY DOES based on its stats
+- Good: "Fires 3 laser shots. High fire chance." (matches stats: shots=3, fireChance=7)
+- Bad: "30% chance to spawn repair nanobots" (this mechanic doesn't exist)
+- Flavor text is fine, but mechanical claims must match the actual stats
 
 Return a JSON object:
 {{"items": [weapon1, weapon2, weapon3]}}"""
@@ -188,7 +197,7 @@ Generate a complete blueprint with:
 - name: UPPERCASE_WITH_UNDERSCORES (e.g., GRAVITY_BEAM)
 - type: One of LASER, BEAM, MISSILES, BOMB, ION, BURST
 - title: Display name
-- desc: 1-2 sentence player-facing description
+- desc: 1-2 sentence player-facing description (SEE RULES BELOW)
 - damage: 0-10
 - shots: 1-10 (for LASER/BURST/ION)
 - fireChance: 0-10
@@ -200,6 +209,12 @@ Generate a complete blueprint with:
 
 Include special fields only if relevant to the weapon concept:
 - ion, missiles, length, sp, persDamage, sysDamage, hullBust, stun, lockdown
+
+CRITICAL - DESCRIPTION RULES:
+The "desc" field MUST only describe effects implemented by the stats above.
+- DO NOT invent mechanics that don't exist (healing, repair, probability-based special effects, etc.)
+- The description must accurately reflect what the weapon ACTUALLY DOES
+- Flavor text about appearance/lore is fine, but mechanical claims must match stats
 
 Return ONLY the weapon object as JSON (not wrapped in an array)."""
 
@@ -286,6 +301,14 @@ Drone type guidelines:
 - BATTLE: Fights enemy crew on your ship
 - HACKING: Disables enemy systems
 
+CRITICAL - DESCRIPTION RULES:
+The "desc" field MUST only describe what the drone type actually does.
+- DO NOT invent mechanics beyond the drone type's standard behavior
+- A COMBAT drone attacks systems - don't claim it "has 30% chance to disable shields permanently"
+- A DEFENSE drone shoots projectiles - don't claim it "heals crew" or "repairs hull"
+- Describe the drone's theme/appearance, but mechanical claims must match the type
+- Flavor text is fine, but don't invent special abilities
+
 Return a JSON object:
 {{"items": [drone1, drone2, ...]}}"""
 
@@ -318,6 +341,15 @@ Augment design guidelines:
 - Effects should be meaningful but not overpowered
 - Consider synergies with the theme's weapons/drones
 - Value typically ranges from 0.1 to 0.5 for percentage bonuses
+
+CRITICAL - DESCRIPTION RULES:
+Augments in vanilla FTL have LIMITED mechanical effects. The "desc" should reflect realistic augment behavior:
+- Percentage bonuses (evasion, damage, speed, etc.) - use the "value" field
+- Passive effects (reveal map, auto-repair, drone recovery, etc.)
+- DO NOT claim effects that require active player control or complex triggers
+- Keep descriptions vague about exact mechanics, or describe in terms of vanilla augment effects
+- Example good: "Improves weapon charge speed" (maps to value for weapon cooldown reduction)
+- Example bad: "Every third jump, gain 50 scrap" (no such mechanic exists)
 
 Return a JSON object:
 {{"items": [augment1, augment2, ...]}}"""

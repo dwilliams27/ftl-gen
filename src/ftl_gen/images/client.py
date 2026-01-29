@@ -7,7 +7,7 @@ from io import BytesIO
 from PIL import Image
 
 from ftl_gen.config import Settings
-from ftl_gen.images.prompts import weapon_sprite_prompt
+from ftl_gen.images.prompts import drone_sprite_prompt, weapon_sprite_prompt
 
 
 @dataclass
@@ -111,6 +111,30 @@ class GeminiImageClient:
 
         return self.generate_image(prompt)
 
+    def generate_drone_sprite(
+        self,
+        drone_name: str,
+        drone_type: str,
+        description: str,
+    ) -> bytes:
+        """Generate a drone sprite image.
+
+        Args:
+            drone_name: Name of the drone
+            drone_type: Type (COMBAT, DEFENSE, etc.)
+            description: Drone description
+
+        Returns:
+            PNG image data as bytes
+        """
+        prompt = drone_sprite_prompt(
+            drone_name=drone_name,
+            drone_type=drone_type,
+            description=description,
+        )
+
+        return self.generate_image(prompt)
+
     def is_available(self) -> bool:
         """Check if image generation is configured."""
         return bool(self.settings.google_ai_api_key)
@@ -135,6 +159,15 @@ class MockImageClient:
     ) -> bytes:
         """Generate a placeholder weapon sprite."""
         return self._create_placeholder(64, 240)
+
+    def generate_drone_sprite(
+        self,
+        drone_name: str,
+        drone_type: str,
+        description: str,
+    ) -> bytes:
+        """Generate a placeholder drone sprite."""
+        return self._create_placeholder(200, 80)
 
     def _create_placeholder(self, width: int, height: int) -> bytes:
         """Create a simple placeholder image."""

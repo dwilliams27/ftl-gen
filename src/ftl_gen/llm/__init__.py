@@ -2,6 +2,7 @@
 
 from ftl_gen.llm.client import LLMClient, TokenUsage, UsageTracker
 from ftl_gen.llm.parsers import (
+    LLMResponseError,
     build_mod_content,
     parse_augment_response,
     parse_augments_response,

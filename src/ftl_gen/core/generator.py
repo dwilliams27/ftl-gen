@@ -54,6 +54,32 @@ class ModGenerator:
         self.image_client = get_image_client(self.settings)
         self.sprite_processor = SpriteProcessor()
 
+    def _save_partial(
+        self,
+        mod_name: str,
+        description: str,
+        weapons: list[WeaponBlueprint] | None = None,
+        events: list[EventBlueprint] | None = None,
+        drones: list[DroneBlueprint] | None = None,
+        augments: list[AugmentBlueprint] | None = None,
+        crew: list[CrewBlueprint] | None = None,
+        sprite_files: dict[str, bytes] | None = None,
+    ) -> Path:
+        """Save current progress as a partial mod.
+
+        Called after each generation step to preserve work in case of later failure.
+        """
+        content = build_mod_content(
+            mod_name=mod_name,
+            description=description,
+            weapons=weapons or [],
+            events=events or [],
+            drones=drones or [],
+            augments=augments or [],
+            crew=crew or [],
+        )
+        return self.mod_builder.build(content, sprite_files)
+
     def generate_mod(
         self,
         theme: str,
@@ -89,86 +115,111 @@ class ModGenerator:
             # Step 1: Expand concept
             task = progress.add_task("Expanding mod concept...", total=None)
             concept = self._expand_concept(theme)
-            progress.update(task, completed=True)
+            progress.remove_task(task)
 
             # Use generated name if not provided
             if not mod_name:
                 mod_name = concept.get("name", "GeneratedMod")
+            description = concept.get("description", f"A mod based on: {theme}")
 
             console.print(f"[bold blue]Generating mod:[/] {mod_name}")
-            console.print(f"[dim]{concept.get('description', '')}[/dim]")
+            console.print(f"[dim]{description}[/dim]")
+
+            # Track generated content for incremental saves
+            weapons: list[WeaponBlueprint] = []
+            drones: list[DroneBlueprint] = []
+            augments: list[AugmentBlueprint] = []
+            crew: list[CrewBlueprint] = []
+            events: list[EventBlueprint] = []
+            sprite_files: dict[str, bytes] = {}
 
             # Step 2: Generate weapons
             task = progress.add_task(f"Generating {num_weapons} weapons...", total=None)
             weapons = self._generate_weapons(
                 theme, concept.get("weapon_concepts", []), num_weapons
             )
-            progress.update(task, completed=True)
+            progress.remove_task(task)
             console.print(f"  [green]Generated {len(weapons)} weapons[/]")
+            self._save_partial(mod_name, description, weapons=weapons)
 
             # Step 3: Generate drones
-            drones: list[DroneBlueprint] = []
             if num_drones > 0:
                 task = progress.add_task(f"Generating {num_drones} drones...", total=None)
                 drones = self._generate_drones(
                     theme, concept.get("drone_concepts", []), num_drones
                 )
-                progress.update(task, completed=True)
+                progress.remove_task(task)
                 console.print(f"  [green]Generated {len(drones)} drones[/]")
+                self._save_partial(mod_name, description, weapons=weapons, drones=drones)
 
             # Step 4: Generate augments
-            augments: list[AugmentBlueprint] = []
             if num_augments > 0:
                 task = progress.add_task(f"Generating {num_augments} augments...", total=None)
                 augments = self._generate_augments(
                     theme, concept.get("augment_concepts", []), num_augments
                 )
-                progress.update(task, completed=True)
+                progress.remove_task(task)
                 console.print(f"  [green]Generated {len(augments)} augments[/]")
+                self._save_partial(mod_name, description, weapons=weapons, drones=drones, augments=augments)
 
             # Step 5: Generate crew races
-            crew: list[CrewBlueprint] = []
             if num_crew > 0:
                 task = progress.add_task(f"Generating {num_crew} crew race(s)...", total=None)
                 crew = self._generate_crew(
                     theme, concept.get("crew_concepts", []), num_crew
                 )
-                progress.update(task, completed=True)
+                progress.remove_task(task)
                 console.print(f"  [green]Generated {len(crew)} crew race(s)[/]")
+                self._save_partial(mod_name, description, weapons=weapons, drones=drones, augments=augments, crew=crew)
 
             # Step 6: Generate events
             task = progress.add_task(f"Generating {num_events} events...", total=None)
             events = self._generate_events(
                 theme, concept.get("event_concepts", []), num_events
             )
-            progress.update(task, completed=True)
+            progress.remove_task(task)
             console.print(f"  [green]Generated {len(events)} events[/]")
+            # Save after events - this is the last content step before sprites
+            self._save_partial(mod_name, description, weapons=weapons, drones=drones, augments=augments, crew=crew, events=events)
 
-            # Step 7: Generate sprites
-            sprite_files: dict[str, bytes] = {}
+            # Step 7: Generate weapon sprites
             if generate_sprites and weapons:
                 task = progress.add_task("Generating weapon sprites...", total=None)
-                sprite_files = self._generate_sprites(weapons, use_cached_images)
-                progress.update(task, completed=True)
-                console.print(f"  [green]Generated {len(sprite_files)} sprite sheets[/]")
+                weapon_sprites = self._generate_weapon_sprites(weapons, use_cached_images)
+                sprite_files.update(weapon_sprites)
+                progress.remove_task(task)
+                console.print(f"  [green]Generated {len(weapon_sprites)} weapon sprites[/]")
 
                 # Link weapon art to sprite animations
                 for weapon in weapons:
                     weapon.weapon_art = weapon.name.lower()
 
-            # Step 8: Build mod
+                # Save with weapon sprites
+                self._save_partial(
+                    mod_name, description, weapons=weapons, drones=drones,
+                    augments=augments, crew=crew, events=events, sprite_files=sprite_files
+                )
+
+            # Step 7b: Generate drone sprites
+            if generate_sprites and drones:
+                task = progress.add_task("Generating drone sprites...", total=None)
+                drone_sprites = self._generate_drone_sprites(drones, use_cached_images)
+                sprite_files.update(drone_sprites)
+                progress.remove_task(task)
+                console.print(f"  [green]Generated {len(drone_sprites)} drone sprites[/]")
+
+                # Link drone image to sprite animations
+                for drone in drones:
+                    drone.drone_image = drone.name.lower()
+
+            # Step 8: Build final mod with sprites
             task = progress.add_task("Building mod package...", total=None)
-            content = build_mod_content(
-                mod_name=mod_name,
-                description=concept.get("description", f"A mod based on: {theme}"),
-                weapons=weapons,
-                events=events,
-                drones=drones,
-                augments=augments,
-                crew=crew,
+            ftl_path = self._save_partial(
+                mod_name, description,
+                weapons=weapons, drones=drones, augments=augments,
+                crew=crew, events=events, sprite_files=sprite_files
             )
-            ftl_path = self.mod_builder.build(content, sprite_files)
-            progress.update(task, completed=True)
+            progress.remove_task(task)
 
         console.print(f"\n[bold green]Mod generated:[/] {ftl_path}")
 
@@ -289,7 +340,7 @@ class ModGenerator:
         cache_dir.mkdir(parents=True, exist_ok=True)
         return cache_dir
 
-    def _get_cache_key(self, weapon: WeaponBlueprint) -> str:
+    def _get_weapon_cache_key(self, weapon: WeaponBlueprint) -> str:
         """Generate a cache key for a weapon sprite.
 
         Uses weapon type only so cache can be reused across different weapon names.
@@ -297,7 +348,14 @@ class ModGenerator:
         """
         return f"weapon_{weapon.type.lower()}"
 
-    def _generate_sprites(
+    def _get_drone_cache_key(self, drone: DroneBlueprint) -> str:
+        """Generate a cache key for a drone sprite.
+
+        Uses drone type only so cache can be reused across different drone names.
+        """
+        return f"drone_{drone.type.lower()}"
+
+    def _generate_weapon_sprites(
         self,
         weapons: list[WeaponBlueprint],
         use_cache: bool = False,
@@ -308,7 +366,7 @@ class ModGenerator:
 
         for weapon in weapons:
             filename = f"{weapon.name.lower()}_strip12.png"
-            cache_key = self._get_cache_key(weapon) if use_cache else None
+            cache_key = self._get_weapon_cache_key(weapon) if use_cache else None
             cached_path = cache_dir / f"{cache_key}.png" if cache_dir and cache_key else None
 
             # Check cache first
@@ -338,6 +396,52 @@ class ModGenerator:
                 console.print(f"[yellow]Warning: Could not generate sprite for {weapon.name}: {e}[/]")
                 # Use placeholder
                 sheet_data = self.sprite_processor.create_placeholder_sprite_sheet(weapon.name)
+                sprite_files[filename] = sheet_data
+
+        return sprite_files
+
+    def _generate_drone_sprites(
+        self,
+        drones: list[DroneBlueprint],
+        use_cache: bool = False,
+    ) -> dict[str, bytes]:
+        """Generate sprite sheets for drones."""
+        sprite_files = {}
+        cache_dir = self._get_cache_dir() if use_cache else None
+
+        for drone in drones:
+            # FTL drone naming: dronename_sheet.png (4 frames of 50x20)
+            filename = f"{drone.name.lower()}_sheet.png"
+            cache_key = self._get_drone_cache_key(drone) if use_cache else None
+            cached_path = cache_dir / f"{cache_key}.png" if cache_dir and cache_key else None
+
+            # Check cache first
+            if cached_path and cached_path.exists():
+                console.print(f"  [dim]Using cached sprite for {drone.name}[/]")
+                sprite_files[filename] = cached_path.read_bytes()
+                continue
+
+            try:
+                # Generate base image
+                image_data = self.image_client.generate_drone_sprite(
+                    drone_name=drone.name,
+                    drone_type=drone.type,
+                    description=drone.desc,
+                )
+
+                # Create sprite sheet
+                sheet_data = self.sprite_processor.create_drone_sprite_sheet(image_data)
+
+                # Cache the result
+                if cached_path:
+                    cached_path.write_bytes(sheet_data)
+
+                sprite_files[filename] = sheet_data
+
+            except Exception as e:
+                console.print(f"[yellow]Warning: Could not generate sprite for {drone.name}: {e}[/]")
+                # Use placeholder
+                sheet_data = self.sprite_processor.create_placeholder_drone_sprite_sheet(drone.name)
                 sprite_files[filename] = sheet_data
 
         return sprite_files
