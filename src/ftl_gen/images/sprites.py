@@ -9,9 +9,10 @@ from PIL import Image
 class SpriteProcessor:
     """Process images into FTL-compatible sprite sheets."""
 
-    # FTL weapon sprite dimensions
-    FRAME_WIDTH = 16
-    FRAME_HEIGHT = 60
+    # FTL weapon sprite dimensions (per frame)
+    # Weapons are horizontal, pointing right
+    FRAME_WIDTH = 55
+    FRAME_HEIGHT = 28
     FRAME_COUNT = 12
 
     def __init__(self):
@@ -28,6 +29,13 @@ class SpriteProcessor:
         the specified number of frames. Frames are created by applying
         slight variations (glow effects, etc.) to simulate animation.
 
+        Pipeline:
+        1. Remove green background (#00FF00) -> transparent
+        2. Crop to content bounds
+        3. Resize to fill frame width (~90% of 16px)
+        4. Center in 16x60 frame
+        5. Create animation frames
+
         Args:
             image_data: Source PNG image data
             frames: Number of animation frames (default 12)
@@ -38,7 +46,13 @@ class SpriteProcessor:
         # Load source image
         source = Image.open(BytesIO(image_data)).convert("RGBA")
 
-        # Resize to single frame size
+        # Remove green background
+        source = self._remove_green_background(source)
+
+        # Crop to content (remove empty space)
+        source = self._crop_to_content(source)
+
+        # Resize to fill frame width
         frame = self._resize_to_frame(source)
 
         # Create sprite sheet
@@ -56,20 +70,86 @@ class SpriteProcessor:
         sheet.save(buffer, format="PNG")
         return buffer.getvalue()
 
+    def _remove_green_background(self, image: Image.Image) -> Image.Image:
+        """Remove green background, replacing with transparency.
+
+        Gemini produces various shades of green, not just #00FF00.
+        Remove any pixel where green is dominant and high.
+
+        Args:
+            image: Source image in RGBA mode
+
+        Returns:
+            Image with green pixels made transparent
+        """
+        image = image.convert("RGBA")
+        data = image.getdata()
+
+        new_data = []
+        for pixel in data:
+            r, g, b, a = pixel
+            # Remove if green is high AND green dominates over red and blue
+            is_green_high = g > 180
+            is_green_dominant = g > r and g > b
+            green_margin = min(g - r, g - b)  # How much greener than other channels
+
+            if is_green_high and is_green_dominant and green_margin > 20:
+                new_data.append((0, 0, 0, 0))  # Transparent
+            else:
+                new_data.append(pixel)
+
+        image.putdata(new_data)
+        return image
+
+    def _crop_to_content(self, image: Image.Image, padding: int = 2) -> Image.Image:
+        """Crop image to non-transparent content bounds.
+
+        Args:
+            image: Source image with transparency
+            padding: Pixels of padding to add around content
+
+        Returns:
+            Cropped image with minimal padding
+        """
+        bbox = image.getbbox()  # Get bounding box of non-transparent pixels
+        if bbox:
+            cropped = image.crop(bbox)
+            # Add small padding
+            padded = Image.new(
+                "RGBA",
+                (cropped.width + padding * 2, cropped.height + padding * 2),
+                (0, 0, 0, 0),
+            )
+            padded.paste(cropped, (padding, padding))
+            return padded
+        return image
+
     def _resize_to_frame(self, image: Image.Image) -> Image.Image:
-        """Resize image to fit within frame dimensions while maintaining aspect ratio."""
-        # Calculate scale to fit
-        width_ratio = self.FRAME_WIDTH / image.width
-        height_ratio = self.FRAME_HEIGHT / image.height
-        scale = min(width_ratio, height_ratio)
+        """Resize horizontal weapon to fill frame.
+
+        Frame is 55x28 (wide, short) - weapon is horizontal pointing right.
+        Scale to fill ~90% of frame while maintaining aspect ratio.
+        """
+        # Target ~90% of frame dimensions
+        target_width = int(self.FRAME_WIDTH * 0.9)  # ~50 pixels
+        target_height = int(self.FRAME_HEIGHT * 0.9)  # ~25 pixels
+
+        # Scale to fit within target bounds while maintaining aspect ratio
+        width_scale = target_width / image.width
+        height_scale = target_height / image.height
+        scale = min(width_scale, height_scale)
 
         new_width = int(image.width * scale)
         new_height = int(image.height * scale)
 
-        # Resize using high-quality resampling then pixelate
+        # Ensure minimum dimensions
+        new_width = max(1, new_width)
+        new_height = max(1, new_height)
+
+        # Resize using high-quality resampling
         resized = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
-        # Center on transparent background
+        # Center on transparent frame
         frame = Image.new("RGBA", (self.FRAME_WIDTH, self.FRAME_HEIGHT), (0, 0, 0, 0))
         x_offset = (self.FRAME_WIDTH - new_width) // 2
         y_offset = (self.FRAME_HEIGHT - new_height) // 2
@@ -216,16 +296,18 @@ class SpriteProcessor:
         # Brightness varies by frame
         brightness = 80 + (frame_index * 10) % 60
 
-        # Draw simple weapon shape
+        # Draw simple horizontal weapon shape (pointing right)
+        # Frame is 55x28, weapon centered vertically
+        center_y = self.FRAME_HEIGHT // 2
         for y in range(self.FRAME_HEIGHT):
             for x in range(self.FRAME_WIDTH):
-                # Main body
-                if 20 < y < 40:
-                    if 2 < x < 14:
+                # Main body (horizontal bar in center)
+                if center_y - 4 < y < center_y + 4:
+                    if 5 < x < 45:
                         pixels[x, y] = (brightness, brightness, brightness + 20, 255)
-                # Barrel
-                if 25 < y < 35:
-                    if x >= 10:
+                # Barrel tip (pointing right)
+                if center_y - 2 < y < center_y + 2:
+                    if x >= 40:
                         pixels[x, y] = (brightness - 20, brightness - 20, brightness, 255)
 
         return frame

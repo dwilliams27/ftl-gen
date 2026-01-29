@@ -1,6 +1,6 @@
 """LLM client and prompt management."""
 
-from ftl_gen.llm.client import LLMClient
+from ftl_gen.llm.client import LLMClient, TokenUsage, UsageTracker
 from ftl_gen.llm.parsers import (
     build_mod_content,
     parse_augment_response,

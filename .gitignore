@@ -37,9 +37,8 @@ env/
 .env
 .env.local
 
-# Output
-output/
-*.ftl
+# Mods directory is tracked - generated mods are saved there
+# mods/
 
 # Testing
 .pytest_cache/

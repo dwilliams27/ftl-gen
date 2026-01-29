@@ -21,39 +21,38 @@ def weapon_sprite_prompt(
 
     visual_desc = visual_description or description
 
-    return f"""Create a pixel art weapon sprite for a sci-fi spaceship game.
+    return f"""Create a pixel art weapon sprite for a spaceship game.
+
+CRITICAL REQUIREMENTS:
+- BACKGROUND: Solid bright green (#00FF00) - like a green screen
+- ORIENTATION: Weapon should be HORIZONTAL, pointing RIGHT (like a side-view turret)
+- SIZE: Weapon should fill most of the image width
+- STYLE: Clean pixel art, 2-4 colors max, no gradients, retro game style
+- EDGES: Sharp edges, no anti-aliasing or blur into background
 
 Weapon: {weapon_name}
 Type: {weapon_type} - {base_shape}
 Description: {visual_desc}
 
-Requirements:
-- Pixel art style, clean and readable at small size
-- Side view of the weapon, oriented horizontally pointing right
-- Simple, bold silhouette with 2-3 accent colors
-- Dark background or transparent background
-- Resolution: approximately 64x240 pixels (will be resized to 16x60)
-- The weapon should look like it mounts on a spaceship hull
-
-Style reference: FTL: Faster Than Light weapon sprites - simple, bold, readable pixel art with limited color palette.
-
-Create a single weapon sprite image, not a sprite sheet or animation."""
+This is a spaceship-mounted weapon shown from the side. The barrel/emitter points to the RIGHT.
+Output a single weapon image, not a sprite sheet or animation."""
 
 
 def weapon_sprite_prompt_simple(weapon_type: str, theme: str) -> str:
     """Simplified prompt for weapon sprite based on type and theme."""
-    return f"""Create a pixel art {weapon_type.lower()} weapon sprite for a sci-fi spaceship game.
+    return f"""Create a pixel art {weapon_type.lower()} weapon sprite for a spaceship game.
 
 Theme: {theme}
 
-Requirements:
-- Pixel art style, 64x240 pixels
-- Side view, horizontal orientation, pointing right
-- Simple bold shapes, 2-3 colors plus shadows
-- Dark or transparent background
-- Should look like it mounts on a spaceship
+CRITICAL REQUIREMENTS:
+- BACKGROUND: Solid bright green (#00FF00) - like a green screen
+- ORIENTATION: Weapon should be HORIZONTAL, pointing RIGHT (like a side-view turret)
+- SIZE: Weapon should fill most of the image width
+- STYLE: Clean pixel art, 2-4 colors max, no gradients, retro game style
+- EDGES: Sharp edges, no anti-aliasing or blur into background
 
-Style: FTL: Faster Than Light - clean, readable pixel art."""
+This is a spaceship-mounted weapon shown from the side. The barrel/emitter points to the RIGHT.
+Output a single weapon image, not a sprite sheet or animation."""
 
 
 def crew_sprite_prompt(race_name: str, description: str) -> str:

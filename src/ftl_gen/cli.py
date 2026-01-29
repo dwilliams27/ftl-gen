@@ -41,6 +41,42 @@ def main(
     pass
 
 
+def _prompt_content_counts() -> dict[str, int]:
+    """Interactively prompt user for content counts."""
+    console.print("\n[bold]What would you like to generate?[/]\n")
+
+    counts = {}
+
+    counts["weapons"] = typer.prompt(
+        "  Weapons (laser, beam, missile, etc.)",
+        default=3,
+        type=int,
+    )
+    counts["events"] = typer.prompt(
+        "  Events (encounters with choices)",
+        default=3,
+        type=int,
+    )
+    counts["drones"] = typer.prompt(
+        "  Drones (combat, defense, repair)",
+        default=0,
+        type=int,
+    )
+    counts["augments"] = typer.prompt(
+        "  Augments (passive bonuses)",
+        default=0,
+        type=int,
+    )
+    counts["crew"] = typer.prompt(
+        "  Crew races (custom species)",
+        default=0,
+        type=int,
+    )
+
+    console.print()
+    return counts
+
+
 @app.command()
 def mod(
     theme: Annotated[str, typer.Argument(help="Theme or concept for the mod")],
@@ -48,11 +84,11 @@ def mod(
     output: Annotated[
         Optional[Path], typer.Option("--output", "-o", help="Output directory")
     ] = None,
-    weapons: Annotated[int, typer.Option("--weapons", help="Number of weapons")] = 3,
-    events: Annotated[int, typer.Option("--events", help="Number of events")] = 5,
-    drones: Annotated[int, typer.Option("--drones", help="Number of drones")] = 2,
-    augments: Annotated[int, typer.Option("--augments", help="Number of augments")] = 2,
-    crew: Annotated[int, typer.Option("--crew", help="Number of crew races (0 to skip)")] = 0,
+    weapons: Annotated[Optional[int], typer.Option("--weapons", "-w", help="Number of weapons")] = None,
+    events: Annotated[Optional[int], typer.Option("--events", "-e", help="Number of events")] = None,
+    drones: Annotated[Optional[int], typer.Option("--drones", "-d", help="Number of drones")] = None,
+    augments: Annotated[Optional[int], typer.Option("--augments", "-a", help="Number of augments")] = None,
+    crew: Annotated[Optional[int], typer.Option("--crew", "-c", help="Number of crew races")] = None,
     sprites: Annotated[bool, typer.Option("--sprites/--no-sprites", help="Generate sprites")] = True,
     validate: Annotated[bool, typer.Option("--validate", help="Validate with Slipstream")] = False,
     patch: Annotated[bool, typer.Option("--patch", help="Apply mod to game")] = False,
@@ -63,10 +99,27 @@ def mod(
 ):
     """Generate a complete themed mod.
 
-    Example:
-        ftl-gen mod "A faction of sentient crystals" --name CrystalFaction
+    Examples:
+        ftl-gen mod "A faction of sentient crystals"
+        ftl-gen mod "Space pirates" -w5 -e3 -d2
     """
     settings = get_settings()
+
+    # If no content counts specified, prompt interactively
+    if all(x is None for x in [weapons, events, drones, augments, crew]):
+        counts = _prompt_content_counts()
+        weapons = counts["weapons"]
+        events = counts["events"]
+        drones = counts["drones"]
+        augments = counts["augments"]
+        crew = counts["crew"]
+    else:
+        # Use provided values, default to 0 for unspecified
+        weapons = weapons if weapons is not None else 0
+        events = events if events is not None else 0
+        drones = drones if drones is not None else 0
+        augments = augments if augments is not None else 0
+        crew = crew if crew is not None else 0
 
     if output:
         settings.output_dir = output
@@ -433,11 +486,16 @@ def patch_mod(
         console.print("[red]Slipstream not found. Please install it first.[/]")
         raise typer.Exit(1)
 
-    # Find mod file
+    # Find mod file - check mods/ directory first
     mod_path = Path(mod_name)
     if not mod_path.exists():
-        # Try output directory
+        # Try mods directory (default)
         mod_path = settings.output_dir / f"{mod_name}.ftl"
+    if not mod_path.exists():
+        # Try without .ftl extension
+        mod_path = settings.output_dir / mod_name
+        if mod_path.is_dir():
+            mod_path = settings.output_dir / f"{mod_name}.ftl"
     if not mod_path.exists():
         # Try Slipstream mods directory
         if slipstream.mods_dir:
@@ -445,6 +503,7 @@ def patch_mod(
 
     if not mod_path.exists():
         console.print(f"[red]Mod not found: {mod_name}[/]")
+        console.print(f"[dim]Searched in: {settings.output_dir}[/]")
         raise typer.Exit(1)
 
     console.print(f"[bold]Patching mod:[/] {mod_path}")
@@ -501,25 +560,47 @@ def validate_mod(
         raise typer.Exit(1)
 
 
-@app.command("list-mods")
-def list_mods():
-    """List available mods in Slipstream directory."""
+@app.command("list")
+def list_mods(
+    slipstream_mods: Annotated[bool, typer.Option("--slipstream", "-s", help="Show Slipstream mods instead")] = False,
+):
+    """List generated mods in the mods/ directory."""
     settings = get_settings()
-    slipstream = SlipstreamManager(settings)
 
-    if not slipstream.is_available():
-        console.print("[red]Slipstream not found. Please install it first.[/]")
-        raise typer.Exit(1)
+    if slipstream_mods:
+        slipstream = SlipstreamManager(settings)
+        if not slipstream.is_available():
+            console.print("[red]Slipstream not found.[/]")
+            raise typer.Exit(1)
 
-    mods = slipstream.list_mods()
+        mods = slipstream.list_mods()
+        if not mods:
+            console.print("[yellow]No mods in Slipstream directory[/]")
+            return
 
-    if not mods:
-        console.print("[yellow]No mods found[/]")
+        console.print("[bold]Slipstream mods:[/]")
+        for mod in mods:
+            console.print(f"  {mod}")
         return
 
-    console.print("[bold]Available mods:[/]")
-    for mod in mods:
-        console.print(f"  - {mod}")
+    # List local mods
+    mods_dir = settings.output_dir
+    if not mods_dir.exists():
+        console.print(f"[yellow]Mods directory not found: {mods_dir}[/]")
+        return
+
+    ftl_files = sorted(mods_dir.glob("*.ftl"))
+    mod_dirs = sorted([d for d in mods_dir.iterdir() if d.is_dir() and not d.name.startswith(".")])
+
+    if not ftl_files and not mod_dirs:
+        console.print("[yellow]No mods found. Generate one with:[/]")
+        console.print("  ftl-gen mod \"your theme\"")
+        return
+
+    console.print(f"[bold]Generated mods ({mods_dir}):[/]")
+    for ftl in ftl_files:
+        size_kb = ftl.stat().st_size / 1024
+        console.print(f"  {ftl.stem} [dim]({size_kb:.1f} KB)[/]")
 
 
 @app.command()

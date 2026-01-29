@@ -1,0 +1,11 @@
+<FTL>
+  <animSheet name="laser_prism_splitter" w="192" h="60" fw="16" fh="60">weapons/laser_prism_splitter_strip12.png</animSheet>
+  <weaponAnim name="laser_prism_splitter">
+    <sheet>laser_prism_splitter</sheet>
+    <desc length="12" x="0" y="0"/>
+    <chargedFrame>5</chargedFrame>
+    <fireFrame>7</fireFrame>
+    <firePoint x="8" y="30"/>
+    <mountPoint x="0" y="30"/>
+  </weaponAnim>
+</FTL>

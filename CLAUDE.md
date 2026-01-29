@@ -61,7 +61,17 @@ src/ftl_gen/
 ```bash
 pip install -e ".[dev]"
 cp .env.example .env  # Add API keys
-ftl-gen mod "your theme" --validate --patch --run
+ftl-gen mod "your theme" -w3 -e3 -d0 -a0 -c0 --validate --patch --run
+```
+
+**IMPORTANT:** Always specify all content flags (`-w`, `-e`, `-d`, `-a`, `-c`) when running non-interactively. Without them, the CLI prompts for input which doesn't work in automated contexts.
+
+```bash
+# Good - explicit counts
+ftl-gen mod "space pirates" -w5 -e3 -d2 -a1 -c0
+
+# Bad - triggers interactive prompt
+ftl-gen mod "space pirates"
 ```
 
 ## To be fully successful, this project needs
@@ -73,3 +83,27 @@ ftl-gen mod "your theme" --validate --patch --run
 5. **Better sprite generation** - Drone sprites, crew sprites, ship hulls
 6. **Balance testing** - Automated playtest simulation to catch OP/useless items
 7. **Mod conflict detection** - Warn when generated content conflicts with popular mods
+
+## TODO: Hyperspace Support
+
+Hyperspace is an FTL hard-coded modding API that extends capabilities far beyond vanilla XML modding:
+- Custom weapon behaviors (not just stats)
+- Custom crew abilities with unique effects
+- New systems
+- Lua scripting support
+- Advanced event functionality
+- Seeded runs
+
+**Requirements:**
+- Only works on FTL 1.6.9 (includes auto-downgrade script)
+- Requires Windows or Wine on Mac/Linux
+- Use FTLMan instead of Slipstream for easier Hyperspace management
+
+**Resources:**
+- https://ftl-hyperspace.github.io/FTL-Hyperspace/
+- Current version: 1.21.1
+
+**Implementation notes:**
+- Would need Wine setup instructions for Mac users
+- Generate Hyperspace-specific XML tags for advanced features
+- Could enable truly unique weapon mechanics beyond stat modifications

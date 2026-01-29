@@ -132,8 +132,11 @@ def _fix_weapon_data(data: dict[str, Any]) -> dict[str, Any]:
         fixed["power"] = 2
     if "cost" not in fixed:
         fixed["cost"] = 50
-    if "shots" not in fixed and fixed.get("type") in ("LASER", "BURST", "ION"):
-        fixed["shots"] = 1
+
+    # Ensure shots is at least 1 for projectile weapons
+    if fixed.get("type") in ("LASER", "BURST", "ION"):
+        if "shots" not in fixed or fixed["shots"] < 1:
+            fixed["shots"] = 1
 
     # Convert string numbers to ints
     for field in ["damage", "shots", "power", "cost", "rarity", "fireChance", "breachChance"]:

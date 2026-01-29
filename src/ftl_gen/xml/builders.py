@@ -32,6 +32,53 @@ class XMLBuilder:
             elem.text = str(text)
         return elem
 
+    # Vanilla FTL assets by weapon type
+    WEAPON_ASSETS = {
+        "LASER": {
+            "image": "laser_light1",
+            "weaponArt": "laser_burst_1",
+            "launch": ["lightLaser1", "lightLaser2", "lightLaser3"],
+            "hitShip": ["hitHull1", "hitHull2", "hitHull3"],
+            "hitShield": ["hitShield1", "hitShield2", "hitShield3"],
+        },
+        "BURST": {
+            "image": "laser_burst1",
+            "weaponArt": "laser_burst_2",
+            "launch": ["lightLaser1", "lightLaser2", "lightLaser3"],
+            "hitShip": ["hitHull1", "hitHull2", "hitHull3"],
+            "hitShield": ["hitShield1", "hitShield2", "hitShield3"],
+        },
+        "ION": {
+            "image": "intruder_ion",
+            "weaponArt": "ion_1",
+            "launch": ["ionShoot1", "ionShoot2", "ionShoot3"],
+            "hitShip": ["intruder_ionHit"],
+            "hitShield": ["intruder_ionHit"],
+        },
+        "BEAM": {
+            "image": "beam_contact",
+            "weaponArt": "beam_1",
+            "launch": ["beam1"],
+            "hitShip": [],
+            "hitShield": [],
+        },
+        "MISSILES": {
+            "image": "missile_2",
+            "weaponArt": "missiles_2",
+            "launch": ["missileLaunch"],
+            "hitShip": ["explosion2", "explosion3", "explosion1"],
+            "hitShield": [],
+            "miss": ["miss"],
+        },
+        "BOMB": {
+            "image": "bomb_1",
+            "weaponArt": "bomb_1",
+            "launch": ["bombTeleport"],
+            "hitShip": ["smallExplosion"],
+            "hitShield": [],
+        },
+    }
+
     def build_weapon(self, weapon: WeaponBlueprint) -> etree._Element:
         """Build weaponBlueprint XML element."""
         bp = etree.Element("weaponBlueprint", name=weapon.name)
@@ -39,8 +86,18 @@ class XMLBuilder:
         # Basic info
         self._add_element(bp, "type", weapon.type)
         self._add_element(bp, "title", weapon.title)
-        if weapon.short:
-            self._add_element(bp, "short", weapon.short)
+        # Short name is REQUIRED for weapons to display in the weapon bar
+        # If not provided, generate from title (max 8 chars)
+        short_name = weapon.short
+        if not short_name:
+            # Generate short name: take first word or abbreviate
+            words = weapon.title.split()
+            if len(words) == 1:
+                short_name = weapon.title[:8]
+            else:
+                # Try first word, or combine initials
+                short_name = words[0][:8] if len(words[0]) <= 8 else "".join(w[0] for w in words[:4])
+        self._add_element(bp, "short", short_name)
         self._add_element(bp, "desc", weapon.desc)
         if weapon.tooltip:
             self._add_element(bp, "tooltip", weapon.tooltip)
@@ -86,11 +143,40 @@ class XMLBuilder:
         self._add_element(bp, "cost", str(weapon.cost))
         self._add_element(bp, "rarity", str(weapon.rarity))
 
-        # Visual
-        if weapon.weapon_art:
+        # Get vanilla assets for this weapon type
+        assets = self.WEAPON_ASSETS.get(weapon.type, self.WEAPON_ASSETS["LASER"])
+
+        # Projectile/beam image - always use vanilla assets since custom images don't exist
+        self._add_element(bp, "image", assets["image"])
+
+        # Weapon art (links to animation for the weapon mount sprite)
+        # Only use custom weaponArt if it matches our sprite naming convention (lowercase weapon name)
+        # This means it was set by our sprite generator, not hallucinated by the LLM
+        if weapon.weapon_art and weapon.weapon_art == weapon.name.lower():
             self._add_element(bp, "weaponArt", weapon.weapon_art)
-        if weapon.image:
-            self._add_element(bp, "image", weapon.image)
+        else:
+            self._add_element(bp, "weaponArt", assets["weaponArt"])
+
+        # Sound effects (required for weapon to function properly)
+        if assets["launch"]:
+            launch_elem = etree.SubElement(bp, "launchSounds")
+            for sound in assets["launch"]:
+                self._add_element(launch_elem, "sound", sound)
+
+        if assets["hitShip"]:
+            hit_ship_elem = etree.SubElement(bp, "hitShipSounds")
+            for sound in assets["hitShip"]:
+                self._add_element(hit_ship_elem, "sound", sound)
+
+        if assets["hitShield"]:
+            hit_shield_elem = etree.SubElement(bp, "hitShieldSounds")
+            for sound in assets["hitShield"]:
+                self._add_element(hit_shield_elem, "sound", sound)
+
+        if "miss" in assets and assets["miss"]:
+            miss_elem = etree.SubElement(bp, "missSounds")
+            for sound in assets["miss"]:
+                self._add_element(miss_elem, "sound", sound)
 
         return bp
 
@@ -288,6 +374,49 @@ class XMLBuilder:
 
         return event_elem
 
+    def build_kestrel_loadout(self, weapon_name: str) -> etree._Element:
+        """Build a modified Kestrel A loadout with a custom weapon for testing.
+
+        Replaces the Artemis Missiles with the specified weapon.
+        """
+        # Complete Kestrel A ship blueprint with all systems
+        ship = etree.Element("shipBlueprint", name="PLAYER_SHIP_HARD", layout="kestral", img="kestral")
+
+        etree.SubElement(ship, "class").text = "Kestrel Cruiser"
+        etree.SubElement(ship, "name").text = "The Kestrel"
+        etree.SubElement(ship, "desc").text = "This class of ship was decommissioned from the Federation fleet years ago. After a number of refits and adjustments, this classic ship is ready for battle."
+
+        # Full system list for Kestrel A
+        system_list = etree.SubElement(ship, "systemList")
+        etree.SubElement(system_list, "pilot", power="1", room="0", start="true", img="room_pilot")
+        etree.SubElement(system_list, "doors", power="1", room="2", start="true", img="room_doors")
+        etree.SubElement(system_list, "sensors", power="1", room="3", start="true", img="room_sensors")
+        etree.SubElement(system_list, "medbay", power="1", room="4", start="true", img="room_medbay")
+        etree.SubElement(system_list, "oxygen", power="1", room="13", start="true", img="room_oxygen")
+        etree.SubElement(system_list, "shields", power="2", room="5", start="true", img="room_shields")
+        etree.SubElement(system_list, "engines", power="2", room="14", start="true", img="room_engines")
+        etree.SubElement(system_list, "weapons", power="3", room="11", start="true", img="room_weapons")
+        etree.SubElement(system_list, "drones", power="0", room="8", start="false")
+        etree.SubElement(system_list, "teleporter", power="0", room="1", start="false")
+        etree.SubElement(system_list, "cloaking", power="0", room="6", start="false")
+
+        etree.SubElement(ship, "weaponSlots").text = "4"
+        etree.SubElement(ship, "droneSlots").text = "2"
+
+        # Weapons: keep Burst Laser II, replace Artemis with custom weapon
+        weapon_list = etree.SubElement(ship, "weaponList", missiles="8", count="2")
+        etree.SubElement(weapon_list, "weapon", name="BASIC_LASER")
+        etree.SubElement(weapon_list, "weapon", name=weapon_name)
+
+        etree.SubElement(ship, "droneList", drones="0", count="0")
+
+        etree.SubElement(ship, "health", amount="30")
+        etree.SubElement(ship, "maxPower", amount="8")
+
+        etree.SubElement(ship, "crewCount", amount="3", max="8", **{"class": "human"})
+
+        return ship
+
     def build_blueprints_append(self, content: ModContent) -> str:
         """Build blueprints.xml.append content."""
         root = self._create_root()
@@ -307,6 +436,10 @@ class XMLBuilder:
         # Crew
         for crew in content.crew:
             root.append(self.build_crew(crew))
+
+        # Add Kestrel loadout modification for testing (first weapon)
+        if content.weapons:
+            root.append(self.build_kestrel_loadout(content.weapons[0].name))
 
         return etree.tostring(root, pretty_print=True, encoding="unicode", xml_declaration=False)
 

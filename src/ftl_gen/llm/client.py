@@ -2,6 +2,7 @@
 
 import json
 import re
+from dataclasses import dataclass, field
 from typing import Any, Literal
 
 import anthropic
@@ -11,6 +12,74 @@ from pydantic import BaseModel
 from ftl_gen.config import Settings
 
 
+# Pricing per million tokens (as of Jan 2026)
+MODEL_PRICING: dict[str, dict[str, float]] = {
+    # Claude 4.5 series (current)
+    "claude-opus-4-5-20251101": {"input": 5.0, "output": 25.0},
+    "claude-sonnet-4-5-20251101": {"input": 3.0, "output": 15.0},
+    "claude-haiku-4-5-20251101": {"input": 1.0, "output": 5.0},
+    # Claude 4 series (legacy)
+    "claude-sonnet-4-20250514": {"input": 3.0, "output": 15.0},
+    "claude-opus-4-20250514": {"input": 15.0, "output": 75.0},
+    # Claude 3.5 series (legacy)
+    "claude-3-5-sonnet-20241022": {"input": 3.0, "output": 15.0},
+    "claude-3-5-haiku-20241022": {"input": 0.80, "output": 4.0},
+    # GPT-5 series (current)
+    "gpt-5": {"input": 1.25, "output": 10.0},
+    "gpt-5.2": {"input": 1.25, "output": 10.0},
+    "gpt-5-pro": {"input": 15.0, "output": 120.0},
+    "gpt-5-mini": {"input": 0.25, "output": 2.0},
+    "gpt-5-nano": {"input": 0.05, "output": 0.40},
+    # GPT-4 series (legacy)
+    "gpt-4o": {"input": 2.50, "output": 10.0},
+    "gpt-4o-mini": {"input": 0.15, "output": 0.60},
+}
+
+
+@dataclass
+class TokenUsage:
+    """Tracks token usage and calculates cost."""
+
+    input_tokens: int = 0
+    output_tokens: int = 0
+    model: str = ""
+
+    @property
+    def total_tokens(self) -> int:
+        return self.input_tokens + self.output_tokens
+
+    @property
+    def cost(self) -> float:
+        """Calculate cost in USD."""
+        pricing = MODEL_PRICING.get(self.model, {"input": 3.0, "output": 15.0})
+        input_cost = (self.input_tokens / 1_000_000) * pricing["input"]
+        output_cost = (self.output_tokens / 1_000_000) * pricing["output"]
+        return input_cost + output_cost
+
+    def __add__(self, other: "TokenUsage") -> "TokenUsage":
+        return TokenUsage(
+            input_tokens=self.input_tokens + other.input_tokens,
+            output_tokens=self.output_tokens + other.output_tokens,
+            model=self.model or other.model,
+        )
+
+
+@dataclass
+class UsageTracker:
+    """Accumulates usage across multiple LLM calls."""
+
+    total: TokenUsage = field(default_factory=TokenUsage)
+    calls: int = 0
+
+    def add(self, usage: TokenUsage) -> None:
+        self.total = self.total + usage
+        self.calls += 1
+
+    def reset(self) -> None:
+        self.total = TokenUsage()
+        self.calls = 0
+
+
 class LLMClient:
     """Multi-provider LLM client supporting Claude and OpenAI."""
 
@@ -18,6 +87,7 @@ class LLMClient:
         self.settings = settings or Settings()
         self._claude_client: anthropic.Anthropic | None = None
         self._openai_client: openai.OpenAI | None = None
+        self.usage = UsageTracker()
 
     @property
     def provider(self) -> Literal["claude", "openai"]:
@@ -77,6 +147,14 @@ class LLMClient:
             kwargs["temperature"] = temperature
 
         response = client.messages.create(**kwargs)
+
+        # Track usage
+        self.usage.add(TokenUsage(
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+            model=self.model,
+        ))
+
         return response.content[0].text
 
     def _generate_openai(
@@ -99,6 +177,14 @@ class LLMClient:
             max_tokens=max_tokens,
             temperature=temperature,
         )
+
+        # Track usage
+        if response.usage:
+            self.usage.add(TokenUsage(
+                input_tokens=response.usage.prompt_tokens,
+                output_tokens=response.usage.completion_tokens,
+                model=self.model,
+            ))
 
         return response.choices[0].message.content or ""
 

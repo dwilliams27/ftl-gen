@@ -150,6 +150,10 @@ class ModGenerator:
                 progress.update(task, completed=True)
                 console.print(f"  [green]Generated {len(sprite_files)} sprite sheets[/]")
 
+                # Link weapon art to sprite animations
+                for weapon in weapons:
+                    weapon.weapon_art = weapon.name.lower()
+
             # Step 8: Build mod
             task = progress.add_task("Building mod package...", total=None)
             content = build_mod_content(
@@ -165,6 +169,15 @@ class ModGenerator:
             progress.update(task, completed=True)
 
         console.print(f"\n[bold green]Mod generated:[/] {ftl_path}")
+
+        # Show LLM usage and cost
+        usage = self.llm.usage.total
+        if usage.total_tokens > 0:
+            console.print(
+                f"[dim]LLM usage: {usage.input_tokens:,} in / {usage.output_tokens:,} out "
+                f"({usage.total_tokens:,} total) · ${usage.cost:.4f}[/]"
+            )
+
         return ftl_path
 
     def _expand_concept(self, theme: str) -> dict[str, Any]:

@@ -21,16 +21,16 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = Field(default=None, alias="ANTHROPIC_API_KEY")
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
     llm_model: str = Field(
-        default="claude-sonnet-4-20250514", alias="LLM_MODEL"
+        default="claude-sonnet-4-5-20251101", alias="LLM_MODEL"
     )
 
     # Image Generation
     google_ai_api_key: str | None = Field(default=None, alias="GOOGLE_AI_API_KEY")
-    image_model: str = Field(default="gemini-2.0-flash-exp", alias="IMAGE_MODEL")
+    image_model: str = Field(default="gemini-2.5-flash-image", alias="IMAGE_MODEL")
 
     # Paths
     slipstream_path: Path | None = Field(default=None, alias="SLIPSTREAM_PATH")
-    output_dir: Path = Field(default=Path("./output"), alias="OUTPUT_DIR")
+    output_dir: Path = Field(default=Path("./mods"), alias="OUTPUT_DIR")
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

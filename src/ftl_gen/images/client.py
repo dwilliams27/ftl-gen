@@ -15,14 +15,17 @@ class GeminiImageClient:
     def __init__(self, settings: Settings | None = None):
         self.settings = settings or Settings()
         self._client = None
+        self._types = None
 
     def _get_client(self):
         """Lazily initialize the Gemini client."""
         if self._client is None:
             try:
                 from google import genai
+                from google.genai import types
 
                 self._client = genai.Client(api_key=self.settings.google_ai_api_key)
+                self._types = types
             except ImportError:
                 raise ImportError(
                     "google-genai package required for image generation. "
@@ -40,22 +43,24 @@ class GeminiImageClient:
             PNG image data as bytes
         """
         client = self._get_client()
+        types = self._types
 
         response = client.models.generate_content(
             model=self.settings.image_model,
             contents=prompt,
-            config={
-                "response_modalities": ["IMAGE", "TEXT"],
-                "generation_config": {
-                    "response_mime_type": "image/png",
-                }
-            }
+            config=types.GenerateContentConfig(
+                response_modalities=["IMAGE"],
+            )
         )
 
         # Extract image from response
         for part in response.candidates[0].content.parts:
             if hasattr(part, "inline_data") and part.inline_data:
-                return base64.b64decode(part.inline_data.data)
+                # Handle both base64 string and raw bytes
+                data = part.inline_data.data
+                if isinstance(data, str):
+                    return base64.b64decode(data)
+                return data
 
         raise ValueError("No image generated in response")
 

@@ -1,0 +1,62 @@
+<FTL>
+  <weaponBlueprint name="LASER_PRISM_SPLITTER">
+    <type>LASER</type>
+    <title>Prism Splitter Laser</title>
+    <short>Prism</short>
+    <desc>An experimental laser that refracts through a crystalline prism upon impact. The initial beam strikes normally, but splits into two secondary beams that arc into adjacent rooms, bypassing shields.</desc>
+    <tooltip>Fires a single laser that deals 1 damage. On impact, splits into 2 beams that each deal 1 damage to adjacent rooms, ignoring shields. The split effect only triggers if the primary shot connects.</tooltip>
+    <damage>1</damage>
+    <shots>1</shots>
+    <breachChance>1</breachChance>
+    <sysDamage>1</sysDamage>
+    <cooldown>12</cooldown>
+    <power>2</power>
+    <cost>75</cost>
+    <rarity>3</rarity>
+    <image>laser_light1</image>
+    <weaponArt>laser_prism_splitter</weaponArt>
+    <launchSounds>
+      <sound>lightLaser1</sound>
+      <sound>lightLaser2</sound>
+      <sound>lightLaser3</sound>
+    </launchSounds>
+    <hitShipSounds>
+      <sound>hitHull1</sound>
+      <sound>hitHull2</sound>
+      <sound>hitHull3</sound>
+    </hitShipSounds>
+    <hitShieldSounds>
+      <sound>hitShield1</sound>
+      <sound>hitShield2</sound>
+      <sound>hitShield3</sound>
+    </hitShieldSounds>
+  </weaponBlueprint>
+  <shipBlueprint name="PLAYER_SHIP_HARD" layout="kestral" img="kestral">
+    <class>Kestrel Cruiser</class>
+    <name>The Kestrel</name>
+    <desc>This class of ship was decommissioned from the Federation fleet years ago. After a number of refits and adjustments, this classic ship is ready for battle.</desc>
+    <systemList>
+      <pilot power="1" room="0" start="true" img="room_pilot"/>
+      <doors power="1" room="2" start="true" img="room_doors"/>
+      <sensors power="1" room="3" start="true" img="room_sensors"/>
+      <medbay power="1" room="4" start="true" img="room_medbay"/>
+      <oxygen power="1" room="13" start="true" img="room_oxygen"/>
+      <shields power="2" room="5" start="true" img="room_shields"/>
+      <engines power="2" room="14" start="true" img="room_engines"/>
+      <weapons power="3" room="11" start="true" img="room_weapons"/>
+      <drones power="0" room="8" start="false"/>
+      <teleporter power="0" room="1" start="false"/>
+      <cloaking power="0" room="6" start="false"/>
+    </systemList>
+    <weaponSlots>4</weaponSlots>
+    <droneSlots>2</droneSlots>
+    <weaponList missiles="8" count="2">
+      <weapon name="BASIC_LASER"/>
+      <weapon name="LASER_PRISM_SPLITTER"/>
+    </weaponList>
+    <droneList drones="0" count="0"/>
+    <health amount="30"/>
+    <maxPower amount="8"/>
+    <crewCount amount="3" max="8" class="human"/>
+  </shipBlueprint>
+</FTL>
