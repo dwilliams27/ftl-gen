@@ -5,24 +5,25 @@ from pathlib import Path
 
 from PIL import Image
 
+from ftl_gen.constants import (
+    DRONE_FRAME_COUNT,
+    DRONE_FRAME_HEIGHT,
+    DRONE_FRAME_WIDTH,
+    WEAPON_FRAME_COUNT,
+    WEAPON_FRAME_HEIGHT,
+    WEAPON_FRAME_WIDTH,
+)
+
 
 class SpriteProcessor:
     """Process images into FTL-compatible sprite sheets."""
 
-    # FTL weapon sprite dimensions (per frame)
-    # Vanilla weapons: 16x60 frames, weapon points UP
-    FRAME_WIDTH = 16
-    FRAME_HEIGHT = 60
-    FRAME_COUNT = 12
-
-    # FTL drone sprite dimensions (per frame)
-    # Vanilla drones: 50x20 frames, 4 frames, drone faces right
-    DRONE_FRAME_WIDTH = 50
-    DRONE_FRAME_HEIGHT = 20
-    DRONE_FRAME_COUNT = 4
-
-    def __init__(self):
-        pass
+    FRAME_WIDTH = WEAPON_FRAME_WIDTH
+    FRAME_HEIGHT = WEAPON_FRAME_HEIGHT
+    FRAME_COUNT = WEAPON_FRAME_COUNT
+    DRONE_FRAME_WIDTH = DRONE_FRAME_WIDTH
+    DRONE_FRAME_HEIGHT = DRONE_FRAME_HEIGHT
+    DRONE_FRAME_COUNT = DRONE_FRAME_COUNT
 
     def create_weapon_sprite_sheet(
         self,
@@ -370,21 +371,6 @@ class SpriteProcessor:
         # Blend with original
         return Image.blend(image, glow, intensity)
 
-    def pixelate(self, image_data: bytes, pixel_size: int = 4) -> bytes:
-        """Apply pixelation effect to make image look more like pixel art."""
-        image = Image.open(BytesIO(image_data)).convert("RGBA")
-
-        # Downscale then upscale for pixelation effect
-        small_width = max(1, image.width // pixel_size)
-        small_height = max(1, image.height // pixel_size)
-
-        small = image.resize((small_width, small_height), Image.Resampling.NEAREST)
-        pixelated = small.resize(image.size, Image.Resampling.NEAREST)
-
-        buffer = BytesIO()
-        pixelated.save(buffer, format="PNG")
-        return buffer.getvalue()
-
     def save_sprite_sheet(
         self,
         image_data: bytes,
@@ -434,25 +420,35 @@ class SpriteProcessor:
         return buffer.getvalue()
 
     def _create_placeholder_frame(self, frame_index: int) -> Image.Image:
-        """Create a single placeholder frame."""
+        """Create a single placeholder frame.
+
+        FTL weapon sprites are 16x60 (narrow, tall) with weapon pointing UP.
+        """
         frame = Image.new("RGBA", (self.FRAME_WIDTH, self.FRAME_HEIGHT), (0, 0, 0, 0))
         pixels = frame.load()
 
-        # Brightness varies by frame
+        # Brightness varies by frame (animation effect)
         brightness = 80 + (frame_index * 10) % 60
 
-        # Draw simple horizontal weapon shape (pointing right)
-        # Frame is 55x28, weapon centered vertically
-        center_y = self.FRAME_HEIGHT // 2
+        # Draw vertical weapon shape (pointing up)
+        # Frame is 16x60 - weapon centered horizontally
+        center_x = self.FRAME_WIDTH // 2  # 8
+
         for y in range(self.FRAME_HEIGHT):
             for x in range(self.FRAME_WIDTH):
-                # Main body (horizontal bar in center)
-                if center_y - 4 < y < center_y + 4:
-                    if 5 < x < 45:
+                # Main body (vertical bar in center, from y=10 to y=55)
+                if 10 < y < 55:
+                    if center_x - 3 < x < center_x + 3:  # 5-10 range
                         pixels[x, y] = (brightness, brightness, brightness + 20, 255)
-                # Barrel tip (pointing right)
-                if center_y - 2 < y < center_y + 2:
-                    if x >= 40:
-                        pixels[x, y] = (brightness - 20, brightness - 20, brightness, 255)
+
+                # Barrel tip (pointing up, at top of frame)
+                if y <= 15:
+                    if center_x - 2 < x < center_x + 2:  # 6-9 range
+                        pixels[x, y] = (brightness + 40, brightness + 20, brightness, 255)
+
+                # Handle/grip (wider at bottom)
+                if y > 50:
+                    if center_x - 4 < x < center_x + 4:  # 4-11 range
+                        pixels[x, y] = (brightness - 20, brightness - 20, brightness - 10, 255)
 
         return frame

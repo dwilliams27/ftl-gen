@@ -136,32 +136,6 @@ class TestModBuilder:
         assert builder._sanitize_name("Test:Mod") == "TestMod"
         assert builder._sanitize_name("Test<Mod>") == "TestMod"
 
-    def test_build_from_files(self, temp_output):
-        builder = ModBuilder(temp_output)
-
-        blueprints_xml = """<FTL>
-<weaponBlueprint name="SIMPLE_LASER">
-    <type>LASER</type>
-    <title>Simple Laser</title>
-    <desc>A simple weapon</desc>
-    <damage>1</damage>
-    <shots>1</shots>
-    <cooldown>10</cooldown>
-    <power>1</power>
-    <cost>30</cost>
-</weaponBlueprint>
-</FTL>"""
-
-        ftl_path = builder.build_from_files(
-            mod_name="SimpleMod",
-            blueprints_xml=blueprints_xml,
-        )
-
-        assert ftl_path.exists()
-        with zipfile.ZipFile(ftl_path, "r") as zf:
-            names = zf.namelist()
-            assert any("blueprints.xml.append" in n for n in names)
-
     def test_overwrites_existing_mod(self, temp_output, sample_content):
         builder = ModBuilder(temp_output)
 

@@ -1,9 +1,9 @@
 """Balance validation for FTL mod content."""
 
-import json
 from dataclasses import dataclass, field
-from pathlib import Path
 
+from ftl_gen.constants import BALANCE_RANGES
+from ftl_gen.data.loader import load_vanilla_reference
 from ftl_gen.xml.schemas import WeaponBlueprint
 
 
@@ -35,27 +35,19 @@ class BalanceResult:
 class BalanceValidator:
     """Validates mod content against balance constraints."""
 
-    # Vanilla reference ranges
-    DAMAGE_RANGE = (0, 10)
-    COOLDOWN_RANGE = (1, 30)
-    POWER_RANGE = (0, 5)
-    COST_RANGE = (10, 200)
-    SHOTS_RANGE = (1, 10)
+    DAMAGE_RANGE = BALANCE_RANGES["weapon"]["damage"]
+    COOLDOWN_RANGE = BALANCE_RANGES["weapon"]["cooldown"]
+    POWER_RANGE = BALANCE_RANGES["weapon"]["power"]
+    COST_RANGE = BALANCE_RANGES["weapon"]["cost"]
+    SHOTS_RANGE = BALANCE_RANGES["weapon"]["shots"]
 
-    # Balance thresholds
-    MAX_DPS_THRESHOLD = 1.5  # Max damage per second per power
-    MAX_EFFICIENCY = 3.0  # Max damage per power
+    # Max damage per second per power before flagging as OP
+    MAX_DPS_THRESHOLD = 1.5
+    # Max total damage per power bar before flagging as OP
+    MAX_EFFICIENCY = 3.0
 
     def __init__(self):
-        self._vanilla_data = self._load_vanilla_reference()
-
-    def _load_vanilla_reference(self) -> dict:
-        """Load vanilla reference data."""
-        ref_path = Path(__file__).parent.parent / "data" / "vanilla_reference.json"
-        if ref_path.exists():
-            with open(ref_path) as f:
-                return json.load(f)
-        return {}
+        self._vanilla_data = load_vanilla_reference()
 
     def validate_weapon(self, weapon: WeaponBlueprint) -> BalanceResult:
         """Validate a weapon against balance constraints."""

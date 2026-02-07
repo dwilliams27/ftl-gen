@@ -2,6 +2,16 @@
 
 from lxml import etree
 
+from ftl_gen.constants import (
+    DRONE_FRAME_COUNT,
+    DRONE_FRAME_HEIGHT,
+    DRONE_FRAME_WIDTH,
+    VANILLA_DRONE_IMAGES,
+    VANILLA_WEAPON_ASSETS,
+    WEAPON_FRAME_COUNT,
+    WEAPON_FRAME_HEIGHT,
+    WEAPON_FRAME_WIDTH,
+)
 from ftl_gen.xml.schemas import (
     AugmentBlueprint,
     CrewBlueprint,
@@ -32,52 +42,7 @@ class XMLBuilder:
             elem.text = str(text)
         return elem
 
-    # Vanilla FTL assets by weapon type
-    WEAPON_ASSETS = {
-        "LASER": {
-            "image": "laser_light1",
-            "weaponArt": "laser_burst_1",
-            "launch": ["lightLaser1", "lightLaser2", "lightLaser3"],
-            "hitShip": ["hitHull1", "hitHull2", "hitHull3"],
-            "hitShield": ["hitShield1", "hitShield2", "hitShield3"],
-        },
-        "BURST": {
-            "image": "laser_burst1",
-            "weaponArt": "laser_burst_2",
-            "launch": ["lightLaser1", "lightLaser2", "lightLaser3"],
-            "hitShip": ["hitHull1", "hitHull2", "hitHull3"],
-            "hitShield": ["hitShield1", "hitShield2", "hitShield3"],
-        },
-        "ION": {
-            "image": "intruder_ion",
-            "weaponArt": "ion_1",
-            "launch": ["ionShoot1", "ionShoot2", "ionShoot3"],
-            "hitShip": ["intruder_ionHit"],
-            "hitShield": ["intruder_ionHit"],
-        },
-        "BEAM": {
-            "image": "beam_contact",
-            "weaponArt": "beam_1",
-            "launch": ["beam1"],
-            "hitShip": [],
-            "hitShield": [],
-        },
-        "MISSILES": {
-            "image": "missile_2",
-            "weaponArt": "missiles_2",
-            "launch": ["missileLaunch"],
-            "hitShip": ["explosion2", "explosion3", "explosion1"],
-            "hitShield": [],
-            "miss": ["miss"],
-        },
-        "BOMB": {
-            "image": "bomb_1",
-            "weaponArt": "bomb_1",
-            "launch": ["bombTeleport"],
-            "hitShip": ["smallExplosion"],
-            "hitShield": [],
-        },
-    }
+    WEAPON_ASSETS = VANILLA_WEAPON_ASSETS
 
     def build_weapon(self, weapon: WeaponBlueprint) -> etree._Element:
         """Build weaponBlueprint XML element."""
@@ -188,16 +153,7 @@ class XMLBuilder:
 
         return bp
 
-    # Default vanilla drone images by type
-    DRONE_IMAGES = {
-        "COMBAT": "drone_player_combat",
-        "DEFENSE": "drone_player_defensive",
-        "SHIP_REPAIR": "drone_repair_ship",
-        "BOARDER": "drone_boarder",
-        "REPAIR": "drone_repair",
-        "BATTLE": "drone_player_battle",
-        "HACKING": "drone_hacking",
-    }
+    DRONE_IMAGES = VANILLA_DRONE_IMAGES
 
     def build_drone(self, drone: DroneBlueprint) -> etree._Element:
         """Build droneBlueprint XML element."""
@@ -443,8 +399,13 @@ class XMLBuilder:
 
         return ship
 
-    def build_blueprints_append(self, content: ModContent) -> str:
-        """Build blueprints.xml.append content."""
+    def build_blueprints_append(self, content: ModContent, *, test_loadout: bool = False) -> str:
+        """Build blueprints.xml.append content.
+
+        Args:
+            content: Mod content to build XML for
+            test_loadout: If True, add a modified Kestrel loadout with the first weapon for testing
+        """
         root = self._create_root()
 
         # Weapons
@@ -464,7 +425,7 @@ class XMLBuilder:
             root.append(self.build_crew(crew))
 
         # Add Kestrel loadout modification for testing (first weapon)
-        if content.weapons:
+        if test_loadout and content.weapons:
             root.append(self.build_kestrel_loadout(content.weapons[0].name))
 
         return etree.tostring(root, pretty_print=True, encoding="unicode", xml_declaration=False)
@@ -484,48 +445,31 @@ class XMLBuilder:
 
         return etree.tostring(root, pretty_print=True, encoding="unicode", xml_declaration=False)
 
-    # FTL weapon sprite frame dimensions (must match sprites.py)
-    # Vanilla: 16x60 frames, weapon points UP
-    FRAME_WIDTH = 16
-    FRAME_HEIGHT = 60
-    FRAME_COUNT = 12
-
-    # FTL drone sprite frame dimensions (must match sprites.py)
-    # Vanilla: 50x20 frames, 4 frames, drone faces right
-    DRONE_FRAME_WIDTH = 50
-    DRONE_FRAME_HEIGHT = 20
-    DRONE_FRAME_COUNT = 4
-
     def build_animations_append(self, weapon_names: list[str]) -> str:
         """Build animations.xml.append for weapon sprites."""
         root = self._create_root()
 
-        # Calculate sheet dimensions
-        sheet_width = self.FRAME_WIDTH * self.FRAME_COUNT  # 660
-        sheet_height = self.FRAME_HEIGHT  # 28
+        sheet_width = WEAPON_FRAME_WIDTH * WEAPON_FRAME_COUNT
+        sheet_height = WEAPON_FRAME_HEIGHT
 
         for name in weapon_names:
             name_lower = name.lower()
 
-            # Animation sheet
             sheet = etree.SubElement(
                 root, "animSheet",
                 name=name_lower,
                 w=str(sheet_width), h=str(sheet_height),
-                fw=str(self.FRAME_WIDTH), fh=str(self.FRAME_HEIGHT)
+                fw=str(WEAPON_FRAME_WIDTH), fh=str(WEAPON_FRAME_HEIGHT)
             )
             sheet.text = f"weapons/{name_lower}_strip12.png"
 
-            # Weapon animation
             anim = etree.SubElement(root, "weaponAnim", name=name_lower)
             self._add_element(anim, "sheet", name_lower)
             etree.SubElement(anim, "desc", length="12", x="0", y="0")
             self._add_element(anim, "chargedFrame", "5")
             self._add_element(anim, "fireFrame", "7")
-            # firePoint: where projectiles spawn (right edge, vertically centered)
-            etree.SubElement(anim, "firePoint", x=str(self.FRAME_WIDTH - 5), y=str(self.FRAME_HEIGHT // 2))
-            # mountPoint: where weapon attaches to ship (left edge, vertically centered)
-            etree.SubElement(anim, "mountPoint", x="0", y=str(self.FRAME_HEIGHT // 2))
+            etree.SubElement(anim, "firePoint", x=str(WEAPON_FRAME_WIDTH - 5), y=str(WEAPON_FRAME_HEIGHT // 2))
+            etree.SubElement(anim, "mountPoint", x="0", y=str(WEAPON_FRAME_HEIGHT // 2))
 
         return etree.tostring(root, pretty_print=True, encoding="unicode", xml_declaration=False)
 
@@ -533,23 +477,20 @@ class XMLBuilder:
         """Build animations.xml.append for drone sprites."""
         root = self._create_root()
 
-        # Calculate sheet dimensions
-        sheet_width = self.DRONE_FRAME_WIDTH * self.DRONE_FRAME_COUNT  # 200
-        sheet_height = self.DRONE_FRAME_HEIGHT  # 20
+        sheet_width = DRONE_FRAME_WIDTH * DRONE_FRAME_COUNT
+        sheet_height = DRONE_FRAME_HEIGHT
 
         for name in drone_names:
             name_lower = name.lower()
 
-            # Animation sheet
             sheet = etree.SubElement(
                 root, "animSheet",
                 name=name_lower,
                 w=str(sheet_width), h=str(sheet_height),
-                fw=str(self.DRONE_FRAME_WIDTH), fh=str(self.DRONE_FRAME_HEIGHT)
+                fw=str(DRONE_FRAME_WIDTH), fh=str(DRONE_FRAME_HEIGHT)
             )
             sheet.text = f"drones/{name_lower}_sheet.png"
 
-            # Drone animation
             anim = etree.SubElement(root, "anim", name=name_lower)
             self._add_element(anim, "sheet", name_lower)
             etree.SubElement(anim, "desc", length="4", x="0", y="0")

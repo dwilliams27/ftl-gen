@@ -39,24 +39,6 @@ Make the weapon BIG - it should dominate the frame, not be a small icon.
 Output a single weapon image, not a sprite sheet or animation."""
 
 
-def weapon_sprite_prompt_simple(weapon_type: str, theme: str) -> str:
-    """Simplified prompt for weapon sprite based on type and theme."""
-    return f"""Create a pixel art {weapon_type.lower()} weapon sprite for a spaceship game.
-
-Theme: {theme}
-
-CRITICAL REQUIREMENTS:
-- BACKGROUND: Solid bright green (#00FF00) - like a green screen
-- ORIENTATION: Weapon should be HORIZONTAL, pointing RIGHT (like a side-view turret)
-- SIZE: Weapon must be LARGE and fill 90-95% of the image. No small centered objects - the weapon should nearly touch the edges.
-- STYLE: Clean pixel art, 2-4 colors max, no gradients, retro game style
-- EDGES: Sharp edges, no anti-aliasing or blur into background
-
-This is a spaceship-mounted weapon shown from the side. The barrel/emitter points to the RIGHT.
-Make the weapon BIG - it should dominate the frame, not be a small icon.
-Output a single weapon image, not a sprite sheet or animation."""
-
-
 def drone_sprite_prompt(
     drone_name: str,
     drone_type: str,
@@ -92,18 +74,3 @@ Make the drone BIG - it should nearly fill the frame horizontally.
 Output a single drone image, not a sprite sheet or animation."""
 
 
-def crew_sprite_prompt(race_name: str, description: str) -> str:
-    """Generate prompt for crew race sprite."""
-    return f"""Create a pixel art character sprite for a sci-fi spaceship game crew member.
-
-Race: {race_name}
-Description: {description}
-
-Requirements:
-- Pixel art style, approximately 32x32 pixels
-- Front-facing view of the character
-- Simple, readable design with clear silhouette
-- 3-4 colors maximum
-- Should be distinct from human crew
-
-Style reference: FTL: Faster Than Light crew sprites - simple, iconic pixel art characters."""

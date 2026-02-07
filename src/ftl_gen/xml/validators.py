@@ -5,6 +5,9 @@ from pathlib import Path
 
 from lxml import etree
 
+from ftl_gen.constants import DRONE_TYPES as _DRONE_TYPES
+from ftl_gen.constants import WEAPON_TYPES as _WEAPON_TYPES
+
 
 @dataclass
 class ValidationResult:
@@ -27,9 +30,8 @@ class XMLValidator:
     DRONE_REQUIRED = {"type", "title", "desc", "power", "cost"}
     EVENT_REQUIRED = {"text"}
 
-    # Valid weapon types
-    WEAPON_TYPES = {"LASER", "MISSILES", "BEAM", "BOMB", "BURST", "ION"}
-    DRONE_TYPES = {"COMBAT", "DEFENSE", "SHIP_REPAIR", "BOARDER", "REPAIR", "BATTLE", "HACKING"}
+    WEAPON_TYPES = _WEAPON_TYPES
+    DRONE_TYPES = _DRONE_TYPES
 
     def validate_xml_string(self, xml_str: str) -> ValidationResult:
         """Validate an XML string for basic syntax."""
@@ -48,7 +50,11 @@ class XMLValidator:
         return ValidationResult(valid=True, errors=errors, warnings=warnings)
 
     def validate_weapon_blueprint(self, elem: etree._Element) -> ValidationResult:
-        """Validate a weaponBlueprint element."""
+        """Validate a weaponBlueprint element for structural correctness.
+
+        Range checking is handled by Pydantic schemas (WeaponBlueprint).
+        This validates XML structure: required elements, valid types, parseable numbers.
+        """
         errors = []
         warnings = []
 
@@ -69,33 +75,14 @@ class XMLValidator:
         if type_elem is not None and type_elem.text not in self.WEAPON_TYPES:
             errors.append(f"Weapon '{name}' has invalid type: {type_elem.text}")
 
-        # Check numeric ranges
-        damage_elem = elem.find("damage")
-        if damage_elem is not None:
-            try:
-                damage = int(damage_elem.text)
-                if damage < 0 or damage > 10:
-                    warnings.append(f"Weapon '{name}' damage {damage} outside typical range 0-10")
-            except (ValueError, TypeError):
-                errors.append(f"Weapon '{name}' has non-numeric damage value")
-
-        cooldown_elem = elem.find("cooldown")
-        if cooldown_elem is not None:
-            try:
-                cooldown = float(cooldown_elem.text)
-                if cooldown < 1 or cooldown > 30:
-                    warnings.append(f"Weapon '{name}' cooldown {cooldown} outside typical range 1-30")
-            except (ValueError, TypeError):
-                errors.append(f"Weapon '{name}' has non-numeric cooldown value")
-
-        power_elem = elem.find("power")
-        if power_elem is not None:
-            try:
-                power = int(power_elem.text)
-                if power < 0 or power > 5:
-                    warnings.append(f"Weapon '{name}' power {power} outside typical range 0-5")
-            except (ValueError, TypeError):
-                errors.append(f"Weapon '{name}' has non-numeric power value")
+        # Check numeric fields are parseable (range validation is in Pydantic)
+        for field, parser in [("damage", int), ("cooldown", float), ("power", int)]:
+            elem_val = elem.find(field)
+            if elem_val is not None:
+                try:
+                    parser(elem_val.text)
+                except (ValueError, TypeError):
+                    errors.append(f"Weapon '{name}' has non-numeric {field} value")
 
         return ValidationResult(valid=len(errors) == 0, errors=errors, warnings=warnings)
 

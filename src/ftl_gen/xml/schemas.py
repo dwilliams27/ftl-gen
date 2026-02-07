@@ -5,16 +5,33 @@ from typing import Literal
 from pydantic import BaseModel, Field, field_validator
 
 
-class WeaponBlueprint(BaseModel):
+class BlueprintBase(BaseModel):
+    """Base class for FTL blueprints with shared fields."""
+
+    name: str = Field(..., description="Blueprint identifier")
+    title: str = Field(..., description="Display name")
+    desc: str = Field(..., description="Description text")
+    cost: int = Field(..., description="Scrap cost")
+    rarity: int = Field(default=2, ge=0, le=5, description="Rarity (higher = rarer)")
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        """Ensure name is UPPERCASE_WITH_UNDERSCORES."""
+        if not v.isupper() or " " in v:
+            return v.upper().replace(" ", "_").replace("-", "_")
+        return v
+
+    model_config = {"populate_by_name": True}
+
+
+class WeaponBlueprint(BlueprintBase):
     """Blueprint for an FTL weapon."""
 
-    name: str = Field(..., description="UPPERCASE_WITH_UNDERSCORES identifier")
     type: Literal["LASER", "MISSILES", "BEAM", "BOMB", "BURST", "ION"] = Field(
         ..., description="Weapon type"
     )
-    title: str = Field(..., description="Display name shown to player")
     short: str | None = Field(None, description="Short name for UI")
-    desc: str = Field(..., description="Weapon description")
     tooltip: str | None = Field(None, description="Additional tooltip text")
 
     # Combat stats
@@ -55,38 +72,23 @@ class WeaponBlueprint(BaseModel):
     # Resources
     power: int = Field(..., ge=1, le=5, description="Power bars required")
     cost: int = Field(..., ge=10, le=200, description="Scrap cost in stores")
-    rarity: int = Field(default=2, ge=0, le=5, description="Rarity (higher = rarer)")
 
     # Visual
     image: str | None = Field(None, description="Sprite image path")
     weapon_art: str | None = Field(None, alias="weaponArt", description="Weapon art name")
 
-    @field_validator("name")
-    @classmethod
-    def validate_name(cls, v: str) -> str:
-        """Ensure name is uppercase with underscores."""
-        if not v.isupper() or " " in v:
-            return v.upper().replace(" ", "_").replace("-", "_")
-        return v
 
-    model_config = {"populate_by_name": True}
-
-
-class DroneBlueprint(BaseModel):
+class DroneBlueprint(BlueprintBase):
     """Blueprint for an FTL drone."""
 
-    name: str = Field(..., description="UPPERCASE_WITH_UNDERSCORES identifier")
     type: Literal[
         "COMBAT", "DEFENSE", "SHIP_REPAIR", "BOARDER", "REPAIR", "BATTLE", "HACKING"
     ] = Field(..., description="Drone type")
-    title: str = Field(..., description="Display name")
     short: str | None = Field(None, description="Short name for UI")
-    desc: str = Field(..., description="Drone description")
 
     # Stats
     power: int = Field(..., ge=1, le=4, description="Power required")
     cost: int = Field(..., ge=10, le=150, description="Scrap cost")
-    rarity: int = Field(default=2, ge=0, le=5, description="Rarity")
 
     # Combat drones
     cooldown: float | None = Field(None, ge=1, le=30, description="Attack cooldown")
@@ -95,44 +97,17 @@ class DroneBlueprint(BaseModel):
     # Visual (set by sprite generator)
     drone_image: str | None = Field(None, description="Drone image/animation name")
 
-    @field_validator("name")
-    @classmethod
-    def validate_name(cls, v: str) -> str:
-        if not v.isupper() or " " in v:
-            return v.upper().replace(" ", "_").replace("-", "_")
-        return v
 
-    model_config = {"populate_by_name": True}
-
-
-class AugmentBlueprint(BaseModel):
+class AugmentBlueprint(BlueprintBase):
     """Blueprint for an FTL augment."""
 
-    name: str = Field(..., description="UPPERCASE_WITH_UNDERSCORES identifier")
-    title: str = Field(..., description="Display name")
-    desc: str = Field(..., description="Augment description")
     cost: int = Field(..., ge=10, le=100, description="Scrap cost")
-    rarity: int = Field(default=2, ge=0, le=5, description="Rarity")
     stackable: bool = Field(default=False, description="Can have multiple")
     value: float | None = Field(None, description="Effect magnitude")
 
-    @field_validator("name")
-    @classmethod
-    def validate_name(cls, v: str) -> str:
-        if not v.isupper() or " " in v:
-            return v.upper().replace(" ", "_").replace("-", "_")
-        return v
 
-    model_config = {"populate_by_name": True}
-
-
-class CrewBlueprint(BaseModel):
+class CrewBlueprint(BlueprintBase):
     """Blueprint for a custom crew race."""
-
-    name: str = Field(..., description="lowercase identifier")
-    title: str = Field(..., description="Display name")
-    short: str | None = Field(None, description="Short name")
-    desc: str = Field(..., description="Race description")
 
     # Stats (0-200, 100 is human baseline)
     max_health: int = Field(default=100, ge=25, le=200, alias="maxHealth")
@@ -154,14 +129,14 @@ class CrewBlueprint(BaseModel):
     provide_power: bool = Field(default=False, alias="providePower")
     clone_speed_modifier: float = Field(default=1.0, ge=0.5, le=2.0, alias="cloneSpeedModifier")
 
+    short: str | None = Field(None, description="Short name")
     cost: int = Field(default=50, ge=20, le=100, description="Scrap cost to hire")
 
     @field_validator("name")
     @classmethod
     def validate_name(cls, v: str) -> str:
+        """Crew names are lowercase."""
         return v.lower().replace(" ", "_").replace("-", "_")
-
-    model_config = {"populate_by_name": True}
 
 
 class EventOutcome(BaseModel):
@@ -247,17 +222,15 @@ class ShipRoom(BaseModel):
     system: str | None = Field(None, description="System installed in room")
 
 
-class ShipBlueprint(BaseModel):
+class ShipBlueprint(BlueprintBase):
     """Blueprint for an FTL ship."""
 
-    name: str = Field(..., description="UPPERCASE_WITH_UNDERSCORES identifier")
     layout: str = Field(..., description="Layout file name")
     img: str = Field(..., description="Ship image name")
 
     # Display
     class_name: str = Field(..., alias="class", description="Ship class name")
     ship_name: str = Field(..., alias="name_", description="Default ship name")
-    desc: str = Field(..., description="Ship description")
     unlock: str | None = Field(None, description="Unlock achievement text")
 
     # Systems (level 0 = not present, 1+ = installed level)
@@ -291,18 +264,10 @@ class ShipBlueprint(BaseModel):
     # Starting crew
     crew: list[str] = Field(default_factory=list, description="List of crew races")
 
-    # Resources
+    # Resources (override base cost since ships don't use scrap cost the same way)
+    cost: int = Field(default=0, ge=0, description="Ship cost")
     missiles: int = Field(default=8, ge=0, le=50)
     drone_parts: int = Field(default=2, ge=0, le=50, alias="droneParts")
-
-    @field_validator("name")
-    @classmethod
-    def validate_name(cls, v: str) -> str:
-        if not v.isupper() or " " in v:
-            return v.upper().replace(" ", "_").replace("-", "_")
-        return v
-
-    model_config = {"populate_by_name": True}
 
 
 class ModMetadata(BaseModel):

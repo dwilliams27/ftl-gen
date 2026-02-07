@@ -1,18 +1,19 @@
 """Prompt templates for FTL mod generation."""
 
 import json
-from pathlib import Path
 
-# Load vanilla reference data
-_vanilla_data_path = Path(__file__).parent.parent / "data" / "vanilla_reference.json"
-if _vanilla_data_path.exists():
-    with open(_vanilla_data_path) as f:
-        VANILLA_REFERENCE = json.load(f)
-else:
-    VANILLA_REFERENCE = {}
+from ftl_gen.constants import BALANCE_RANGES
+from ftl_gen.data.loader import load_vanilla_reference
 
+VANILLA_REFERENCE = load_vanilla_reference()
 
-SYSTEM_PROMPT = """You are an expert FTL: Faster Than Light mod creator. You have deep knowledge of:
+# Generate range text from BALANCE_RANGES so prompts always match schemas
+_wr = BALANCE_RANGES["weapon"]
+_dr = BALANCE_RANGES["drone"]
+_ar = BALANCE_RANGES["augment"]
+_cr = BALANCE_RANGES["crew"]
+
+SYSTEM_PROMPT = f"""You are an expert FTL: Faster Than Light mod creator. You have deep knowledge of:
 - FTL game mechanics, balance, and XML modding structure
 - Creating engaging events with meaningful choices
 - Designing weapons that are balanced yet interesting
@@ -26,7 +27,7 @@ When creating mod content:
 5. Keep descriptions concise but evocative
 
 Reference vanilla balance:
-- Weapons: 1-5 power, 10-200 scrap cost, 8-25 second cooldown
+- Weapons: {_wr["power"][0]}-{_wr["power"][1]} power, {_wr["cost"][0]}-{_wr["cost"][1]} scrap cost, 8-25 second cooldown
 - Most weapons deal 1-3 damage per shot
 - Higher damage weapons have longer cooldowns and higher power costs
 - Rare/powerful weapons have rarity 4-5, common ones have rarity 0-2"""
@@ -100,24 +101,24 @@ For each weapon, generate a complete blueprint with:
 - type: One of LASER, BEAM, MISSILES, BOMB, ION, BURST
 - title: Display name (e.g., "Plasma Burst Laser")
 - desc: 1-2 sentence description for the player (SEE DESCRIPTION RULES BELOW)
-- damage: 0-10 (most weapons: 1-3)
-- shots: 1-10 (for LASER/BURST/ION)
-- fireChance: 0-10 (10 = 100% fire chance)
-- breachChance: 0-10 (10 = 100% breach chance)
+- damage: {_wr["damage"][0]}-{_wr["damage"][1]} (most weapons: 1-3)
+- shots: {_wr["shots"][0]}-{_wr["shots"][1]} (for LASER/BURST/ION)
+- fireChance: {_wr["fireChance"][0]}-{_wr["fireChance"][1]} (10 = 100% fire chance)
+- breachChance: {_wr["breachChance"][0]}-{_wr["breachChance"][1]} (10 = 100% breach chance)
 - cooldown: 8-25 seconds (higher damage = longer cooldown)
-- power: 1-5 (most weapons: 1-3)
-- cost: 20-150 scrap (scale with power/usefulness)
-- rarity: 0-5 (0=common, 5=very rare)
+- power: {_wr["power"][0]}-{_wr["power"][1]} (most weapons: 1-3)
+- cost: {_wr["cost"][0]}-{_wr["cost"][1]} scrap (scale with power/usefulness)
+- rarity: {_wr["rarity"][0]}-{_wr["rarity"][1]} (0=common, 5=very rare)
 
 Special fields (include only if relevant):
-- ion: 1-5 (for ION weapons)
-- missiles: 1 (for MISSILES/BOMB)
-- length: 20-60 (for BEAM weapons, in pixels)
-- sp: 1-3 (shield piercing)
-- persDamage: 1-5 (crew damage)
-- sysDamage: 1-3 (bonus system damage)
+- ion: {_wr["ion"][0]}-{_wr["ion"][1]} (for ION weapons)
+- missiles: {_wr["missiles"][0]}-{_wr["missiles"][1]} (for MISSILES/BOMB)
+- length: {_wr["length"][0]}-{_wr["length"][1]} (for BEAM weapons, in pixels)
+- sp: {_wr["sp"][0]}-{_wr["sp"][1]} (shield piercing)
+- persDamage: {_wr["persDamage"][0]}-{_wr["persDamage"][1]} (crew damage)
+- sysDamage: {_wr["sysDamage"][0]}-{_wr["sysDamage"][1]} (bonus system damage)
 - hullBust: true (bonus hull damage)
-- stun: 1-5 (stun duration)
+- stun: {_wr["stun"][0]}-{_wr["stun"][1]} (stun duration)
 - lockdown: true (crystal lockdown)
 
 CRITICAL - DESCRIPTION RULES:
@@ -198,14 +199,14 @@ Generate a complete blueprint with:
 - type: One of LASER, BEAM, MISSILES, BOMB, ION, BURST
 - title: Display name
 - desc: 1-2 sentence player-facing description (SEE RULES BELOW)
-- damage: 0-10
-- shots: 1-10 (for LASER/BURST/ION)
-- fireChance: 0-10
-- breachChance: 0-10
+- damage: {_wr["damage"][0]}-{_wr["damage"][1]}
+- shots: {_wr["shots"][0]}-{_wr["shots"][1]} (for LASER/BURST/ION)
+- fireChance: {_wr["fireChance"][0]}-{_wr["fireChance"][1]}
+- breachChance: {_wr["breachChance"][0]}-{_wr["breachChance"][1]}
 - cooldown: 8-25 seconds
-- power: 1-5
-- cost: 20-150 scrap
-- rarity: 0-5
+- power: {_wr["power"][0]}-{_wr["power"][1]}
+- cost: {_wr["cost"][0]}-{_wr["cost"][1]} scrap
+- rarity: {_wr["rarity"][0]}-{_wr["rarity"][1]}
 
 Include special fields only if relevant to the weapon concept:
 - ion, missiles, length, sp, persDamage, sysDamage, hullBust, stun, lockdown
@@ -284,13 +285,13 @@ For each drone, generate a complete blueprint with:
 - type: One of COMBAT, DEFENSE, SHIP_REPAIR, BOARDER, REPAIR, BATTLE, HACKING
 - title: Display name (e.g., "Plasma Combat Drone")
 - desc: 1-2 sentence description for the player
-- power: 1-4 (power bars required)
-- cost: 30-120 scrap
-- rarity: 0-5 (0=common, 5=very rare)
+- power: {_dr["power"][0]}-{_dr["power"][1]} (power bars required)
+- cost: {_dr["cost"][0]}-{_dr["cost"][1]} scrap
+- rarity: {_dr["rarity"][0]}-{_dr["rarity"][1]} (0=common, 5=very rare)
 
 For COMBAT/BATTLE drones, also include:
-- cooldown: 5-20 (attack cooldown)
-- speed: 10-40 (movement speed)
+- cooldown: {_dr["cooldown"][0]}-{_dr["cooldown"][1]} (attack cooldown)
+- speed: {_dr["speed"][0]}-{_dr["speed"][1]} (movement speed)
 
 Drone type guidelines:
 - COMBAT: Attacks enemy ship systems
@@ -331,8 +332,8 @@ For each augment, generate a complete blueprint with:
 - name: UPPERCASE_WITH_UNDERSCORES (e.g., PLASMA_CAPACITOR)
 - title: Display name (e.g., "Plasma Capacitor")
 - desc: 1-2 sentence description explaining the effect
-- cost: 30-80 scrap
-- rarity: 0-5 (0=common, 5=very rare)
+- cost: {_ar["cost"][0]}-{_ar["cost"][1]} scrap
+- rarity: {_ar["rarity"][0]}-{_ar["rarity"][1]} (0=common, 5=very rare)
 - stackable: true/false (can player have multiple?)
 - value: numeric effect value if applicable (e.g., 0.15 for 15% bonus)
 
@@ -377,15 +378,15 @@ For each crew race, generate a complete blueprint with:
 - name: lowercase_with_underscores (e.g., plasma_being)
 - title: Display name (e.g., "Plasma Being")
 - desc: 2-3 sentence description of the race
-- cost: 35-75 scrap (cost to hire)
+- cost: {_cr["cost"][0]}-{_cr["cost"][1]} scrap (cost to hire)
 
-Stats (100 = human baseline, range 25-200):
-- maxHealth: 50-150 (health points)
-- moveSpeed: 50-150 (movement speed)
-- repairSpeed: 50-150 (system repair speed)
-- damageMultiplier: 0.5-2.0 (combat damage multiplier)
-- fireRepair: 50-150 (fire extinguishing speed)
-- suffocationModifier: 0.0-2.0 (oxygen consumption, 0 = doesn't need oxygen)
+Stats (100 = human baseline, range {_cr["maxHealth"][0]}-{_cr["maxHealth"][1]}):
+- maxHealth: {_cr["maxHealth"][0]}-{_cr["maxHealth"][1]} (health points)
+- moveSpeed: {_cr["moveSpeed"][0]}-{_cr["moveSpeed"][1]} (movement speed)
+- repairSpeed: {_cr["repairSpeed"][0]}-{_cr["repairSpeed"][1]} (system repair speed)
+- damageMultiplier: {_cr["damageMultiplier"][0]}-{_cr["damageMultiplier"][1]} (combat damage multiplier)
+- fireRepair: {_cr["fireRepair"][0]}-{_cr["fireRepair"][1]} (fire extinguishing speed)
+- suffocationModifier: {_cr["suffocationModifier"][0]}-{_cr["suffocationModifier"][1]} (oxygen consumption, 0 = doesn't need oxygen)
 
 Special abilities (true/false):
 - canFight: Can engage in combat (default true)
@@ -416,11 +417,11 @@ Generate a complete blueprint with:
 - type: One of COMBAT, DEFENSE, SHIP_REPAIR, BOARDER, REPAIR, BATTLE, HACKING
 - title: Display name
 - desc: 1-2 sentence player-facing description
-- power: 1-4
-- cost: 30-120 scrap
-- rarity: 0-5
+- power: {_dr["power"][0]}-{_dr["power"][1]}
+- cost: {_dr["cost"][0]}-{_dr["cost"][1]} scrap
+- rarity: {_dr["rarity"][0]}-{_dr["rarity"][1]}
 
-For combat-type drones, include cooldown (5-20) and speed (10-40).
+For combat-type drones, include cooldown ({_dr["cooldown"][0]}-{_dr["cooldown"][1]}) and speed ({_dr["speed"][0]}-{_dr["speed"][1]}).
 
 Return ONLY the drone object as JSON (not wrapped in an array)."""
 
@@ -435,8 +436,8 @@ Generate a complete blueprint with:
 - name: UPPERCASE_WITH_UNDERSCORES
 - title: Display name
 - desc: 1-2 sentence description explaining the effect
-- cost: 30-80 scrap
-- rarity: 0-5
+- cost: {_ar["cost"][0]}-{_ar["cost"][1]} scrap
+- rarity: {_ar["rarity"][0]}-{_ar["rarity"][1]}
 - stackable: true/false
 - value: numeric effect value if applicable
 
@@ -453,15 +454,15 @@ Generate a complete blueprint with:
 - name: lowercase_with_underscores
 - title: Display name
 - desc: 2-3 sentence race description
-- cost: 35-75 scrap
+- cost: {_cr["cost"][0]}-{_cr["cost"][1]} scrap
 
 Stats (100 = human baseline):
-- maxHealth: 50-150
-- moveSpeed: 50-150
-- repairSpeed: 50-150
-- damageMultiplier: 0.5-2.0
-- fireRepair: 50-150
-- suffocationModifier: 0.0-2.0
+- maxHealth: {_cr["maxHealth"][0]}-{_cr["maxHealth"][1]}
+- moveSpeed: {_cr["moveSpeed"][0]}-{_cr["moveSpeed"][1]}
+- repairSpeed: {_cr["repairSpeed"][0]}-{_cr["repairSpeed"][1]}
+- damageMultiplier: {_cr["damageMultiplier"][0]}-{_cr["damageMultiplier"][1]}
+- fireRepair: {_cr["fireRepair"][0]}-{_cr["fireRepair"][1]}
+- suffocationModifier: {_cr["suffocationModifier"][0]}-{_cr["suffocationModifier"][1]}
 
 Abilities (include only non-default values):
 - canFight, canRepair, canMan, canSuffocate, canBurn, providePower

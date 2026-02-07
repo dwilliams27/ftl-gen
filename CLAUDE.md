@@ -18,32 +18,48 @@ Validated and patched into FTL
 
 ```
 src/ftl_gen/
-├── cli.py              # Typer CLI commands
-├── config.py           # Settings, env vars
+├── cli.py              # Typer CLI commands (shared helpers for single-item + validate/patch/run)
+├── config.py           # Settings singleton, env vars, Slipstream discovery
+├── constants.py        # Single source of truth: sprite dims, balance ranges, vanilla assets, type sets
 ├── core/
-│   ├── generator.py    # Main orchestrator (incremental saves)
+│   ├── generator.py    # Main orchestrator (chaos/LLM tracked separately, sprites extracted)
 │   ├── mod_builder.py  # .ftl packaging
 │   └── slipstream.py   # Slipstream integration
+├── chaos/              # Chaos mode - FREE local transforms
+│   ├── randomizer.py   # Stat randomization with seed support
+│   ├── sprites.py      # Sprite mutations + vanilla sprite extraction
+│   └── transforms.py   # Text transforms (word shuffle, zalgo, etc.)
 ├── llm/
 │   ├── client.py       # Claude/OpenAI client
-│   ├── prompts.py      # Generation prompts (constrained for valid mechanics)
-│   └── parsers.py      # JSON parsing + description validation
+│   ├── prompts.py      # Generation prompts (ranges from constants.py)
+│   └── parsers.py      # JSON parsing + description validation (generic _fix/_parse helpers)
 ├── images/
 │   ├── client.py       # Gemini image generation + cost tracking
 │   ├── prompts.py      # Sprite generation prompts (green screen)
 │   └── sprites.py      # Sprite sheets (weapons: 16x60x12, drones: 50x20x4)
 ├── xml/
-│   ├── schemas.py      # Pydantic models
-│   ├── builders.py     # XML generation
-│   └── validators.py   # XML validation
-├── balance/            # Balance constraints
-└── data/               # Vanilla reference data
+│   ├── schemas.py      # Pydantic models (BlueprintBase -> Weapon/Drone/Augment/Crew/Ship)
+│   ├── builders.py     # XML generation (Kestrel test loadout opt-in via --test-loadout)
+│   └── validators.py   # Structural XML validation (range checking in Pydantic)
+├── balance/
+│   └── constraints.py  # Balance validation (ranges from constants.py)
+└── data/
+    ├── loader.py       # Cached vanilla data loader (single load point)
+    └── vanilla_reference.json
 ```
+
+## Architecture decisions
+
+- **Single source of truth**: All balance ranges, sprite dimensions, type sets, and vanilla asset mappings live in `constants.py`. Schemas, prompts, validators, and constraints all import from there.
+- **BlueprintBase**: Shared Pydantic base class for Weapon/Drone/Augment/Crew/Ship blueprints. Eliminates duplicated name/title/desc/cost/rarity fields.
+- **Generic parsers**: `_fix_blueprint_data()` and `_parse_single()`/`_parse_list()` replace 12 near-identical parse functions. Public API preserved as thin wrappers.
+- **Generator decoupling**: Chaos and LLM content tracked in separate lists (no fragile index slicing). Concept expansion skipped when no LLM content requested ($0 for chaos-only).
+- **Test loadout opt-in**: `build_kestrel_loadout()` only included when `--test-loadout` flag is passed (was previously always appended).
 
 ## Key dependencies
 
 - **LLM**: Claude API or OpenAI for content generation
-- **Images**: Google Gemini for weapon sprites
+- **Images**: Google Gemini for weapon and drone sprites
 - **Slipstream**: Java-based mod manager for validation/patching
 - **FTL**: The actual game installation
 
@@ -57,6 +73,7 @@ src/ftl_gen/
 - Slipstream validation and patching
 - Items appear in stores in-game
 - Image caching (`--cache-images`) and cost tracking
+- **Chaos mode** - randomize vanilla game data (FREE, no LLM calls)
 
 ## What's limited
 
@@ -82,6 +99,47 @@ ftl-gen mod "space pirates" -w5 -e3 -d2 -a1 -c0
 # Bad - triggers interactive prompt
 ftl-gen mod "space pirates"
 ```
+
+## Chaos Mode
+
+Chaos mode randomizes ALL vanilla game items (weapons, drones, augments, crew) using FREE local transforms (no LLM calls, $0.00 cost).
+
+```bash
+# Standalone chaos (no new content, just randomized vanilla)
+ftl-gen chaos --level 0.5                    # 50% chaos
+ftl-gen chaos --level 0.8 --seed 12345       # Reproducible chaos
+ftl-gen chaos --level 1.0 --unsafe           # Extreme values allowed
+
+# Chaos + themed LLM content
+ftl-gen mod "pirates" --chaos 0.5 -w2 -e0 -d0 -a0 -c0  # Chaotified vanilla + new pirate weapons
+```
+
+**How it works:**
+- Randomizes stats by ±50% (at chaos=1.0) around original values
+- Type-safe: never changes weapon types (prevents game crashes)
+- Same names override vanilla items when patched
+- Seeded RNG for reproducible results (`--seed`)
+- `--unsafe` removes bounds (10%-500% range by default)
+- `--mutate-sprites` generates chaos-mutated placeholder sprites
+
+**What gets chaotified:**
+| Item | Stats |
+|------|-------|
+| Weapons | damage, cooldown, power, cost, fireChance, breachChance, shots, length, ion |
+| Drones | power, cost, cooldown, speed |
+| Augments | cost, value |
+| Crew | maxHealth, moveSpeed, repairSpeed, damageMultiplier, cost |
+
+**Sprite mutations (--mutate-sprites):**
+| Transform | Effect |
+|-----------|--------|
+| Brightness | ±30% random per sprite |
+| Contrast | ±20% random per sprite |
+| Hue shift | 0-360° random rotation |
+| Saturation | ±40% random |
+| Color invert | 10% chance at high chaos |
+| Posterize | Reduce color depth at high chaos |
+| Noise | Random pixel noise at very high chaos |
 
 ## To be fully successful, this project needs
 

@@ -66,6 +66,8 @@ The generator creates the blueprint XML only. Full ship integration requires Sup
 
 ## Sprites
 
-Weapon sprites are generated via Google Gemini and formatted as 12-frame sprite sheets. These work automatically - weapons will display custom visuals in-game.
+**Weapon sprites** are generated via Google Gemini and formatted as 12-frame sprite sheets (16x60 pixels per frame). These work automatically - weapons will display custom visuals in-game.
 
-Drone, augment, crew, and ship sprites are **not generated** and will use placeholder/vanilla visuals.
+**Drone sprites** are also generated via Gemini as 4-frame sprite sheets (50x20 pixels per frame). Custom drones will display unique visuals in-game.
+
+Augment, crew, and ship sprites are **not generated** and will use placeholder/vanilla visuals.

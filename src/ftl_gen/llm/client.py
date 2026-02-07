@@ -75,10 +75,6 @@ class UsageTracker:
         self.total = self.total + usage
         self.calls += 1
 
-    def reset(self) -> None:
-        self.total = TokenUsage()
-        self.calls = 0
-
 
 class LLMClient:
     """Multi-provider LLM client supporting Claude and OpenAI."""

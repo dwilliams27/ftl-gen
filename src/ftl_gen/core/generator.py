@@ -1,12 +1,12 @@
 """Full mod generation orchestrator."""
 
-import hashlib
 from pathlib import Path
 from typing import Any
 
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
+from ftl_gen.chaos import ChaosConfig, SpriteMutator, randomize_all
 from ftl_gen.config import Settings, get_settings
 from ftl_gen.core.mod_builder import ModBuilder
 from ftl_gen.core.slipstream import SlipstreamManager
@@ -64,6 +64,8 @@ class ModGenerator:
         augments: list[AugmentBlueprint] | None = None,
         crew: list[CrewBlueprint] | None = None,
         sprite_files: dict[str, bytes] | None = None,
+        *,
+        test_loadout: bool = False,
     ) -> Path:
         """Save current progress as a partial mod.
 
@@ -78,7 +80,7 @@ class ModGenerator:
             augments=augments or [],
             crew=crew or [],
         )
-        return self.mod_builder.build(content, sprite_files)
+        return self.mod_builder.build(content, sprite_files, test_loadout=test_loadout)
 
     def generate_mod(
         self,
@@ -91,6 +93,8 @@ class ModGenerator:
         num_crew: int = 0,
         generate_sprites: bool = True,
         use_cached_images: bool = False,
+        chaos_config: ChaosConfig | None = None,
+        test_loadout: bool = False,
     ) -> Path:
         """Generate a complete mod from a theme.
 
@@ -103,121 +107,142 @@ class ModGenerator:
             num_augments: Number of augments to generate
             num_crew: Number of crew races to generate (0 = none)
             generate_sprites: Whether to generate weapon sprites
+            use_cached_images: Whether to use cached sprite images
+            chaos_config: Optional chaos configuration for randomizing vanilla items
+            test_loadout: If True, add a modified Kestrel loadout with the first weapon
 
         Returns:
             Path to generated .ftl file
         """
+        total_llm_content = num_weapons + num_events + num_drones + num_augments + num_crew
+
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             console=console,
         ) as progress:
-            # Step 1: Expand concept
-            task = progress.add_task("Expanding mod concept...", total=None)
-            concept = self._expand_concept(theme)
-            progress.remove_task(task)
+            # Step 0: Apply chaos to vanilla items if configured
+            chaos_weapons: list[WeaponBlueprint] = []
+            chaos_drones: list[DroneBlueprint] = []
+            chaos_augments: list[AugmentBlueprint] = []
+            chaos_crew: list[CrewBlueprint] = []
+
+            if chaos_config:
+                task = progress.add_task("Applying chaos to vanilla items...", total=None)
+                chaos_result = randomize_all(chaos_config)
+                chaos_weapons = chaos_result.weapons
+                chaos_drones = chaos_result.drones
+                chaos_augments = chaos_result.augments
+                chaos_crew = chaos_result.crew
+                progress.remove_task(task)
+                console.print(f"  [magenta]Chaotified {len(chaos_weapons)} weapons, {len(chaos_drones)} drones, {len(chaos_augments)} augments, {len(chaos_crew)} crew[/]")
+                console.print(f"  [dim]Chaos seed: {chaos_result.seed_used}[/]")
+
+            # Step 1: Expand concept (skip if no LLM content requested - saves an LLM call)
+            if total_llm_content > 0:
+                task = progress.add_task("Expanding mod concept...", total=None)
+                concept = self._expand_concept(theme)
+                progress.remove_task(task)
+            else:
+                concept = {}
 
             # Use generated name if not provided
             if not mod_name:
                 mod_name = concept.get("name", "GeneratedMod")
             description = concept.get("description", f"A mod based on: {theme}")
+            if chaos_config:
+                description += f" [Chaos mode: {int(chaos_config.level * 100)}%]"
 
             console.print(f"[bold blue]Generating mod:[/] {mod_name}")
             console.print(f"[dim]{description}[/dim]")
 
-            # Track generated content for incremental saves
-            weapons: list[WeaponBlueprint] = []
-            drones: list[DroneBlueprint] = []
-            augments: list[AugmentBlueprint] = []
-            crew: list[CrewBlueprint] = []
+            # Track LLM-generated content separately from chaos content
+            llm_weapons: list[WeaponBlueprint] = []
+            llm_drones: list[DroneBlueprint] = []
+            llm_augments: list[AugmentBlueprint] = []
+            llm_crew: list[CrewBlueprint] = []
             events: list[EventBlueprint] = []
-            sprite_files: dict[str, bytes] = {}
 
-            # Step 2: Generate weapons
-            task = progress.add_task(f"Generating {num_weapons} weapons...", total=None)
-            weapons = self._generate_weapons(
-                theme, concept.get("weapon_concepts", []), num_weapons
-            )
-            progress.remove_task(task)
-            console.print(f"  [green]Generated {len(weapons)} weapons[/]")
-            self._save_partial(mod_name, description, weapons=weapons)
+            # Step 2: Generate LLM content
+            if num_weapons > 0:
+                task = progress.add_task(f"Generating {num_weapons} weapons...", total=None)
+                llm_weapons = self._generate_weapons(
+                    theme, concept.get("weapon_concepts", []), num_weapons
+                )
+                progress.remove_task(task)
+                console.print(f"  [green]Generated {len(llm_weapons)} new weapons[/]")
 
-            # Step 3: Generate drones
             if num_drones > 0:
                 task = progress.add_task(f"Generating {num_drones} drones...", total=None)
-                drones = self._generate_drones(
+                llm_drones = self._generate_drones(
                     theme, concept.get("drone_concepts", []), num_drones
                 )
                 progress.remove_task(task)
-                console.print(f"  [green]Generated {len(drones)} drones[/]")
-                self._save_partial(mod_name, description, weapons=weapons, drones=drones)
+                console.print(f"  [green]Generated {len(llm_drones)} new drones[/]")
 
-            # Step 4: Generate augments
             if num_augments > 0:
                 task = progress.add_task(f"Generating {num_augments} augments...", total=None)
-                augments = self._generate_augments(
+                llm_augments = self._generate_augments(
                     theme, concept.get("augment_concepts", []), num_augments
                 )
                 progress.remove_task(task)
-                console.print(f"  [green]Generated {len(augments)} augments[/]")
-                self._save_partial(mod_name, description, weapons=weapons, drones=drones, augments=augments)
+                console.print(f"  [green]Generated {len(llm_augments)} new augments[/]")
 
-            # Step 5: Generate crew races
             if num_crew > 0:
                 task = progress.add_task(f"Generating {num_crew} crew race(s)...", total=None)
-                crew = self._generate_crew(
+                llm_crew = self._generate_crew(
                     theme, concept.get("crew_concepts", []), num_crew
                 )
                 progress.remove_task(task)
-                console.print(f"  [green]Generated {len(crew)} crew race(s)[/]")
-                self._save_partial(mod_name, description, weapons=weapons, drones=drones, augments=augments, crew=crew)
+                console.print(f"  [green]Generated {len(llm_crew)} new crew race(s)[/]")
 
-            # Step 6: Generate events
-            task = progress.add_task(f"Generating {num_events} events...", total=None)
-            events = self._generate_events(
-                theme, concept.get("event_concepts", []), num_events
-            )
-            progress.remove_task(task)
-            console.print(f"  [green]Generated {len(events)} events[/]")
-            # Save after events - this is the last content step before sprites
-            self._save_partial(mod_name, description, weapons=weapons, drones=drones, augments=augments, crew=crew, events=events)
-
-            # Step 7: Generate weapon sprites
-            if generate_sprites and weapons:
-                task = progress.add_task("Generating weapon sprites...", total=None)
-                weapon_sprites = self._generate_weapon_sprites(weapons, use_cached_images)
-                sprite_files.update(weapon_sprites)
+            if num_events > 0:
+                task = progress.add_task(f"Generating {num_events} events...", total=None)
+                events = self._generate_events(
+                    theme, concept.get("event_concepts", []), num_events
+                )
                 progress.remove_task(task)
-                console.print(f"  [green]Generated {len(weapon_sprites)} weapon sprites[/]")
+                console.print(f"  [green]Generated {len(events)} events[/]")
 
-                # Link weapon art to sprite animations
-                for weapon in weapons:
-                    weapon.weapon_art = weapon.name.lower()
+            # Combine chaos + LLM content into final lists
+            all_weapons = chaos_weapons + llm_weapons
+            all_drones = chaos_drones + llm_drones
+            all_augments = chaos_augments + llm_augments
+            all_crew = chaos_crew + llm_crew
 
-                # Save with weapon sprites
+            # Checkpoint: save after all content generation, before sprites
+            if total_llm_content > 0:
                 self._save_partial(
-                    mod_name, description, weapons=weapons, drones=drones,
-                    augments=augments, crew=crew, events=events, sprite_files=sprite_files
+                    mod_name, description, weapons=all_weapons, drones=all_drones,
+                    augments=all_augments, crew=all_crew, events=events,
                 )
 
-            # Step 7b: Generate drone sprites
-            if generate_sprites and drones:
-                task = progress.add_task("Generating drone sprites...", total=None)
-                drone_sprites = self._generate_drone_sprites(drones, use_cached_images)
-                sprite_files.update(drone_sprites)
+            # Step 3: Generate sprites (only for LLM-generated items)
+            sprite_files = self._generate_all_sprites(
+                progress, llm_weapons, llm_drones, generate_sprites, use_cached_images
+            )
+
+            # Step 3b: Apply chaos mutations to all generated sprites
+            if chaos_config and sprite_files:
+                task = progress.add_task("Mutating sprites with chaos...", total=None)
+                sprite_mutator = SpriteMutator(chaos_config.level, chaos_config.seed)
+                mutated_count = 0
+                for filename, sprite_data in sprite_files.items():
+                    try:
+                        sprite_files[filename] = sprite_mutator.mutate_sprite(sprite_data)
+                        mutated_count += 1
+                    except Exception as e:
+                        console.print(f"[yellow]Warning: Could not mutate {filename}: {e}[/]")
                 progress.remove_task(task)
-                console.print(f"  [green]Generated {len(drone_sprites)} drone sprites[/]")
+                console.print(f"  [magenta]Mutated {mutated_count} sprites with chaos[/]")
 
-                # Link drone image to sprite animations
-                for drone in drones:
-                    drone.drone_image = drone.name.lower()
-
-            # Step 8: Build final mod with sprites
+            # Step 4: Build final mod package
             task = progress.add_task("Building mod package...", total=None)
             ftl_path = self._save_partial(
                 mod_name, description,
-                weapons=weapons, drones=drones, augments=augments,
-                crew=crew, events=events, sprite_files=sprite_files
+                weapons=all_weapons, drones=all_drones, augments=all_augments,
+                crew=all_crew, events=events, sprite_files=sprite_files,
+                test_loadout=test_loadout,
             )
             progress.remove_task(task)
 
@@ -333,6 +358,44 @@ class ModGenerator:
         prompt = crew_prompt(theme, concepts, count)
         response = self.llm.generate(prompt, system=SYSTEM_PROMPT, max_tokens=4096)
         return parse_crew_races_response(response)
+
+    def _generate_all_sprites(
+        self,
+        progress: Progress,
+        llm_weapons: list[WeaponBlueprint],
+        llm_drones: list[DroneBlueprint],
+        generate_sprites: bool,
+        use_cache: bool,
+    ) -> dict[str, bytes]:
+        """Generate sprites for all LLM-generated weapons and drones.
+
+        Chaos weapons/drones already have sprites in the game so they are skipped.
+        """
+        sprite_files: dict[str, bytes] = {}
+
+        if generate_sprites and llm_weapons:
+            task = progress.add_task("Generating weapon sprites...", total=None)
+            weapon_sprites = self._generate_weapon_sprites(llm_weapons, use_cache)
+            sprite_files.update(weapon_sprites)
+            progress.remove_task(task)
+            console.print(f"  [green]Generated {len(weapon_sprites)} weapon sprites[/]")
+
+            # Link weapon art to sprite animations
+            for weapon in llm_weapons:
+                weapon.weapon_art = weapon.name.lower()
+
+        if generate_sprites and llm_drones:
+            task = progress.add_task("Generating drone sprites...", total=None)
+            drone_sprites = self._generate_drone_sprites(llm_drones, use_cache)
+            sprite_files.update(drone_sprites)
+            progress.remove_task(task)
+            console.print(f"  [green]Generated {len(drone_sprites)} drone sprites[/]")
+
+            # Link drone image to sprite animations
+            for drone in llm_drones:
+                drone.drone_image = drone.name.lower()
+
+        return sprite_files
 
     def _get_cache_dir(self) -> Path:
         """Get the image cache directory."""

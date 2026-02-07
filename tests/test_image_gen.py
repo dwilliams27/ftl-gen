@@ -54,14 +54,6 @@ class TestSpriteProcessor:
         assert result.width == 192
         assert result.height == 60
 
-    def test_pixelate(self, processor, sample_image):
-        pixelated = processor.pixelate(sample_image, pixel_size=4)
-
-        result = Image.open(BytesIO(pixelated))
-        # Dimensions should be preserved
-        assert result.width == 64
-        assert result.height == 240
-
     def test_resize_to_frame(self, processor):
         # Create an oversized image
         img = Image.new("RGBA", (100, 200), (255, 0, 0, 255))

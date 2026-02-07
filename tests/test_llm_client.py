@@ -50,7 +50,9 @@ I hope that helps!"""
         assert len(result["items"]) == 2
 
     def test_invalid_json_raises(self):
-        with pytest.raises(json.JSONDecodeError):
+        from ftl_gen.llm.parsers import LLMResponseError
+
+        with pytest.raises(LLMResponseError):
             extract_json("not json at all")
 
 

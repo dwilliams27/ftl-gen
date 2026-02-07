@@ -20,6 +20,8 @@ class ModBuilder:
         content: ModContent,
         sprite_files: dict[str, bytes] | None = None,
         output_name: str | None = None,
+        *,
+        test_loadout: bool = False,
     ) -> Path:
         """Build a complete mod package.
 
@@ -27,6 +29,7 @@ class ModBuilder:
             content: ModContent with all blueprints
             sprite_files: Dict mapping filenames to PNG data
             output_name: Override mod folder/file name
+            test_loadout: If True, add a modified Kestrel loadout with the first weapon
 
         Returns:
             Path to generated .ftl file
@@ -39,7 +42,7 @@ class ModBuilder:
         self._create_directory_structure(mod_dir)
 
         # Generate XML files
-        self._write_xml_files(mod_dir, content)
+        self._write_xml_files(mod_dir, content, test_loadout=test_loadout)
 
         # Write sprite files if provided
         if sprite_files:
@@ -72,15 +75,16 @@ class ModBuilder:
         (mod_dir / "data").mkdir(parents=True)
         (mod_dir / "img" / "weapons").mkdir(parents=True)
         (mod_dir / "img" / "drones").mkdir(parents=True)
+        (mod_dir / "img" / "ship").mkdir(parents=True)  # For drone sprites in vanilla
         (mod_dir / "mod-appendix").mkdir(parents=True)
 
-    def _write_xml_files(self, mod_dir: Path, content: ModContent) -> None:
+    def _write_xml_files(self, mod_dir: Path, content: ModContent, *, test_loadout: bool = False) -> None:
         """Generate and write XML files."""
         data_dir = mod_dir / "data"
 
         # blueprints.xml.append - weapons, drones, augments, crew
         if content.weapons or content.drones or content.augments or content.crew:
-            blueprints_xml = self.xml_builder.build_blueprints_append(content)
+            blueprints_xml = self.xml_builder.build_blueprints_append(content, test_loadout=test_loadout)
             (data_dir / "blueprints.xml.append").write_text(blueprints_xml)
 
         # events.xml.append - events
@@ -130,16 +134,21 @@ class ModBuilder:
         content: ModContent,
     ) -> None:
         """Write sprite files to img directory."""
-        weapons_dir = mod_dir / "img" / "weapons"
-        drones_dir = mod_dir / "img" / "drones"
+        img_dir = mod_dir / "img"
+        weapons_dir = img_dir / "weapons"
+        drones_dir = img_dir / "drones"
 
         for filename, data in sprite_files.items():
-            # Determine destination based on filename
-            if "_sheet.png" in filename:
-                # Drone sprite
+            # Check if filename includes a path (e.g., "weapons/laser1.png" or "ship/drone.png")
+            if "/" in filename:
+                # Path-based filename - write to img/<path>
+                filepath = img_dir / filename
+                filepath.parent.mkdir(parents=True, exist_ok=True)
+            elif "_sheet.png" in filename:
+                # Drone sprite (legacy naming)
                 filepath = drones_dir / filename
             else:
-                # Weapon sprite
+                # Weapon sprite (legacy naming)
                 filepath = weapons_dir / filename
             filepath.write_bytes(data)
 
@@ -166,49 +175,3 @@ class ModBuilder:
 
         return ftl_path
 
-    def build_from_files(
-        self,
-        mod_name: str,
-        blueprints_xml: str | None = None,
-        events_xml: str | None = None,
-        animations_xml: str | None = None,
-        sprite_files: dict[str, bytes] | None = None,
-        metadata_xml: str | None = None,
-    ) -> Path:
-        """Build a mod from raw XML strings.
-
-        Useful for testing or manual content creation.
-        """
-        mod_dir = self.output_dir / mod_name
-        self._create_directory_structure(mod_dir)
-
-        data_dir = mod_dir / "data"
-
-        if blueprints_xml:
-            (data_dir / "blueprints.xml.append").write_text(blueprints_xml)
-
-        if events_xml:
-            (data_dir / "events.xml.append").write_text(events_xml)
-
-        if animations_xml:
-            (data_dir / "animations.xml.append").write_text(animations_xml)
-
-        if sprite_files:
-            weapons_dir = mod_dir / "img" / "weapons"
-            for filename, data in sprite_files.items():
-                (weapons_dir / filename).write_bytes(data)
-
-        if metadata_xml:
-            (mod_dir / "mod-appendix" / "metadata.xml").write_text(metadata_xml)
-        else:
-            # Create minimal metadata
-            minimal_metadata = f"""<?xml version='1.0' encoding='UTF-8'?>
-<metadata>
-  <title>{mod_name}</title>
-  <author>FTL-Gen</author>
-  <version>1.0.0</version>
-  <description>Generated mod</description>
-</metadata>"""
-            (mod_dir / "mod-appendix" / "metadata.xml").write_text(minimal_metadata)
-
-        return self._package_ftl(mod_dir, mod_name)
