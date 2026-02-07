@@ -1,0 +1,25 @@
+<FTL><animSheet name="prototype_flux_cannon" w="192" h="60" fw="16" fh="60">weapons/prototype_flux_cannon_strip12.png</animSheet>
+  <weaponAnim name="prototype_flux_cannon">
+    <sheet>prototype_flux_cannon</sheet>
+    <desc length="12" x="0" y="0"/>
+    <chargedFrame>5</chargedFrame>
+    <fireFrame>7</fireFrame>
+    <firePoint x="11" y="30"/>
+    <mountPoint x="0" y="30"/>
+  </weaponAnim>
+  <animSheet name="prototype_phase_lance" w="192" h="60" fw="16" fh="60">weapons/prototype_phase_lance_strip12.png</animSheet>
+  <weaponAnim name="prototype_phase_lance">
+    <sheet>prototype_phase_lance</sheet>
+    <desc length="12" x="0" y="0"/>
+    <chargedFrame>5</chargedFrame>
+    <fireFrame>7</fireFrame>
+    <firePoint x="11" y="30"/>
+    <mountPoint x="0" y="30"/>
+  </weaponAnim>
+<animSheet name="prototype_adaptive_drone" w="200" h="20" fw="50" fh="20">drones/prototype_adaptive_drone_sheet.png</animSheet>
+  <anim name="prototype_adaptive_drone">
+    <sheet>prototype_adaptive_drone</sheet>
+    <desc length="4" x="0" y="0"/>
+    <time>0.3</time>
+  </anim>
+</FTL>

@@ -1,5 +1,6 @@
 """Full mod generation orchestrator."""
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -95,6 +96,7 @@ class ModGenerator:
         use_cached_images: bool = False,
         chaos_config: ChaosConfig | None = None,
         test_loadout: bool = False,
+        progress_callback: Callable[..., None] | None = None,
     ) -> Path:
         """Generate a complete mod from a theme.
 
@@ -116,6 +118,10 @@ class ModGenerator:
         """
         total_llm_content = num_weapons + num_events + num_drones + num_augments + num_crew
 
+        def _notify(step: str, status: str, **kwargs):
+            if progress_callback:
+                progress_callback(step, status, **kwargs)
+
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -128,6 +134,7 @@ class ModGenerator:
             chaos_crew: list[CrewBlueprint] = []
 
             if chaos_config:
+                _notify("chaos", "started")
                 task = progress.add_task("Applying chaos to vanilla items...", total=None)
                 chaos_result = randomize_all(chaos_config)
                 chaos_weapons = chaos_result.weapons
@@ -137,12 +144,15 @@ class ModGenerator:
                 progress.remove_task(task)
                 console.print(f"  [magenta]Chaotified {len(chaos_weapons)} weapons, {len(chaos_drones)} drones, {len(chaos_augments)} augments, {len(chaos_crew)} crew[/]")
                 console.print(f"  [dim]Chaos seed: {chaos_result.seed_used}[/]")
+                _notify("chaos", "completed")
 
             # Step 1: Expand concept (skip if no LLM content requested - saves an LLM call)
             if total_llm_content > 0:
+                _notify("concept", "started")
                 task = progress.add_task("Expanding mod concept...", total=None)
                 concept = self._expand_concept(theme)
                 progress.remove_task(task)
+                _notify("concept", "completed")
             else:
                 concept = {}
 
@@ -165,44 +175,54 @@ class ModGenerator:
 
             # Step 2: Generate LLM content
             if num_weapons > 0:
+                _notify("weapons", "started")
                 task = progress.add_task(f"Generating {num_weapons} weapons...", total=None)
                 llm_weapons = self._generate_weapons(
                     theme, concept.get("weapon_concepts", []), num_weapons
                 )
                 progress.remove_task(task)
                 console.print(f"  [green]Generated {len(llm_weapons)} new weapons[/]")
+                _notify("weapons", "completed", items_so_far=len(llm_weapons))
 
             if num_drones > 0:
+                _notify("drones", "started")
                 task = progress.add_task(f"Generating {num_drones} drones...", total=None)
                 llm_drones = self._generate_drones(
                     theme, concept.get("drone_concepts", []), num_drones
                 )
                 progress.remove_task(task)
                 console.print(f"  [green]Generated {len(llm_drones)} new drones[/]")
+                _notify("drones", "completed", items_so_far=len(llm_drones))
 
             if num_augments > 0:
+                _notify("augments", "started")
                 task = progress.add_task(f"Generating {num_augments} augments...", total=None)
                 llm_augments = self._generate_augments(
                     theme, concept.get("augment_concepts", []), num_augments
                 )
                 progress.remove_task(task)
                 console.print(f"  [green]Generated {len(llm_augments)} new augments[/]")
+                _notify("augments", "completed", items_so_far=len(llm_augments))
 
             if num_crew > 0:
+                _notify("crew", "started")
                 task = progress.add_task(f"Generating {num_crew} crew race(s)...", total=None)
                 llm_crew = self._generate_crew(
                     theme, concept.get("crew_concepts", []), num_crew
                 )
                 progress.remove_task(task)
                 console.print(f"  [green]Generated {len(llm_crew)} new crew race(s)[/]")
+                _notify("crew", "completed", items_so_far=len(llm_crew))
 
             if num_events > 0:
+                _notify("events", "started")
                 task = progress.add_task(f"Generating {num_events} events...", total=None)
                 events = self._generate_events(
                     theme, concept.get("event_concepts", []), num_events
                 )
                 progress.remove_task(task)
                 console.print(f"  [green]Generated {len(events)} events[/]")
+                _notify("events", "completed", items_so_far=len(events))
 
             # Combine chaos + LLM content into final lists
             all_weapons = chaos_weapons + llm_weapons
@@ -218,9 +238,11 @@ class ModGenerator:
                 )
 
             # Step 3: Generate sprites (only for LLM-generated items)
+            _notify("sprites", "started")
             sprite_files = self._generate_all_sprites(
                 progress, llm_weapons, llm_drones, generate_sprites, use_cached_images
             )
+            _notify("sprites", "completed")
 
             # Step 3b: Apply chaos mutations to all generated sprites
             if chaos_config and sprite_files:
@@ -237,6 +259,7 @@ class ModGenerator:
                 console.print(f"  [magenta]Mutated {mutated_count} sprites with chaos[/]")
 
             # Step 4: Build final mod package
+            _notify("building", "started")
             task = progress.add_task("Building mod package...", total=None)
             ftl_path = self._save_partial(
                 mod_name, description,
@@ -245,6 +268,7 @@ class ModGenerator:
                 test_loadout=test_loadout,
             )
             progress.remove_task(task)
+            _notify("building", "completed")
 
         console.print(f"\n[bold green]Mod generated:[/] {ftl_path}")
 

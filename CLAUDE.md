@@ -21,8 +21,20 @@ src/ftl_gen/
 ├── cli.py              # Typer CLI commands (shared helpers for single-item + validate/patch/run)
 ├── config.py           # Settings singleton, env vars, Slipstream discovery
 ├── constants.py        # Single source of truth: sprite dims, balance ranges, vanilla assets, type sets
+├── api/                # FastAPI web UI backend
+│   ├── app.py          # FastAPI app factory, static file serving, CORS
+│   ├── deps.py         # Dependency injection (Settings, Slipstream)
+│   ├── models.py       # API request/response Pydantic models
+│   ├── services.py     # ModReader - parses mods from disk/ZIP back into schemas
+│   └── routes/         # API route modules
+│       ├── config.py   # GET /api/v1/config
+│       ├── mods.py     # CRUD for mods (list, detail, delete, download)
+│       ├── sprites.py  # Serve sprite PNGs from mods
+│       ├── generate.py # Mod generation with SSE progress streaming
+│       ├── chaos.py    # Chaos mode endpoints
+│       └── validate.py # Slipstream validation + patching
 ├── core/
-│   ├── generator.py    # Main orchestrator (chaos/LLM tracked separately, sprites extracted)
+│   ├── generator.py    # Main orchestrator (chaos/LLM tracked separately, sprites extracted, progress_callback)
 │   ├── mod_builder.py  # .ftl packaging
 │   └── slipstream.py   # Slipstream integration
 ├── chaos/              # Chaos mode - FREE local transforms
@@ -46,6 +58,16 @@ src/ftl_gen/
 └── data/
     ├── loader.py       # Cached vanilla data loader (single load point)
     └── vanilla_reference.json
+
+ui/                     # React frontend (Vite + TypeScript + Tailwind)
+├── src/
+│   ├── api/            # Typed fetch client + TanStack Query hooks
+│   ├── components/     # Layout (AppShell, Sidebar), mod cards, blueprint cards
+│   ├── pages/          # Dashboard, Mods, ModDetail, Generate, Chaos, Settings
+│   ├── lib/            # TypeScript types, utilities
+│   └── styles/         # Tailwind globals + FTL dark theme
+├── vite.config.ts      # Vite config with API proxy + Tailwind plugin
+└── package.json
 ```
 
 ## Architecture decisions
@@ -55,6 +77,7 @@ src/ftl_gen/
 - **Generic parsers**: `_fix_blueprint_data()` and `_parse_single()`/`_parse_list()` replace 12 near-identical parse functions. Public API preserved as thin wrappers.
 - **Generator decoupling**: Chaos and LLM content tracked in separate lists (no fragile index slicing). Concept expansion skipped when no LLM content requested ($0 for chaos-only).
 - **Test loadout opt-in**: `build_kestrel_loadout()` only included when `--test-loadout` flag is passed (was previously always appended).
+- **Web UI architecture**: FastAPI backend serves React SPA as static files. Single `ftl-gen ui` command. API uses SSE for streaming generation progress. `ModReader` service parses mods from disk/ZIP back into Pydantic models (reverse of `XMLBuilder`). Vite dev server proxies `/api` to FastAPI for hot reload during development.
 
 ## Key dependencies
 
@@ -62,6 +85,8 @@ src/ftl_gen/
 - **Images**: Google Gemini for weapon and drone sprites
 - **Slipstream**: Java-based mod manager for validation/patching
 - **FTL**: The actual game installation
+- **Web UI** (optional `[ui]` extra): FastAPI, uvicorn, sse-starlette
+- **Frontend**: React 18, Vite, TanStack Query, Tailwind CSS, React Router, lucide-react
 
 ## What works
 
@@ -74,6 +99,7 @@ src/ftl_gen/
 - Items appear in stores in-game
 - Image caching (`--cache-images`) and cost tracking
 - **Chaos mode** - randomize vanilla game data (FREE, no LLM calls)
+- **Web UI** - local mod browser, generator, chaos mode, validate/patch/run (http://localhost:8421)
 
 ## What's limited
 
@@ -99,6 +125,27 @@ ftl-gen mod "space pirates" -w5 -e3 -d2 -a1 -c0
 # Bad - triggers interactive prompt
 ftl-gen mod "space pirates"
 ```
+
+## Web UI
+
+```bash
+# Install UI dependencies
+pip install -e ".[ui]"
+cd ui && npm install && npm run build && cd ..
+
+# Start (serves SPA + API on one port)
+ftl-gen ui                    # http://localhost:8421
+ftl-gen ui --dev              # Dev mode (CORS for Vite HMR)
+ftl-gen ui --port 9000        # Custom port
+
+# Development (two terminals)
+ftl-gen ui --dev              # Backend on :8421
+cd ui && npm run dev          # Vite HMR on :5173 (proxies /api → :8421)
+```
+
+**Pages:** Dashboard, Mod Browser, Mod Detail (tabbed: weapons/drones/augments/crew/events/sprites/XML), Generate, Chaos, Settings
+
+**API:** All endpoints at `/api/v1/` — OpenAPI docs at `/api/docs`
 
 ## Chaos Mode
 

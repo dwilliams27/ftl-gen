@@ -44,12 +44,23 @@ class XMLBuilder:
 
     WEAPON_ASSETS = VANILLA_WEAPON_ASSETS
 
+    # Map internal weapon types to actual FTL XML type values.
+    # ION is not a real FTL type - vanilla ION weapons use type=LASER + <ion> tag.
+    # BURST is Flak (needs <projectiles>) - safer to map to LASER.
+    _TYPE_MAP = {
+        "ION": "LASER",
+        "BURST": "LASER",
+    }
+
     def build_weapon(self, weapon: WeaponBlueprint) -> etree._Element:
         """Build weaponBlueprint XML element."""
         bp = etree.Element("weaponBlueprint", name=weapon.name)
 
+        # Map internal type to valid FTL type
+        xml_type = self._TYPE_MAP.get(weapon.type, weapon.type)
+
         # Basic info
-        self._add_element(bp, "type", weapon.type)
+        self._add_element(bp, "type", xml_type)
         self._add_element(bp, "title", weapon.title)
         # Short name is REQUIRED for weapons to display in the weapon bar
         # If not provided, generate from title (max 8 chars)
@@ -71,18 +82,16 @@ class XMLBuilder:
         self._add_element(bp, "damage", str(weapon.damage))
         if weapon.type in ("LASER", "BURST", "ION"):
             self._add_element(bp, "shots", str(weapon.shots))
-        if weapon.sp:
-            self._add_element(bp, "sp", str(weapon.sp))
         if weapon.ion:
             self._add_element(bp, "ion", str(weapon.ion))
+        # Shield pierce - vanilla always includes sp, even if 0
+        self._add_element(bp, "sp", str(weapon.sp or 0))
         if weapon.stun:
             self._add_element(bp, "stun", str(weapon.stun))
 
         # Effects
-        if weapon.fire_chance > 0:
-            self._add_element(bp, "fireChance", str(weapon.fire_chance))
-        if weapon.breach_chance > 0:
-            self._add_element(bp, "breachChance", str(weapon.breach_chance))
+        self._add_element(bp, "fireChance", str(weapon.fire_chance))
+        self._add_element(bp, "breachChance", str(weapon.breach_chance))
         if weapon.hull_bust:
             self._add_element(bp, "hullBust", "true")
         if weapon.lockdown:
@@ -100,13 +109,16 @@ class XMLBuilder:
         if weapon.missiles:
             self._add_element(bp, "missiles", str(weapon.missiles))
 
-        # Bombs and missiles need explosion animation and shots
-        if weapon.type in ("BOMB", "MISSILES"):
+        # Bombs need explosion animation and forced shots=1
+        if weapon.type == "BOMB":
             self._add_element(bp, "shots", "1")
-            if not weapon.sp:  # Only add sp=0 if not already set
-                self._add_element(bp, "sp", "0")
             explosion = weapon.explosion if weapon.explosion else "explosion_random"
             self._add_element(bp, "explosion", explosion)
+
+        # Missiles need shots=1 (unless multi-shot)
+        if weapon.type == "MISSILES":
+            if weapon.shots <= 1:
+                self._add_element(bp, "shots", "1")
 
         # Timing and resources
         # Format cooldown as int if it's a whole number
@@ -119,8 +131,16 @@ class XMLBuilder:
         # Get vanilla assets for this weapon type
         assets = self.WEAPON_ASSETS.get(weapon.type, self.WEAPON_ASSETS["LASER"])
 
+        # Projectile speed (ION and BEAM weapons need this)
+        if "speed" in assets:
+            self._add_element(bp, "speed", str(assets["speed"]))
+
         # Projectile/beam image - always use vanilla assets since custom images don't exist
         self._add_element(bp, "image", assets["image"])
+
+        # ION weapons need explosion animation for hit effect
+        if "explosion" in assets:
+            self._add_element(bp, "explosion", assets["explosion"])
 
         # Weapon art (links to animation for the weapon mount sprite)
         # Only use custom weaponArt if it matches our sprite naming convention (lowercase weapon name)
@@ -129,6 +149,9 @@ class XMLBuilder:
             self._add_element(bp, "weaponArt", weapon.weapon_art)
         else:
             self._add_element(bp, "weaponArt", assets["weaponArt"])
+
+        # Icon image (required for weapon to display properly in stores/UI)
+        self._add_element(bp, "iconImage", assets["iconImage"])
 
         # Sound effects (required for weapon to function properly)
         if assets["launch"]:

@@ -592,6 +592,41 @@ def info():
 
 
 @app.command()
+def ui(
+    port: Annotated[int, typer.Option("--port", "-p", help="Port to serve on")] = 8421,
+    dev: Annotated[bool, typer.Option("--dev", help="Development mode (CORS + reload)")] = False,
+    host: Annotated[str, typer.Option("--host", help="Host to bind to")] = "127.0.0.1",
+):
+    """Launch the web UI.
+
+    Starts a local web server with mod browser, generator, and more.
+
+    Examples:
+        ftl-gen ui                # Start on http://localhost:8421
+        ftl-gen ui --dev          # Dev mode with CORS for Vite
+        ftl-gen ui --port 9000    # Custom port
+    """
+    try:
+        import uvicorn
+    except ImportError:
+        console.print("[red]Web UI dependencies not installed.[/]")
+        console.print("Install with: [bold]pip install -e \".[ui]\"[/]")
+        raise typer.Exit(1)
+
+    from ftl_gen.api.app import create_app
+
+    app_instance = create_app(dev=dev)
+
+    console.print(f"[bold green]FTL-Gen Web UI[/] starting on http://{host}:{port}")
+    if dev:
+        console.print("[dim]Dev mode: CORS enabled for localhost:5173[/]")
+        console.print("[dim]Run 'cd ui && npm run dev' for frontend hot reload[/]")
+    console.print("[dim]API docs: http://{host}:{port}/api/docs[/]")
+
+    uvicorn.run(app_instance, host=host, port=port, log_level="info")
+
+
+@app.command()
 def chaos(
     level: Annotated[float, typer.Option("--level", "-l", help="Chaos level 0.0-1.0")] = 0.5,
     seed: Annotated[Optional[int], typer.Option("--seed", "-s", help="Random seed for reproducibility")] = None,

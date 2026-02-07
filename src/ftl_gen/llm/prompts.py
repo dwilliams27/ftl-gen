@@ -59,7 +59,7 @@ Return your response as a JSON object with this structure:
     "description": "Brief mod description",
     "lore": "2-3 sentences of faction background",
     "weapon_concepts": [
-        {{"name": "WEAPON_NAME", "type": "LASER|BEAM|MISSILES|BOMB|ION", "concept": "Brief description", "visual": "Visual description for sprite"}}
+        {{"name": "WEAPON_NAME", "type": "LASER|BEAM|MISSILES|BOMB|ION (ion weapons are LASER subtype)", "concept": "Brief description", "visual": "Visual description for sprite"}}
     ],
     "drone_concepts": [
         {{"name": "DRONE_NAME", "type": "COMBAT|DEFENSE|REPAIR|BOARDER", "concept": "Brief description"}}
@@ -98,7 +98,7 @@ Reference - vanilla laser weapons for balance:
 
 For each weapon, generate a complete blueprint with:
 - name: UPPERCASE_WITH_UNDERSCORES (e.g., PLASMA_BURST_LASER)
-- type: One of LASER, BEAM, MISSILES, BOMB, ION, BURST
+- type: One of LASER, BEAM, MISSILES, BOMB, ION
 - title: Display name (e.g., "Plasma Burst Laser")
 - desc: 1-2 sentence description for the player (SEE DESCRIPTION RULES BELOW)
 - damage: {_wr["damage"][0]}-{_wr["damage"][1]} (most weapons: 1-3)
@@ -196,7 +196,7 @@ Reference - vanilla laser weapons for balance:
 
 Generate a complete blueprint with:
 - name: UPPERCASE_WITH_UNDERSCORES (e.g., GRAVITY_BEAM)
-- type: One of LASER, BEAM, MISSILES, BOMB, ION, BURST
+- type: One of LASER, BEAM, MISSILES, BOMB, ION
 - title: Display name
 - desc: 1-2 sentence player-facing description (SEE RULES BELOW)
 - damage: {_wr["damage"][0]}-{_wr["damage"][1]}

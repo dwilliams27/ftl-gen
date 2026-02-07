@@ -1,0 +1,207 @@
+<FTL>
+  <weaponBlueprint name="OCARINA_TEMPORAL_DISRUPTOR">
+    <type>ION</type>
+    <title>Ocarina of Time</title>
+    <short>Ocarina</short>
+    <desc>Ancient Hylian artifact modified for combat. Fires 3 ion shots in rapid sequence. Each subsequent shot charges faster than the last.</desc>
+    <damage>0</damage>
+    <shots>3</shots>
+    <ion>1</ion>
+    <cooldown>12</cooldown>
+    <power>2</power>
+    <cost>80</cost>
+    <rarity>3</rarity>
+    <image>intruder_ion</image>
+    <weaponArt>ocarina_temporal_disruptor</weaponArt>
+    <launchSounds>
+      <sound>ionShoot1</sound>
+      <sound>ionShoot2</sound>
+      <sound>ionShoot3</sound>
+    </launchSounds>
+    <hitShipSounds>
+      <sound>intruder_ionHit</sound>
+    </hitShipSounds>
+    <hitShieldSounds>
+      <sound>intruder_ionHit</sound>
+    </hitShieldSounds>
+  </weaponBlueprint>
+  <weaponBlueprint name="MASTER_BLADE_BEAM">
+    <type>BEAM</type>
+    <title>Master Sword Beam</title>
+    <short>Master</short>
+    <desc>Channels the legendary blade's power into a focused energy beam. Short range but devastating - sweep through rooms to maximize damage.</desc>
+    <damage>2</damage>
+    <sp>1</sp>
+    <length>55</length>
+    <cooldown>20</cooldown>
+    <power>3</power>
+    <cost>95</cost>
+    <rarity>4</rarity>
+    <image>beam_contact</image>
+    <weaponArt>master_blade_beam</weaponArt>
+    <launchSounds>
+      <sound>beam1</sound>
+    </launchSounds>
+  </weaponBlueprint>
+  <weaponBlueprint name="BOMBCHU_PAYLOAD_SYSTEM">
+    <type>MISSILES</type>
+    <title>Bombchu Launcher</title>
+    <short>Bombchu</short>
+    <desc>Fires an explosive mechanical mouse that seeks enemy systems. Deals 2 damage, high breach chance, and can start fires.</desc>
+    <damage>2</damage>
+    <fireChance>3</fireChance>
+    <breachChance>5</breachChance>
+    <missiles>1</missiles>
+    <shots>1</shots>
+    <sp>0</sp>
+    <explosion>explosion_random</explosion>
+    <cooldown>13</cooldown>
+    <power>2</power>
+    <cost>65</cost>
+    <rarity>2</rarity>
+    <image>missile_2</image>
+    <weaponArt>bombchu_payload_system</weaponArt>
+    <launchSounds>
+      <sound>missileLaunch</sound>
+    </launchSounds>
+    <hitShipSounds>
+      <sound>explosion2</sound>
+      <sound>explosion3</sound>
+      <sound>explosion1</sound>
+    </hitShipSounds>
+    <missSounds>
+      <sound>miss</sound>
+    </missSounds>
+  </weaponBlueprint>
+  <weaponBlueprint name="DINS_FIRE_PROJECTOR">
+    <type>LASER</type>
+    <title>Din's Fire</title>
+    <short>Din's</short>
+    <desc>Goddess of Power's flame unleashed. Fires 5 shots with extreme fire chance that spread across enemy systems. Requires significant power.</desc>
+    <damage>1</damage>
+    <shots>5</shots>
+    <fireChance>8</fireChance>
+    <breachChance>1</breachChance>
+    <cooldown>25</cooldown>
+    <power>4</power>
+    <cost>120</cost>
+    <rarity>5</rarity>
+    <image>laser_light1</image>
+    <weaponArt>dins_fire_projector</weaponArt>
+    <launchSounds>
+      <sound>lightLaser1</sound>
+      <sound>lightLaser2</sound>
+      <sound>lightLaser3</sound>
+    </launchSounds>
+    <hitShipSounds>
+      <sound>hitHull1</sound>
+      <sound>hitHull2</sound>
+      <sound>hitHull3</sound>
+    </hitShipSounds>
+    <hitShieldSounds>
+      <sound>hitShield1</sound>
+      <sound>hitShield2</sound>
+      <sound>hitShield3</sound>
+    </hitShieldSounds>
+  </weaponBlueprint>
+  <droneBlueprint name="NAVI_TACTICAL_DRONE">
+    <type>COMBAT</type>
+    <title>Navi Tactical Drone</title>
+    <desc>A small, glowing fairy-like drone that attacks enemy systems with weak but persistent laser fire. Its annoying alerts supposedly help your crew focus fire, though they mostly just say 'HEY! LISTEN!'</desc>
+    <power>2</power>
+    <cost>45</cost>
+    <rarity>2</rarity>
+    <cooldown>8.0</cooldown>
+    <speed>25</speed>
+    <droneImage>navi_tactical_drone</droneImage>
+  </droneBlueprint>
+  <droneBlueprint name="GOSSIP_STONE_SCANNER">
+    <type>DEFENSE</type>
+    <title>Gossip Stone Scanner Drone</title>
+    <desc>An ancient Sheikah stone that hovers protectively near your ship. Rather than intercepting projectiles, it analyzes enemy attack patterns and provides early warnings to your crew, allowing for better evasive maneuvers.</desc>
+    <power>2</power>
+    <cost>55</cost>
+    <rarity>3</rarity>
+    <cooldown>3.0</cooldown>
+    <speed>20</speed>
+    <droneImage>gossip_stone_scanner</droneImage>
+  </droneBlueprint>
+  <droneBlueprint name="DEKU_SCRUB_DEFENDER">
+    <type>DEFENSE</type>
+    <title>Deku Scrub Defense Drone</title>
+    <desc>A wooden drone that spits nuts to intercept enemy drones and missiles. Its rapid-fire defensive capabilities make it excellent at protecting your ship from automated threats.</desc>
+    <power>3</power>
+    <cost>85</cost>
+    <rarity>4</rarity>
+    <cooldown>2.0</cooldown>
+    <speed>30</speed>
+    <droneImage>deku_scrub_defender</droneImage>
+  </droneBlueprint>
+  <droneBlueprint name="FAIRY_REPAIR_SPIRIT">
+    <type>SHIP_REPAIR</type>
+    <title>Fairy Repair Spirit</title>
+    <desc>A mystical fairy drone that slowly mends hull breaches with restorative magic. Legend says these spirits can save a ship from the brink of destruction, though each fairy can only perform such a miracle once.</desc>
+    <power>3</power>
+    <cost>95</cost>
+    <rarity>4</rarity>
+    <cooldown>3.0</cooldown>
+    <speed>15</speed>
+    <droneImage>fairy_repair_spirit</droneImage>
+  </droneBlueprint>
+  <augBlueprint name="TRIFORCE_OF_COURAGE">
+    <title>Triforce of Courage</title>
+    <desc>Ancient Hylian artifact that emboldens crew in combat. Crew deal increased damage and move faster during boarding actions, but the ship's hull becomes more vulnerable to enemy fire.</desc>
+    <cost>60</cost>
+    <rarity>3</rarity>
+    <value>0.2</value>
+  </augBlueprint>
+  <augBlueprint name="TRIFORCE_OF_WISDOM">
+    <title>Triforce of Wisdom</title>
+    <desc>Sacred relic of Princess Zelda that optimizes power distribution throughout the ship. All systems operate more efficiently, requiring less power, though weapon systems charge slightly slower.</desc>
+    <cost>80</cost>
+    <rarity>4</rarity>
+    <value>1.0</value>
+  </augBlueprint>
+  <augBlueprint name="TRIFORCE_OF_POWER">
+    <title>Triforce of Power</title>
+    <desc>Ganondorf's cursed treasure amplifies all weapon damage output. The aggressive energy signature reduces evasion capability and prevents FTL jumps during combat encounters.</desc>
+    <cost>90</cost>
+    <rarity>5</rarity>
+    <value>1.0</value>
+  </augBlueprint>
+  <augBlueprint name="LENS_OF_TRUTH">
+    <title>Lens of Truth</title>
+    <desc>Sheikah technology that pierces illusions and reveals hidden information. Provides complete intelligence on enemy ship layouts, crew positions, and equipment before engagement begins.</desc>
+    <cost>50</cost>
+    <rarity>2</rarity>
+    <value>1.0</value>
+  </augBlueprint>
+  <shipBlueprint name="PLAYER_SHIP_HARD" layout="kestral" img="kestral">
+    <class>Kestrel Cruiser</class>
+    <name>The Kestrel</name>
+    <desc>This class of ship was decommissioned from the Federation fleet years ago. After a number of refits and adjustments, this classic ship is ready for battle.</desc>
+    <systemList>
+      <pilot power="1" room="0" start="true" img="room_pilot"/>
+      <doors power="1" room="2" start="true" img="room_doors"/>
+      <sensors power="1" room="3" start="true" img="room_sensors"/>
+      <medbay power="1" room="4" start="true" img="room_medbay"/>
+      <oxygen power="1" room="13" start="true" img="room_oxygen"/>
+      <shields power="2" room="5" start="true" img="room_shields"/>
+      <engines power="2" room="14" start="true" img="room_engines"/>
+      <weapons power="3" room="11" start="true" img="room_weapons"/>
+      <drones power="0" room="8" start="false"/>
+      <teleporter power="0" room="1" start="false"/>
+      <cloaking power="0" room="6" start="false"/>
+    </systemList>
+    <weaponSlots>4</weaponSlots>
+    <droneSlots>2</droneSlots>
+    <weaponList missiles="8" count="2">
+      <weapon name="LASER_BURST_3"/>
+      <weapon name="OCARINA_TEMPORAL_DISRUPTOR"/>
+    </weaponList>
+    <droneList drones="0" count="0"/>
+    <health amount="30"/>
+    <maxPower amount="8"/>
+    <crewCount amount="3" max="8" class="human"/>
+  </shipBlueprint>
+</FTL>
