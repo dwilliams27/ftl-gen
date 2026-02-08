@@ -55,14 +55,3 @@ export function usePatchAndRun() {
   });
 }
 
-export function useDiagnose() {
-  return useMutation({
-    mutationFn: (name: string) => api.diagnose(name),
-  });
-}
-
-export function useCrashReport() {
-  return useMutation({
-    mutationFn: () => api.getCrashReport(),
-  });
-}

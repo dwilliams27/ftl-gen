@@ -51,9 +51,13 @@ def create_app(dev: bool = False) -> FastAPI:
 
         @app.get("/{path:path}")
         async def serve_spa(path: str):
-            # Don't serve SPA for API routes
+            # Don't serve SPA for API routes — return 404 so errors aren't swallowed
             if path.startswith("api/"):
-                return
+                from fastapi.responses import JSONResponse
+                return JSONResponse(
+                    status_code=404,
+                    content={"detail": "Not found"},
+                )
             # Serve static files if they exist
             file_path = UI_DIST / path
             if file_path.is_file():

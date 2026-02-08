@@ -129,23 +129,6 @@ class PatchResult(BaseModel):
     message: str = ""
 
 
-class DiagnosticCheckModel(BaseModel):
-    """A single diagnostic check result."""
-
-    name: str
-    status: str  # "pass" | "fail" | "warn"
-    message: str = ""
-
-
-class DiagnosticReport(BaseModel):
-    """Full diagnostic report for a mod."""
-
-    ok: bool
-    checks: list[DiagnosticCheckModel] = Field(default_factory=list)
-    event_cycles: list[list[str]] = Field(default_factory=list)
-    dangling_refs: list[str] = Field(default_factory=list)
-
-
 class CrashReportResponse(BaseModel):
     """Crash report snapshot from a monitored FTL launch."""
 
@@ -154,6 +137,15 @@ class CrashReportResponse(BaseModel):
     log_lines: list[str] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
     mod_name: str | None = None
+
+
+class FtlLogResponse(BaseModel):
+    """Live FTL log state for the launch monitor."""
+
+    running: bool
+    mod_name: str | None = None
+    log_lines: list[str] = Field(default_factory=list)
+    exit_code: int | None = None
 
 
 class GenerationProgress(BaseModel):

@@ -67,28 +67,19 @@ class FTLLauncher:
         self._stop_tailing = threading.Event()
         self._log_bookmark: int = 0
 
-    def launch(self) -> LaunchResult:
-        """Launch FTL and monitor for hangs/crashes.
+    def start(self) -> LaunchResult:
+        """Start FTL and begin tailing the log. Returns immediately (non-blocking).
 
-        1. Record current FTL.log size
-        2. Launch FTL via Popen
-        3. Tail FTL.log in background thread
-        4. Watchdog: detect early exit, hang, or success
+        Use get_crash_report() to poll for log lines and process status.
         """
         ftl_exe = self.settings.find_ftl_executable()
         if not ftl_exe:
-            return LaunchResult(
-                success=False,
-                message="FTL executable not found",
-            )
+            return LaunchResult(success=False, message="FTL executable not found")
 
         log_path = self.settings.ftl_log_path
 
         # Bookmark current log size so we only capture new lines
-        if log_path.exists():
-            self._log_bookmark = log_path.stat().st_size
-        else:
-            self._log_bookmark = 0
+        self._log_bookmark = log_path.stat().st_size if log_path.exists() else 0
 
         # Launch FTL
         try:
@@ -98,10 +89,7 @@ class FTLLauncher:
                 stderr=subprocess.DEVNULL,
             )
         except OSError as e:
-            return LaunchResult(
-                success=False,
-                message=f"Failed to launch FTL: {e}",
-            )
+            return LaunchResult(success=False, message=f"Failed to launch FTL: {e}")
 
         # Start log tailing thread
         self._stop_tailing.clear()
@@ -109,6 +97,20 @@ class FTLLauncher:
             target=self._tail_log, args=(log_path,), daemon=True
         )
         self._log_thread.start()
+
+        return LaunchResult(success=True, message="FTL launched")
+
+    def launch(self) -> LaunchResult:
+        """Launch FTL and monitor for hangs/crashes (blocking, up to 30s).
+
+        1. Record current FTL.log size
+        2. Launch FTL via Popen
+        3. Tail FTL.log in background thread
+        4. Watchdog: detect early exit, hang, or success
+        """
+        result = self.start()
+        if not result.success:
+            return result
 
         # Watchdog loop
         blueprints_loaded = False

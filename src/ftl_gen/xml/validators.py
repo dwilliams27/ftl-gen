@@ -188,6 +188,12 @@ def check_common_crash_patterns(
                         issues.append(
                             f"{wtype} weapon '{name}' missing <missiles> (ammo cost)"
                         )
+
+                # iconImage is required on ALL weapons — missing it freezes at load
+                if weapon.find("iconImage") is None:
+                    issues.append(
+                        f"Weapon '{name}' missing <iconImage> (freezes game at 'Blueprints Loaded!')"
+                    )
         except etree.XMLSyntaxError:
             issues.append("Blueprints XML has syntax errors")
 

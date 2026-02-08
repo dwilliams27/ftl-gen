@@ -177,9 +177,9 @@ class TestCheckCommonCrashPatterns:
             </weaponBlueprint>
         """)
         issues = check_common_crash_patterns(bp_xml, None)
-        assert len(issues) == 1
-        assert "BEAM" in issues[0]
-        assert "length" in issues[0]
+        assert len(issues) == 2
+        assert any("length" in i for i in issues)
+        assert any("iconImage" in i for i in issues)
 
     def test_missiles_missing_ammo(self):
         bp_xml = _wrap_events("""
@@ -189,9 +189,32 @@ class TestCheckCommonCrashPatterns:
             </weaponBlueprint>
         """)
         issues = check_common_crash_patterns(bp_xml, None)
+        assert len(issues) == 2
+        assert any("missiles" in i for i in issues)
+        assert any("iconImage" in i for i in issues)
+
+    def test_missing_icon_image(self):
+        bp_xml = _wrap_events("""
+            <weaponBlueprint name="NO_ICON">
+                <type>LASER</type>
+                <damage>1</damage>
+            </weaponBlueprint>
+        """)
+        issues = check_common_crash_patterns(bp_xml, None)
         assert len(issues) == 1
-        assert "MISSILES" in issues[0]
-        assert "missiles" in issues[0]
+        assert "iconImage" in issues[0]
+        assert "NO_ICON" in issues[0]
+
+    def test_icon_image_present(self):
+        bp_xml = _wrap_events("""
+            <weaponBlueprint name="GOOD_WEAPON">
+                <type>LASER</type>
+                <damage>1</damage>
+                <iconImage>laser</iconImage>
+            </weaponBlueprint>
+        """)
+        issues = check_common_crash_patterns(bp_xml, None)
+        assert len(issues) == 0
 
     def test_no_issues_when_both_none(self):
         assert check_common_crash_patterns(None, None) == []

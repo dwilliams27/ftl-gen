@@ -1,4 +1,4 @@
-"""Validation, diagnostics, and patching endpoints."""
+"""Validation and patching endpoints."""
 
 from pathlib import Path
 
@@ -7,8 +7,7 @@ from fastapi import APIRouter, HTTPException
 from ftl_gen.api.deps import get_mods_dir, get_slipstream
 from ftl_gen.api.models import (
     CrashReportResponse,
-    DiagnosticCheckModel,
-    DiagnosticReport,
+    FtlLogResponse,
     PatchResult,
     ValidationResult,
 )
@@ -16,8 +15,6 @@ from ftl_gen.api.services import ModReader
 from ftl_gen.core.mod_builder import ModBuilder
 from ftl_gen.llm.parsers import build_mod_content
 from ftl_gen.xml.validators import (
-    XMLValidator,
-    check_common_crash_patterns,
     check_dangling_references,
     detect_event_loops,
 )
@@ -50,8 +47,11 @@ def _get_mod_xml(name: str) -> tuple[str | None, str | None]:
     return blueprints_xml, events_xml
 
 
-def _rebuild_with_test_loadout(name: str) -> Path:
-    """Rebuild a mod with the Kestrel test loadout enabled."""
+def _rebuild_mod(name: str, test_loadout: bool = False) -> Path:
+    """Rebuild a mod's .ftl from its directory sources.
+
+    Always rebuilds so the .ftl reflects the current build pipeline.
+    """
     mods_dir = get_mods_dir()
     reader = ModReader(mods_dir)
     mod = reader.get_mod(name)
@@ -76,117 +76,7 @@ def _rebuild_with_test_loadout(name: str) -> Path:
     )
 
     builder = ModBuilder(mods_dir)
-    return builder.build(content, sprite_files or None, test_loadout=True)
-
-
-def _run_diagnostics(name: str) -> DiagnosticReport:
-    """Run all diagnostic checks on a mod."""
-    mods_dir = get_mods_dir()
-    checks: list[DiagnosticCheckModel] = []
-    event_cycles: list[list[str]] = []
-    dangling_refs: list[str] = []
-
-    # 1. XML syntax check
-    mod_dir = mods_dir / name
-    validator = XMLValidator()
-    if mod_dir.exists():
-        result = validator.validate_mod_directory(mod_dir)
-        if result.ok:
-            checks.append(DiagnosticCheckModel(name="XML Syntax", status="pass"))
-        else:
-            checks.append(DiagnosticCheckModel(
-                name="XML Syntax", status="fail",
-                message="; ".join(result.errors),
-            ))
-    else:
-        checks.append(DiagnosticCheckModel(
-            name="XML Syntax", status="warn",
-            message="No mod directory found (only .ftl archive)",
-        ))
-
-    blueprints_xml, events_xml = _get_mod_xml(name)
-
-    # 2. Required fields check (weapon blueprints)
-    if blueprints_xml:
-        from lxml import etree
-        try:
-            root = etree.fromstring(blueprints_xml.encode())
-            field_errors = []
-            for weapon in root.findall(".//weaponBlueprint"):
-                r = validator.validate_weapon_blueprint(weapon)
-                field_errors.extend(r.errors)
-            if field_errors:
-                checks.append(DiagnosticCheckModel(
-                    name="Required Fields", status="fail",
-                    message="; ".join(field_errors),
-                ))
-            else:
-                checks.append(DiagnosticCheckModel(name="Required Fields", status="pass"))
-        except etree.XMLSyntaxError:
-            checks.append(DiagnosticCheckModel(
-                name="Required Fields", status="fail",
-                message="Cannot parse blueprints XML",
-            ))
-    else:
-        checks.append(DiagnosticCheckModel(name="Required Fields", status="pass"))
-
-    # 3. Event loops
-    if events_xml:
-        event_cycles = detect_event_loops(events_xml)
-        if event_cycles:
-            cycle_strs = [" -> ".join(c) for c in event_cycles]
-            checks.append(DiagnosticCheckModel(
-                name="Event Loops", status="fail",
-                message=f"Circular references: {'; '.join(cycle_strs)}",
-            ))
-        else:
-            checks.append(DiagnosticCheckModel(name="Event Loops", status="pass"))
-    else:
-        checks.append(DiagnosticCheckModel(name="Event Loops", status="pass"))
-
-    # 4. Dangling references
-    if events_xml:
-        dangling_refs = check_dangling_references(events_xml)
-        if dangling_refs:
-            checks.append(DiagnosticCheckModel(
-                name="Dangling Refs", status="warn",
-                message="; ".join(dangling_refs),
-            ))
-        else:
-            checks.append(DiagnosticCheckModel(name="Dangling Refs", status="pass"))
-    else:
-        checks.append(DiagnosticCheckModel(name="Dangling Refs", status="pass"))
-
-    # 5. Crash patterns
-    crash_issues = check_common_crash_patterns(blueprints_xml, events_xml)
-    if crash_issues:
-        checks.append(DiagnosticCheckModel(
-            name="Crash Patterns", status="fail",
-            message="; ".join(crash_issues),
-        ))
-    else:
-        checks.append(DiagnosticCheckModel(name="Crash Patterns", status="pass"))
-
-    ok = all(c.status != "fail" for c in checks)
-    return DiagnosticReport(
-        ok=ok,
-        checks=checks,
-        event_cycles=event_cycles,
-        dangling_refs=dangling_refs,
-    )
-
-
-@router.post("/diagnose", response_model=DiagnosticReport)
-def diagnose_mod(name: str):
-    """Run all diagnostic checks on a mod."""
-    # Verify mod exists
-    mods_dir = get_mods_dir()
-    mod_dir = mods_dir / name
-    ftl_path = mods_dir / f"{name}.ftl"
-    if not mod_dir.exists() and not ftl_path.exists():
-        raise HTTPException(status_code=404, detail=f"Mod not found: {name}")
-
-    return _run_diagnostics(name)
+    return builder.build(content, sprite_files or None, test_loadout=test_loadout)
 
 
 @router.get("/crash-report", response_model=CrashReportResponse)
@@ -206,6 +96,34 @@ def get_crash_report():
         log_lines=report.log_lines,
         errors=report.errors,
         mod_name=report.mod_name,
+    )
+
+
+@router.get("/ftl-log", response_model=FtlLogResponse)
+def get_ftl_log():
+    """Get current FTL log state. Poll this after patch-and-run."""
+    slipstream = get_slipstream()
+    report = slipstream.get_crash_report()
+    if report is not None:
+        return FtlLogResponse(
+            running=report.process_alive,
+            mod_name=report.mod_name,
+            log_lines=report.log_lines,
+            exit_code=report.exit_code,
+        )
+
+    # No monitored launch — fall back to reading FTL.log directly
+    from ftl_gen.config import get_settings
+    settings = get_settings()
+    log_path = settings.ftl_log_path
+    log_lines: list[str] = []
+    if log_path.exists():
+        log_lines = log_path.read_text(errors="replace").splitlines()
+
+    return FtlLogResponse(
+        running=False,
+        mod_name=None,
+        log_lines=log_lines,
     )
 
 
@@ -246,26 +164,32 @@ def patch_mod(name: str, test_loadout: bool = False):
     if not slipstream.is_available():
         raise HTTPException(status_code=503, detail="Slipstream not available")
 
-    if test_loadout:
-        ftl_path = _rebuild_with_test_loadout(name)
-    else:
-        ftl_path = _resolve_mod_path(name)
-
+    ftl_path = _rebuild_mod(name, test_loadout=test_loadout)
     result = slipstream.patch([ftl_path])
     return PatchResult(success=result.success, message=result.message)
 
 
 @router.post("/patch-and-run", response_model=PatchResult)
 def patch_and_run(name: str, test_loadout: bool = False):
-    """Patch a mod and launch FTL."""
+    """Patch a mod and launch FTL with log monitoring (non-blocking)."""
     slipstream = get_slipstream()
     if not slipstream.is_available():
         raise HTTPException(status_code=503, detail="Slipstream not available")
 
-    if test_loadout:
-        ftl_path = _rebuild_with_test_loadout(name)
-    else:
-        ftl_path = _resolve_mod_path(name)
+    ftl_path = _rebuild_mod(name, test_loadout=test_loadout)
 
-    result = slipstream.patch_and_run([ftl_path])
-    return PatchResult(success=result.success, message=result.message)
+    # Patch
+    patch_result = slipstream.patch([ftl_path])
+    if not patch_result.success:
+        return PatchResult(success=False, message=patch_result.message)
+
+    # Launch with monitoring (non-blocking — just starts the process and log tailer)
+    from ftl_gen.core.launcher import FTLLauncher
+    launcher = FTLLauncher(slipstream.settings, mod_name=name)
+    result = launcher.start()
+    if not result.success:
+        return PatchResult(success=False, message=result.message)
+
+    # Store launcher for log polling via GET /ftl-log
+    slipstream._launcher = launcher
+    return PatchResult(success=True, message=f"FTL launched with {name}")

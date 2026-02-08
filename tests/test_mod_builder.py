@@ -89,8 +89,7 @@ class TestModBuilder:
             # Check for blueprints
             assert any("blueprints.xml.append" in n for n in names)
 
-            # Check for events
-            assert any("events.xml.append" in n for n in names)
+            # Events skipped by default (PATCH_EVENTS != "1")
 
             # Check for metadata
             assert any("mod-appendix/metadata.xml" in n for n in names)

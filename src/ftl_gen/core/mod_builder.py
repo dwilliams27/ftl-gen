@@ -88,7 +88,11 @@ class ModBuilder:
             (data_dir / "blueprints.xml.append").write_text(blueprints_xml)
 
         # events.xml.append - events
-        if content.events:
+        # TODO: Events cause FTL to freeze at "Blueprints Loaded!" — they need
+        # deeper sector integration to work. Skipped for now; set
+        # PATCH_EVENTS=1 env var to re-enable for testing.
+        import os
+        if content.events and os.environ.get("PATCH_EVENTS") == "1":
             events_xml = self.xml_builder.build_events_append(content)
             (data_dir / "events.xml.append").write_text(events_xml)
 
