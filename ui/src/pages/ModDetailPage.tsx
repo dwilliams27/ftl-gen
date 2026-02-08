@@ -249,18 +249,27 @@ function XmlTab({ mod }: { mod: ModDetail }) {
 function LaunchMonitor({ onClose }: { onClose: () => void }) {
   const [logData, setLogData] = useState<FtlLogResponse | null>(null);
   const [copied, setCopied] = useState(false);
+  const [stopped, setStopped] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
 
-  // Poll GET /ftl-log every second
+  // Poll GET /ftl-log — stop polling once FTL exits
   useEffect(() => {
     let active = true;
+    let seenRunning = false;
     async function poll() {
       while (active) {
         try {
           const data = await api.getFtlLog();
-          if (active) setLogData(data);
+          if (!active) break;
+          setLogData(data);
+          if (data.running) seenRunning = true;
+          // Stop polling once FTL has exited (after we've seen it running)
+          if (seenRunning && !data.running) {
+            setStopped(true);
+            break;
+          }
         } catch { /* ignore */ }
-        await new Promise((r) => setTimeout(r, 1000));
+        await new Promise((r) => setTimeout(r, 2000));
       }
     }
     poll();
@@ -323,7 +332,7 @@ function LaunchMonitor({ onClose }: { onClose: () => void }) {
                 /error|exception|fatal|failed/i.test(line) && "text-destructive",
               )}>{line}</div>
             ))
-          : <span className="text-muted-foreground">Waiting for FTL output...</span>}
+          : <span className="text-muted-foreground">{stopped ? "No output captured." : "Waiting for FTL output..."}</span>}
         <div ref={logEndRef} />
       </pre>
     </div>

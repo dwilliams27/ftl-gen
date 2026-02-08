@@ -47,8 +47,12 @@ class Settings(BaseSettings):
 
     @property
     def ftl_log_path(self) -> Path:
-        """Path to FTL's log file."""
-        return Path.home() / "Library" / "Application Support" / "FasterThanLight" / "FTL.log"
+        """Path to FTL's log file.
+
+        FTL writes FTL.log to the working directory of the process that
+        launched it, which is typically the repo/project root.
+        """
+        return Path.cwd() / "FTL.log"
 
     def find_ftl_executable(self) -> Path | None:
         """Auto-detect FTL executable on macOS."""

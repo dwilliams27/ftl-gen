@@ -201,6 +201,10 @@ def patch_and_run(
     if not patch_result.success:
         return PatchResult(success=False, message=patch_result.message)
 
+    # Stop any previous launcher before starting a new one
+    if slipstream._launcher is not None:
+        slipstream._launcher.stop()
+
     # Launch with monitoring (non-blocking — just starts the process and log tailer)
     from ftl_gen.core.launcher import FTLLauncher
     launcher = FTLLauncher(slipstream.settings, mod_name=name)

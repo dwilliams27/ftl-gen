@@ -78,8 +78,15 @@ class FTLLauncher:
 
         log_path = self.settings.ftl_log_path
 
-        # Bookmark current log size so we only capture new lines
-        self._log_bookmark = log_path.stat().st_size if log_path.exists() else 0
+        # FTL truncates its log on each launch, but rewrites it so fast
+        # (~510 bytes in microseconds) that polling-based truncation
+        # detection misses it.  Truncate the file ourselves before launch
+        # so we can simply read from position 0.
+        try:
+            log_path.write_text("")
+        except OSError:
+            pass
+        self._log_bookmark = 0
 
         # Launch FTL
         try:
@@ -218,6 +225,11 @@ class FTLLauncher:
 
             try:
                 size = log_path.stat().st_size
+                if size < pos:
+                    # File was truncated (FTL rewrites log on each launch)
+                    pos = 0
+                    with self._log_lock:
+                        self._log_lines.clear()
                 if size > pos:
                     with open(log_path, "r", errors="replace") as f:
                         f.seek(pos)
