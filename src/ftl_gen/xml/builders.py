@@ -379,55 +379,99 @@ class XMLBuilder:
 
         return event_elem
 
-    def build_kestrel_loadout(self, weapon_name: str) -> etree._Element:
-        """Build a modified Kestrel A loadout with a custom weapon for testing.
+    def build_engi_test_loadout(
+        self,
+        weapon_name: str | None = None,
+        drone_name: str | None = None,
+        augment_name: str | None = None,
+    ) -> etree._Element:
+        """Build a modified Engi A loadout for testing custom items.
 
-        Replaces the Artemis Missiles with the specified weapon.
+        For each slot, uses the custom item if provided, otherwise keeps vanilla.
+        Vanilla Engi A: ION_4, COMBAT_1 drone, NANO_MEDBAY augment.
+        Matches actual PLAYER_SHIP_CIRCLE from vanilla blueprints.xml.
         """
-        # Complete Kestrel A ship blueprint with all systems
-        ship = etree.Element("shipBlueprint", name="PLAYER_SHIP_HARD", layout="kestral", img="kestral")
+        ship = etree.Element(
+            "shipBlueprint",
+            name="PLAYER_SHIP_CIRCLE",
+            layout="circle_cruiser",
+            img="circle_cruiser",
+        )
 
-        etree.SubElement(ship, "class").text = "Kestrel Cruiser"
-        etree.SubElement(ship, "name").text = "The Kestrel"
-        etree.SubElement(ship, "desc").text = "This class of ship was decommissioned from the Federation fleet years ago. After a number of refits and adjustments, this classic ship is ready for battle."
+        # Use localization IDs matching vanilla
+        etree.SubElement(ship, "class", id="ship_PLAYER_SHIP_CIRCLE_class")
+        etree.SubElement(ship, "name", id="ship_PLAYER_SHIP_CIRCLE_name")
+        etree.SubElement(ship, "unlock", id="ship_PLAYER_SHIP_CIRCLE_unlock")
+        etree.SubElement(ship, "desc", id="ship_PLAYER_SHIP_CIRCLE_desc")
 
-        # Full system list for Kestrel A
+        # Full 15-system systemList matching vanilla exactly
         system_list = etree.SubElement(ship, "systemList")
-        etree.SubElement(system_list, "pilot", power="1", room="0", start="true", img="room_pilot")
-        etree.SubElement(system_list, "doors", power="1", room="2", start="true", img="room_doors")
-        etree.SubElement(system_list, "sensors", power="1", room="3", start="true", img="room_sensors")
-        etree.SubElement(system_list, "medbay", power="1", room="4", start="true", img="room_medbay")
-        etree.SubElement(system_list, "oxygen", power="1", room="13", start="true", img="room_oxygen")
-        etree.SubElement(system_list, "shields", power="2", room="5", start="true", img="room_shields")
-        etree.SubElement(system_list, "engines", power="2", room="14", start="true", img="room_engines")
-        etree.SubElement(system_list, "weapons", power="3", room="11", start="true", img="room_weapons")
-        etree.SubElement(system_list, "drones", power="0", room="8", start="false")
-        etree.SubElement(system_list, "teleporter", power="0", room="1", start="false")
-        etree.SubElement(system_list, "cloaking", power="0", room="6", start="false")
+        etree.SubElement(system_list, "pilot", power="1", room="8", start="true")
 
-        etree.SubElement(ship, "weaponSlots").text = "4"
-        etree.SubElement(ship, "droneSlots").text = "2"
+        doors = etree.SubElement(system_list, "doors", power="1", room="5", start="true", img="room_doors_4")
+        doors_slot = etree.SubElement(doors, "slot")
+        etree.SubElement(doors_slot, "direction").text = "right"
+        etree.SubElement(doors_slot, "number").text = "0"
 
-        # Weapons: keep Burst Laser II, replace Artemis with custom weapon
-        weapon_list = etree.SubElement(ship, "weaponList", missiles="8", count="2")
-        etree.SubElement(weapon_list, "weapon", name="LASER_BURST_3")
-        etree.SubElement(weapon_list, "weapon", name=weapon_name)
+        sensors = etree.SubElement(system_list, "sensors", power="1", room="4", start="true", img="room_sensors_4")
+        sensors_slot = etree.SubElement(sensors, "slot")
+        etree.SubElement(sensors_slot, "direction").text = "left"
+        etree.SubElement(sensors_slot, "number").text = "1"
 
-        etree.SubElement(ship, "droneList", drones="0", count="0")
+        etree.SubElement(system_list, "oxygen", power="1", room="15", start="true", img="room_oxygen_4")
+        etree.SubElement(system_list, "engines", power="2", room="2", start="true", img="room_engines_2")
+        etree.SubElement(system_list, "shields", power="2", room="3", start="true", img="room_shields_4")
+        etree.SubElement(system_list, "weapons", power="3", room="11", start="true")
+        etree.SubElement(system_list, "drones", power="3", room="0", start="true")
+        etree.SubElement(system_list, "medbay", power="1", room="7", start="true")
+        etree.SubElement(system_list, "clonebay", power="1", room="7", start="false")
+        etree.SubElement(system_list, "teleporter", power="1", room="9", start="false")
+        etree.SubElement(system_list, "cloaking", power="1", room="12", start="false", img="room_cloaking_4")
+        etree.SubElement(system_list, "battery", power="1", room="1", start="false", img="room_battery_6")
+        etree.SubElement(system_list, "mind", power="1", room="6", start="false", img="room_mind_6")
+
+        hacking = etree.SubElement(system_list, "hacking", power="1", room="14", start="false", img="room_hacking_2")
+        hacking_slot = etree.SubElement(hacking, "slot")
+        etree.SubElement(hacking_slot, "direction").text = "down"
+        etree.SubElement(hacking_slot, "number").text = "0"
+
+        etree.SubElement(ship, "weaponSlots").text = "3"
+        etree.SubElement(ship, "droneSlots").text = "3"
+
+        # Weapon: custom or vanilla ION_4
+        weapon_list = etree.SubElement(ship, "weaponList", missiles="0", count="1")
+        etree.SubElement(weapon_list, "weapon", name=weapon_name or "ION_4")
+
+        # Drones: custom or vanilla Combat Drone I
+        drone_list = etree.SubElement(ship, "droneList", drones="15", count="1")
+        etree.SubElement(drone_list, "drone", name=drone_name or "COMBAT_1")
+
+        # Augment — vanilla uses <aug name="..."/> not <augmentList>
+        etree.SubElement(ship, "aug", name=augment_name or "NANO_MEDBAY")
 
         etree.SubElement(ship, "health", amount="30")
-        etree.SubElement(ship, "maxPower", amount="8")
+        etree.SubElement(ship, "maxPower", amount="10")
 
-        etree.SubElement(ship, "crewCount", amount="3", max="8", **{"class": "human"})
+        etree.SubElement(ship, "crewCount", amount="1", **{"class": "human"})
+        etree.SubElement(ship, "crewCount", amount="2", **{"class": "engi"})
 
         return ship
 
-    def build_blueprints_append(self, content: ModContent, *, test_loadout: bool = False) -> str:
+    def build_blueprints_append(
+        self,
+        content: ModContent,
+        *,
+        test_weapon: bool = False,
+        test_drone: bool = False,
+        test_augment: bool = False,
+    ) -> str:
         """Build blueprints.xml.append content.
 
         Args:
             content: Mod content to build XML for
-            test_loadout: If True, add a modified Kestrel loadout with the first weapon for testing
+            test_weapon: If True, replace Engi A weapon with first mod weapon
+            test_drone: If True, replace Engi A drone with first mod drone
+            test_augment: If True, replace Engi A augment with first mod augment
         """
         root = self._create_root()
 
@@ -447,9 +491,12 @@ class XMLBuilder:
         for crew in content.crew:
             root.append(self.build_crew(crew))
 
-        # Add Kestrel loadout modification for testing (first weapon)
-        if test_loadout and content.weapons:
-            root.append(self.build_kestrel_loadout(content.weapons[0].name))
+        # Add Engi A loadout modification for testing
+        if test_weapon or test_drone or test_augment:
+            weapon_name = content.weapons[0].name if test_weapon and content.weapons else None
+            drone_name = content.drones[0].name if test_drone and content.drones else None
+            augment_name = content.augments[0].name if test_augment and content.augments else None
+            root.append(self.build_engi_test_loadout(weapon_name, drone_name, augment_name))
 
         return etree.tostring(root, pretty_print=True, encoding="unicode", xml_declaration=False)
 

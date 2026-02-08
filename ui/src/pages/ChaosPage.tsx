@@ -29,7 +29,9 @@ export function ChaosPage() {
         unsafe,
         mutate_sprites: false,
         name: name.trim() || undefined,
-        test_loadout: false,
+        test_weapon: false,
+        test_drone: false,
+        test_augment: false,
       };
 
       const res = await fetch("/api/v1/chaos", {

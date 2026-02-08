@@ -1,916 +1,1367 @@
 {
   "weapons": {
-    "lasers": {
-      "BASIC_LASER": {
-        "title": "Burst Laser I",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 2,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 11,
-        "power": 2,
-        "cost": 50,
-        "rarity": 0
-      },
-      "BURST_LASER_2": {
-        "title": "Burst Laser II",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 3,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 12,
-        "power": 2,
-        "cost": 80,
-        "rarity": 3
-      },
-      "BURST_LASER_3": {
-        "title": "Burst Laser III",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 5,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 19,
-        "power": 4,
-        "cost": 95,
-        "rarity": 5
-      },
-      "HEAVY_LASER": {
-        "title": "Heavy Laser I",
-        "type": "LASER",
-        "damage": 2,
-        "shots": 1,
-        "fireChance": 3,
-        "breachChance": 3,
-        "cooldown": 9,
-        "power": 1,
-        "cost": 50,
-        "rarity": 1
-      },
-      "HEAVY_LASER_2": {
-        "title": "Heavy Laser II",
-        "type": "LASER",
-        "damage": 2,
-        "shots": 2,
-        "fireChance": 3,
-        "breachChance": 3,
-        "cooldown": 13,
-        "power": 3,
-        "cost": 65,
-        "rarity": 4
-      },
-      "LASER_CHAINGUN": {
-        "title": "Chain Laser",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 1,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 16,
-        "power": 1,
-        "cost": 55,
-        "rarity": 3
-      },
-      "DUAL_LASER": {
-        "title": "Dual Lasers",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 2,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 10,
-        "power": 1,
-        "cost": 25,
-        "rarity": 1
-      },
-      "LASER_CHARGEGUN": {
-        "title": "Charge Laser I",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 1,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 6,
-        "power": 2,
-        "cost": 45,
-        "rarity": 2
-      },
-      "LASER_CHARGEGUN_2": {
-        "title": "Charge Laser II",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 2,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 5,
-        "power": 3,
-        "cost": 70,
-        "rarity": 4
-      },
-      "SCATTER_LASER": {
-        "title": "Flak I",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 3,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 10,
-        "power": 2,
-        "cost": 65,
-        "rarity": 2
-      },
-      "SCATTER_LASER_2": {
-        "title": "Flak II",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 7,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 21,
-        "power": 3,
-        "cost": 85,
-        "rarity": 4
-      }
+    "ARTILLERY_BOSS_1": {
+      "type": "LASER",
+      "noloc": true,
+      "damage": 1,
+      "shots": 3,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 1,
+      "power": 1,
+      "cost": 55,
+      "rarity": 0,
+      "cooldown": 20.0
     },
-    "beams": {
-      "BEAM_1": {
-        "title": "Pike Beam",
-        "type": "BEAM",
-        "damage": 1,
-        "length": 60,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 16,
-        "power": 2,
-        "cost": 60,
-        "rarity": 2
-      },
-      "BEAM_2": {
-        "title": "Halberd Beam",
-        "type": "BEAM",
-        "damage": 2,
-        "length": 40,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 17,
-        "power": 3,
-        "cost": 65,
-        "rarity": 3
-      },
-      "BEAM_HULL": {
-        "title": "Hull Beam",
-        "type": "BEAM",
-        "damage": 2,
-        "length": 35,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 14,
-        "power": 2,
-        "cost": 60,
-        "rarity": 4,
-        "hullBust": true
-      },
-      "BEAM_GLAIVE": {
-        "title": "Glaive Beam",
-        "type": "BEAM",
-        "damage": 3,
-        "length": 50,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 25,
-        "power": 4,
-        "cost": 95,
-        "rarity": 5
-      },
-      "BEAM_FIRE": {
-        "title": "Fire Beam",
-        "type": "BEAM",
-        "damage": 1,
-        "length": 45,
-        "fireChance": 10,
-        "breachChance": 0,
-        "cooldown": 20,
-        "power": 2,
-        "cost": 40,
-        "rarity": 2
-      },
-      "BEAM_BIO": {
-        "title": "Anti-Bio Beam",
-        "type": "BEAM",
-        "damage": 0,
-        "persDamage": 60,
-        "length": 45,
-        "fireChance": 0,
-        "breachChance": 0,
-        "cooldown": 14,
-        "power": 2,
-        "cost": 50,
-        "rarity": 3
-      },
-      "BEAM_HULL_SMASHER": {
-        "title": "Hull Smasher Laser A",
-        "type": "BEAM",
-        "damage": 1,
-        "length": 20,
-        "fireChance": 0,
-        "breachChance": 3,
-        "cooldown": 12,
-        "power": 1,
-        "cost": 30,
-        "rarity": 2,
-        "hullBust": true
-      },
-      "BEAM_HULL_SMASHER_2": {
-        "title": "Hull Smasher Laser B",
-        "type": "BEAM",
-        "damage": 2,
-        "length": 25,
-        "fireChance": 0,
-        "breachChance": 5,
-        "cooldown": 14,
-        "power": 2,
-        "cost": 55,
-        "rarity": 3,
-        "hullBust": true
-      }
+    "ARTILLERY_BOSS_2": {
+      "type": "MISSILES",
+      "noloc": true,
+      "damage": 1,
+      "shots": 3,
+      "sp": 5,
+      "fireChance": 3,
+      "breachChance": 2,
+      "missiles": 0,
+      "power": 1,
+      "cost": 80,
+      "rarity": 0,
+      "cooldown": 23.0
     },
-    "missiles": {
-      "MISSILES": {
-        "title": "Artemis",
-        "type": "MISSILES",
-        "damage": 2,
-        "missiles": 1,
-        "breachChance": 3,
-        "fireChance": 1,
-        "cooldown": 11,
-        "power": 1,
-        "cost": 38,
-        "rarity": 0
-      },
-      "MISSILES_2": {
-        "title": "Leto",
-        "type": "MISSILES",
-        "damage": 1,
-        "missiles": 1,
-        "breachChance": 1,
-        "fireChance": 1,
-        "cooldown": 9,
-        "power": 1,
-        "cost": 20,
-        "rarity": 1
-      },
-      "MISSILES_BREACH": {
-        "title": "Breach Missile",
-        "type": "MISSILES",
-        "damage": 4,
-        "missiles": 1,
-        "breachChance": 8,
-        "fireChance": 0,
-        "cooldown": 22,
-        "power": 3,
-        "cost": 65,
-        "rarity": 3
-      },
-      "MISSILES_HULL": {
-        "title": "Hull Missile",
-        "type": "MISSILES",
-        "damage": 2,
-        "missiles": 1,
-        "breachChance": 3,
-        "fireChance": 0,
-        "cooldown": 14,
-        "power": 2,
-        "cost": 50,
-        "rarity": 2,
-        "hullBust": true
-      },
-      "MISSILES_BIG": {
-        "title": "Hermes Missile",
-        "type": "MISSILES",
-        "damage": 3,
-        "missiles": 1,
-        "breachChance": 4,
-        "fireChance": 2,
-        "cooldown": 14,
-        "power": 3,
-        "cost": 55,
-        "rarity": 3
-      },
-      "MISSILES_ENERGY": {
-        "title": "Swarm Missiles",
-        "type": "MISSILES",
-        "damage": 1,
-        "shots": 3,
-        "missiles": 1,
-        "breachChance": 0,
-        "fireChance": 0,
-        "cooldown": 17,
-        "power": 2,
-        "cost": 65,
-        "rarity": 4
-      },
-      "MISSILES_CLUSTER": {
-        "title": "Pegasus Missiles",
-        "type": "MISSILES",
-        "damage": 2,
-        "shots": 2,
-        "missiles": 2,
-        "breachChance": 3,
-        "fireChance": 1,
-        "cooldown": 20,
-        "power": 3,
-        "cost": 75,
-        "rarity": 4
-      }
+    "ARTILLERY_BOSS_3": {
+      "type": "BEAM",
+      "noloc": true,
+      "damage": 2,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 1,
+      "cost": 70,
+      "rarity": 0,
+      "cooldown": 26.0,
+      "length": 100
     },
-    "bombs": {
-      "BOMB_ION": {
-        "title": "Ion Bomb",
-        "type": "BOMB",
-        "damage": 0,
-        "ion": 4,
-        "missiles": 1,
-        "cooldown": 22,
-        "power": 1,
-        "cost": 55,
-        "rarity": 3,
-        "sp": 0
-      },
-      "BOMB_FIRE": {
-        "title": "Fire Bomb",
-        "type": "BOMB",
-        "damage": 0,
-        "missiles": 1,
-        "fireChance": 10,
-        "cooldown": 15,
-        "power": 2,
-        "cost": 40,
-        "rarity": 2,
-        "sp": 0
-      },
-      "BOMB_BREACH_2": {
-        "title": "Breach Bomb II",
-        "type": "BOMB",
-        "damage": 3,
-        "missiles": 1,
-        "breachChance": 8,
-        "cooldown": 17,
-        "power": 2,
-        "cost": 60,
-        "rarity": 4,
-        "sp": 0
-      },
-      "BOMB_BREACH": {
-        "title": "Breach Bomb I",
-        "type": "BOMB",
-        "damage": 1,
-        "missiles": 1,
-        "breachChance": 6,
-        "cooldown": 15,
-        "power": 1,
-        "cost": 40,
-        "rarity": 2,
-        "sp": 0
-      },
-      "BOMB_SMALL": {
-        "title": "Small Bomb",
-        "type": "BOMB",
-        "damage": 2,
-        "missiles": 1,
-        "breachChance": 0,
-        "fireChance": 0,
-        "cooldown": 13,
-        "power": 1,
-        "cost": 35,
-        "rarity": 1,
-        "sp": 0
-      },
-      "BOMB_STUN": {
-        "title": "Stun Bomb",
-        "type": "BOMB",
-        "damage": 0,
-        "missiles": 1,
-        "stun": 15,
-        "cooldown": 15,
-        "power": 1,
-        "cost": 50,
-        "rarity": 3,
-        "sp": 0
-      },
-      "BOMB_HEAL": {
-        "title": "Healing Burst",
-        "type": "BOMB",
-        "damage": 0,
-        "missiles": 1,
-        "cooldown": 16,
-        "power": 2,
-        "cost": 50,
-        "rarity": 3,
-        "sp": 0
-      },
-      "BOMB_LOCKDOWN": {
-        "title": "Lockdown Bomb",
-        "type": "BOMB",
-        "damage": 1,
-        "missiles": 1,
-        "lockdown": true,
-        "cooldown": 16,
-        "power": 1,
-        "cost": 40,
-        "rarity": 4,
-        "sp": 0
-      }
+    "ARTILLERY_BOSS_4": {
+      "type": "ION",
+      "noloc": true,
+      "damage": 0,
+      "shots": 3,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "ion": 1,
+      "power": 1,
+      "cost": 40,
+      "rarity": 0,
+      "cooldown": 28.0,
+      "speed": 40
     },
-    "ions": {
-      "ION_BLAST": {
-        "title": "Ion Blast I",
-        "type": "ION",
-        "damage": 0,
-        "ion": 1,
-        "shots": 1,
-        "cooldown": 8,
-        "power": 1,
-        "cost": 30,
-        "rarity": 0
-      },
-      "ION_BLAST_2": {
-        "title": "Ion Blast II",
-        "type": "ION",
-        "damage": 0,
-        "ion": 3,
-        "shots": 1,
-        "cooldown": 14,
-        "power": 3,
-        "cost": 70,
-        "rarity": 3
-      },
-      "CHAIN_ION": {
-        "title": "Chain Ion",
-        "type": "ION",
-        "damage": 0,
-        "ion": 1,
-        "shots": 1,
-        "cooldown": 14,
-        "power": 2,
-        "cost": 55,
-        "rarity": 4
-      },
-      "ION_HEAVY": {
-        "title": "Heavy Ion Stunner",
-        "type": "ION",
-        "damage": 0,
-        "ion": 2,
-        "stun": 5,
-        "shots": 1,
-        "cooldown": 13,
-        "power": 2,
-        "cost": 45,
-        "rarity": 2
-      },
-      "ION_CHARGEGUN": {
-        "title": "Ion Charger",
-        "type": "ION",
-        "damage": 0,
-        "ion": 1,
-        "shots": 1,
-        "cooldown": 6,
-        "power": 2,
-        "cost": 50,
-        "rarity": 3
-      }
+    "ARTILLERY_FED": {
+      "type": "BEAM",
+      "damage": 1,
+      "sp": 5,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 1,
+      "cost": 0,
+      "rarity": 0,
+      "cooldown": 40.0,
+      "length": 500,
+      "speed": 13
     },
-    "crystals": {
-      "CRYSTAL_1": {
-        "title": "Crystal Burst I",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 2,
-        "sp": 1,
-        "cooldown": 15,
-        "power": 2,
-        "cost": 60,
-        "rarity": 5
-      },
-      "CRYSTAL_2": {
-        "title": "Crystal Burst II",
-        "type": "LASER",
-        "damage": 1,
-        "shots": 3,
-        "sp": 1,
-        "cooldown": 17,
-        "power": 3,
-        "cost": 80,
-        "rarity": 5
-      },
-      "CRYSTAL_HEAVY": {
-        "title": "Heavy Crystal I",
-        "type": "LASER",
-        "damage": 2,
-        "shots": 1,
-        "sp": 1,
-        "fireChance": 0,
-        "breachChance": 3,
-        "cooldown": 13,
-        "power": 2,
-        "cost": 55,
-        "rarity": 5
-      },
-      "CRYSTAL_HEAVY_2": {
-        "title": "Heavy Crystal II",
-        "type": "LASER",
-        "damage": 4,
-        "shots": 1,
-        "sp": 1,
-        "fireChance": 0,
-        "breachChance": 5,
-        "cooldown": 17,
-        "power": 3,
-        "cost": 70,
-        "rarity": 5
-      }
+    "LASER_BURST_1": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 1,
+      "cost": 20,
+      "rarity": 0,
+      "cooldown": 10.0
+    },
+    "LASER_BURST_2": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 2,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 1,
+      "cost": 25,
+      "rarity": 0,
+      "cooldown": 10.0
+    },
+    "LASER_BURST_2_A": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 2,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 50,
+      "rarity": 1,
+      "cooldown": 11.0
+    },
+    "LASER_BURST_3": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 3,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 80,
+      "rarity": 4,
+      "cooldown": 12.0
+    },
+    "LASER_BURST_5": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 5,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 4,
+      "cost": 95,
+      "rarity": 4,
+      "cooldown": 19.0
+    },
+    "LASER_HEAVY_1": {
+      "type": "LASER",
+      "damage": 2,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 3,
+      "breachChance": 3,
+      "stunChance": 2,
+      "power": 1,
+      "cost": 50,
+      "rarity": 2,
+      "cooldown": 9.0
+    },
+    "LASER_HEAVY_2": {
+      "type": "LASER",
+      "damage": 2,
+      "shots": 2,
+      "sp": 0,
+      "fireChance": 3,
+      "breachChance": 3,
+      "stunChance": 2,
+      "power": 3,
+      "cost": 65,
+      "rarity": 4,
+      "cooldown": 13.0
+    },
+    "LASER_HEAVY_1_SP": {
+      "type": "LASER",
+      "damage": 2,
+      "shots": 1,
+      "sp": 1,
+      "fireChance": 3,
+      "breachChance": 3,
+      "power": 2,
+      "cost": 55,
+      "rarity": 0,
+      "cooldown": 10.0
+    },
+    "CRYSTAL_1": {
+      "type": "MISSILES",
+      "noloc": true,
+      "damage": 1,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 0,
+      "breachChance": 1,
+      "stunChance": 2,
+      "missiles": 0,
+      "power": 1,
+      "cost": 20,
+      "rarity": 0,
+      "cooldown": 9.0
+    },
+    "MISSILES_1": {
+      "type": "MISSILES",
+      "damage": 1,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 1,
+      "breachChance": 1,
+      "stunChance": 1,
+      "missiles": 1,
+      "power": 1,
+      "cost": 20,
+      "rarity": 0,
+      "cooldown": 9.0
+    },
+    "MISSILES_2_PLAYER": {
+      "type": "MISSILES",
+      "damage": 2,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 1,
+      "breachChance": 1,
+      "stunChance": 1,
+      "missiles": 1,
+      "power": 1,
+      "cost": 38,
+      "rarity": 0,
+      "cooldown": 11.0
+    },
+    "MISSILES_2": {
+      "type": "MISSILES",
+      "damage": 2,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 1,
+      "breachChance": 1,
+      "stunChance": 1,
+      "missiles": 1,
+      "power": 2,
+      "cost": 38,
+      "rarity": 0,
+      "cooldown": 10.0
+    },
+    "MISSILES_3": {
+      "type": "MISSILES",
+      "damage": 3,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 3,
+      "breachChance": 2,
+      "stunChance": 1,
+      "missiles": 1,
+      "power": 3,
+      "cost": 45,
+      "rarity": 2,
+      "cooldown": 14.0
+    },
+    "MISSILES_BURST": {
+      "type": "MISSILES",
+      "damage": 2,
+      "shots": 2,
+      "sp": 5,
+      "fireChance": 3,
+      "breachChance": 2,
+      "stunChance": 1,
+      "missiles": 1,
+      "power": 3,
+      "cost": 60,
+      "rarity": 3,
+      "cooldown": 20.0
+    },
+    "MISSILES_BREACH": {
+      "type": "MISSILES",
+      "damage": 4,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 3,
+      "breachChance": 8,
+      "stunChance": 1,
+      "missiles": 1,
+      "power": 3,
+      "cost": 65,
+      "rarity": 3,
+      "cooldown": 22.0
+    },
+    "BEAM_1": {
+      "type": "BEAM",
+      "damage": 1,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 1,
+      "cost": 20,
+      "rarity": 0,
+      "cooldown": 12.0,
+      "length": 45,
+      "speed": 3
+    },
+    "BEAM_LONG": {
+      "type": "BEAM",
+      "damage": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 55,
+      "rarity": 2,
+      "cooldown": 16.0,
+      "length": 170,
+      "speed": 13
+    },
+    "BEAM_2": {
+      "type": "BEAM",
+      "damage": 2,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 3,
+      "cost": 65,
+      "rarity": 2,
+      "cooldown": 17.0,
+      "length": 80
+    },
+    "BEAM_3": {
+      "type": "BEAM",
+      "damage": 3,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 4,
+      "cost": 95,
+      "rarity": 5,
+      "cooldown": 25.0,
+      "length": 80
+    },
+    "BEAM_FIRE": {
+      "type": "BEAM",
+      "damage": 0,
+      "sp": 0,
+      "fireChance": 8,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 50,
+      "rarity": 3,
+      "cooldown": 20.0,
+      "length": 140
+    },
+    "BEAM_BIO": {
+      "type": "BEAM",
+      "damage": 0,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 50,
+      "rarity": 5,
+      "persDamage": 4,
+      "cooldown": 16.0,
+      "length": 140,
+      "speed": 13
+    },
+    "LASER_HULL_1": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 2,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 2,
+      "power": 2,
+      "cost": 55,
+      "rarity": 2,
+      "cooldown": 14.0,
+      "hullBust": true,
+      "speed": 75
+    },
+    "LASER_HULL_2": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 3,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 3,
+      "power": 3,
+      "cost": 75,
+      "rarity": 3,
+      "cooldown": 15.0,
+      "hullBust": true,
+      "speed": 90
+    },
+    "BEAM_HULL": {
+      "type": "BEAM",
+      "damage": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 70,
+      "rarity": 3,
+      "cooldown": 14.0,
+      "hullBust": true,
+      "length": 100
+    },
+    "MISSILES_HULL": {
+      "type": "MISSILES",
+      "damage": 2,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 1,
+      "breachChance": 3,
+      "stunChance": 1,
+      "missiles": 1,
+      "power": 2,
+      "cost": 65,
+      "rarity": 3,
+      "cooldown": 17.0,
+      "hullBust": true
+    },
+    "ION_1": {
+      "type": "ION",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "stunChance": 1,
+      "ion": 1,
+      "power": 1,
+      "cost": 30,
+      "rarity": 3,
+      "cooldown": 8.0,
+      "speed": 30
+    },
+    "ION_2": {
+      "type": "ION",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "stunChance": 2,
+      "ion": 2,
+      "power": 2,
+      "cost": 45,
+      "rarity": 3,
+      "cooldown": 13.0,
+      "speed": 40
+    },
+    "ION_4": {
+      "type": "ION",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "stunChance": 1,
+      "ion": 1,
+      "power": 3,
+      "cost": 70,
+      "rarity": 4,
+      "cooldown": 4.0,
+      "speed": 30
+    },
+    "BOMB_1": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "missiles": 1,
+      "power": 1,
+      "cost": 45,
+      "rarity": 1,
+      "persDamage": 2,
+      "sysDamage": 2,
+      "cooldown": 13.0
+    },
+    "BOMB_BREACH_1": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 10,
+      "missiles": 1,
+      "power": 1,
+      "cost": 50,
+      "rarity": 0,
+      "persDamage": 2,
+      "sysDamage": 1,
+      "cooldown": 9.0
+    },
+    "BOMB_BREACH_2": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 10,
+      "missiles": 1,
+      "power": 2,
+      "cost": 60,
+      "rarity": 4,
+      "persDamage": 3,
+      "sysDamage": 3,
+      "cooldown": 17.0
+    },
+    "BOMB_FIRE": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 10,
+      "breachChance": 0,
+      "missiles": 1,
+      "power": 2,
+      "cost": 50,
+      "rarity": 2,
+      "persDamage": 2,
+      "sysDamage": 0,
+      "cooldown": 15.0
+    },
+    "BOMB_ION": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "stunChance": 2,
+      "ion": 4,
+      "missiles": 1,
+      "power": 1,
+      "cost": 55,
+      "rarity": 3,
+      "cooldown": 22.0
+    },
+    "BOMB_HEAL": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "missiles": 1,
+      "power": 1,
+      "cost": 40,
+      "rarity": 3,
+      "persDamage": -10,
+      "sysDamage": 0,
+      "cooldown": 18.0
+    },
+    "BOMB_LOCK": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "missiles": 1,
+      "power": 1,
+      "cost": 45,
+      "rarity": 0,
+      "persDamage": 0,
+      "sysDamage": 0,
+      "cooldown": 15.0,
+      "lockdown": true
+    },
+    "CRYSTAL_BURST_1": {
+      "type": "MISSILES",
+      "damage": 1,
+      "shots": 2,
+      "sp": 1,
+      "fireChance": 0,
+      "breachChance": 1,
+      "stunChance": 1,
+      "power": 2,
+      "cost": 20,
+      "rarity": 0,
+      "cooldown": 15.0,
+      "speed": 50
+    },
+    "CRYSTAL_BURST_2": {
+      "type": "MISSILES",
+      "damage": 1,
+      "shots": 3,
+      "sp": 1,
+      "fireChance": 0,
+      "breachChance": 1,
+      "stunChance": 1,
+      "power": 3,
+      "cost": 20,
+      "rarity": 0,
+      "cooldown": 17.0,
+      "speed": 50
+    },
+    "CRYSTAL_HEAVY_1": {
+      "type": "MISSILES",
+      "damage": 2,
+      "shots": 1,
+      "sp": 1,
+      "fireChance": 0,
+      "breachChance": 1,
+      "stunChance": 2,
+      "power": 1,
+      "cost": 20,
+      "rarity": 0,
+      "cooldown": 13.0,
+      "speed": 50
+    },
+    "CRYSTAL_HEAVY_2": {
+      "type": "MISSILES",
+      "damage": 4,
+      "shots": 1,
+      "sp": 1,
+      "fireChance": 0,
+      "breachChance": 10,
+      "stunChance": 2,
+      "power": 3,
+      "cost": 20,
+      "rarity": 0,
+      "cooldown": 19.0,
+      "speed": 50
+    },
+    "DRONE_LASER": {
+      "type": "LASER",
+      "noloc": true,
+      "damage": 1,
+      "shots": 1,
+      "fireChance": 1,
+      "breachChance": 0,
+      "rarity": 0
+    },
+    "DRONE_LASER_2": {
+      "type": "LASER",
+      "noloc": true,
+      "damage": 1,
+      "shots": 1,
+      "fireChance": 1,
+      "breachChance": 0,
+      "rarity": 0,
+      "speed": 120
+    },
+    "DRONE_BEAM": {
+      "type": "BEAM",
+      "noloc": true,
+      "damage": 1,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "rarity": 0,
+      "length": 20,
+      "speed": 3
+    },
+    "DRONE_ION": {
+      "type": "ION",
+      "noloc": true,
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "ion": 1,
+      "rarity": 0,
+      "speed": 30
+    },
+    "DRONE_MISSILE": {
+      "type": "MISSILES",
+      "noloc": true,
+      "damage": 1,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 1,
+      "breachChance": 1,
+      "rarity": 0
+    },
+    "LIGHT_BOW": {
+      "type": "BEAM",
+      "damage": 1,
+      "power": 2,
+      "cost": 65,
+      "rarity": 3,
+      "cooldown": 13.0,
+      "length": 90
+    },
+    "BOMBCHU_LAUNCHER": {
+      "type": "MISSILES",
+      "damage": 3,
+      "shots": 1,
+      "sp": 0,
+      "missiles": 1,
+      "power": 3,
+      "cost": 80,
+      "rarity": 4,
+      "cooldown": 17.0
+    },
+    "DINS_FIRE_PROJECTOR": {
+      "type": "BOMB",
+      "damage": 3,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 4,
+      "missiles": 1,
+      "power": 1,
+      "cost": 70,
+      "rarity": 4,
+      "cooldown": 20.0
+    },
+    "MASTER_SWORD_BEAM": {
+      "type": "BEAM",
+      "damage": 3,
+      "power": 4,
+      "cost": 120,
+      "rarity": 5,
+      "cooldown": 22.0,
+      "length": 90
+    },
+    "ANTI_DRONE_ION": {
+      "type": "ION",
+      "noloc": true,
+      "damage": 0,
+      "shots": 1,
+      "fireChance": 0,
+      "breachChance": 0,
+      "ion": 1,
+      "rarity": 0,
+      "speed": 90
+    },
+    "DRONE_BEAM2": {
+      "type": "BEAM",
+      "noloc": true,
+      "damage": 1,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "rarity": 0,
+      "length": 40,
+      "speed": 8
+    },
+    "DRONE_FIREBEAM": {
+      "type": "BEAM",
+      "noloc": true,
+      "damage": 0,
+      "sp": 0,
+      "fireChance": 9,
+      "breachChance": 0,
+      "rarity": 0,
+      "length": 10,
+      "speed": 2
+    },
+    "BOMB_HEAL_SYSTEM": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "missiles": 1,
+      "power": 1,
+      "cost": 40,
+      "rarity": 3,
+      "persDamage": 0,
+      "sysDamage": -8,
+      "cooldown": 14.0
+    },
+    "SHOTGUN_PLAYER": {
+      "type": "BURST",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 1,
+      "cost": 60,
+      "rarity": 0,
+      "cooldown": 8.0,
+      "speed": 26
+    },
+    "SHOTGUN": {
+      "type": "BURST",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 65,
+      "rarity": 1,
+      "cooldown": 10.0,
+      "speed": 26
+    },
+    "ARTILLERY_FED_C": {
+      "type": "BURST",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 3,
+      "cost": 75,
+      "rarity": 0,
+      "cooldown": 40.0,
+      "speed": 26
+    },
+    "SHOTGUN_2": {
+      "type": "BURST",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 3,
+      "cost": 80,
+      "rarity": 4,
+      "cooldown": 21.0,
+      "speed": 26
+    },
+    "MISSILE_CHARGEGUN": {
+      "type": "BURST",
+      "damage": 1,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 1,
+      "breachChance": 1,
+      "missiles": 1,
+      "power": 2,
+      "cost": 65,
+      "rarity": 4,
+      "cooldown": 7.0,
+      "speed": 45
+    },
+    "LASER_CHAINGUN": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 2,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 65,
+      "rarity": 3,
+      "cooldown": 16.0
+    },
+    "LASER_CHAINGUN_2": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 4,
+      "cost": 95,
+      "rarity": 5,
+      "cooldown": 11.1
+    },
+    "ION_CHAINGUN": {
+      "type": "ION",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "ion": 1,
+      "power": 3,
+      "cost": 55,
+      "rarity": 4,
+      "cooldown": 14.0,
+      "speed": 30
+    },
+    "LASER_CHARGEGUN_PLAYER": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 1,
+      "cost": 30,
+      "rarity": 0,
+      "cooldown": 5.5
+    },
+    "LASER_CHARGEGUN": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "power": 2,
+      "cost": 55,
+      "rarity": 3,
+      "cooldown": 6.0
+    },
+    "LASER_CHARGEGUN_2": {
+      "type": "LASER",
+      "damage": 1,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 1,
+      "breachChance": 0,
+      "power": 3,
+      "cost": 70,
+      "rarity": 3,
+      "cooldown": 5.0
+    },
+    "ION_CHARGEGUN": {
+      "type": "ION",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "ion": 1,
+      "power": 2,
+      "cost": 50,
+      "rarity": 3,
+      "cooldown": 6.0,
+      "speed": 30
+    },
+    "ION_STUN": {
+      "type": "ION",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "ion": 1,
+      "power": 1,
+      "cost": 35,
+      "rarity": 4,
+      "stun": 5,
+      "cooldown": 10.0,
+      "speed": 30
+    },
+    "BOMB_STUN": {
+      "type": "BOMB",
+      "damage": 0,
+      "shots": 1,
+      "sp": 0,
+      "fireChance": 0,
+      "breachChance": 0,
+      "ion": 1,
+      "missiles": 1,
+      "power": 1,
+      "cost": 45,
+      "rarity": 2,
+      "stun": 15,
+      "persDamage": 0,
+      "sysDamage": 0,
+      "cooldown": 17.0
+    },
+    "PDS_SHOT": {
+      "type": "LASER",
+      "damage": 3,
+      "shots": 1,
+      "sp": 5,
+      "fireChance": 0,
+      "breachChance": 10,
+      "power": 1,
+      "cost": 55,
+      "rarity": 0,
+      "cooldown": 9.0,
+      "speed": 20
     }
   },
   "drones": {
-    "combat": {
-      "COMBAT_1": {
-        "title": "Combat Drone I",
-        "type": "COMBAT",
-        "power": 2,
-        "cost": 50,
-        "cooldown": 8,
-        "speed": 15,
-        "rarity": 1
-      },
-      "COMBAT_2": {
-        "title": "Combat Drone II",
-        "type": "COMBAT",
-        "power": 4,
-        "cost": 70,
-        "cooldown": 5,
-        "speed": 20,
-        "rarity": 4
-      },
-      "COMBAT_BEAM": {
-        "title": "Beam Drone I",
-        "type": "COMBAT",
-        "power": 2,
-        "cost": 80,
-        "cooldown": 12,
-        "speed": 10,
-        "rarity": 3
-      },
-      "COMBAT_BEAM_2": {
-        "title": "Beam Drone II",
-        "type": "COMBAT",
-        "power": 3,
-        "cost": 95,
-        "cooldown": 10,
-        "speed": 12,
-        "rarity": 5
-      },
-      "COMBAT_FIRE": {
-        "title": "Fire Drone",
-        "type": "COMBAT",
-        "power": 3,
-        "cost": 75,
-        "cooldown": 10,
-        "speed": 12,
-        "rarity": 4
-      },
-      "COMBAT_ION": {
-        "title": "Ion Drone",
-        "type": "COMBAT",
-        "power": 2,
-        "cost": 65,
-        "cooldown": 7,
-        "speed": 15,
-        "rarity": 3
-      }
+    "COMBAT_ION": {
+      "type": "COMBAT",
+      "noloc": true,
+      "power": 2,
+      "cost": 50,
+      "rarity": 0,
+      "speed": 5,
+      "dodge": 0,
+      "cooldown": 1000.0
     },
-    "defense": {
-      "DEFENSE_1": {
-        "title": "Defense Drone I",
-        "type": "DEFENSE",
-        "power": 2,
-        "cost": 50,
-        "cooldown": 4,
-        "speed": 20,
-        "rarity": 1
-      },
-      "DEFENSE_2": {
-        "title": "Defense Drone II",
-        "type": "DEFENSE",
-        "power": 3,
-        "cost": 75,
-        "cooldown": 3,
-        "speed": 25,
-        "rarity": 4
-      },
-      "ANTI_COMBAT": {
-        "title": "Anti-Combat Drone",
-        "type": "DEFENSE",
-        "power": 2,
-        "cost": 50,
-        "cooldown": 5,
-        "speed": 18,
-        "rarity": 2
-      },
-      "SHIELD": {
-        "title": "Shield Overcharger",
-        "type": "DEFENSE",
-        "power": 2,
-        "cost": 70,
-        "cooldown": 10,
-        "speed": 5,
-        "rarity": 3
-      }
+    "COMBAT_MISSILE": {
+      "type": "COMBAT",
+      "noloc": true,
+      "power": 2,
+      "cost": 50,
+      "rarity": 0,
+      "speed": 5,
+      "dodge": 0,
+      "cooldown": 1000.0
     },
-    "repair": {
-      "REPAIR": {
-        "title": "System Repair Drone",
-        "type": "REPAIR",
-        "power": 1,
-        "cost": 30,
-        "speed": 5,
-        "rarity": 2
-      },
-      "SHIP_REPAIR": {
-        "title": "Hull Repair Drone",
-        "type": "SHIP_REPAIR",
-        "power": 3,
-        "cost": 85,
-        "speed": 5,
-        "rarity": 4
-      }
+    "COMBAT_1": {
+      "type": "COMBAT",
+      "power": 2,
+      "cost": 50,
+      "rarity": 2,
+      "speed": 15,
+      "dodge": 0,
+      "cooldown": 1000.0
     },
-    "boarder": {
-      "BOARDER_ION": {
-        "title": "Boarding Drone",
-        "type": "BOARDER",
-        "power": 3,
-        "cost": 80,
-        "rarity": 4
-      }
+    "COMBAT_BEAM": {
+      "type": "COMBAT",
+      "power": 2,
+      "cost": 50,
+      "rarity": 3,
+      "speed": 15,
+      "dodge": 0,
+      "cooldown": 1000.0
     },
-    "battle": {
-      "BATTLE": {
-        "title": "Battle Drone",
-        "type": "BATTLE",
-        "power": 1,
-        "cost": 40,
-        "speed": 10,
-        "rarity": 2
-      }
+    "COMBAT_2": {
+      "type": "COMBAT",
+      "power": 4,
+      "cost": 75,
+      "rarity": 5,
+      "speed": 28,
+      "dodge": 0,
+      "cooldown": 1000.0
     },
-    "hacking": {
-      "HACKING": {
-        "title": "Hacking Drone",
-        "type": "HACKING",
-        "power": 0,
-        "cost": 0,
-        "rarity": 0
-      }
+    "SHIP_REPAIR": {
+      "type": "SHIP_REPAIR",
+      "power": 2,
+      "cost": 85,
+      "rarity": 4,
+      "speed": 20,
+      "dodge": 0,
+      "cooldown": 1000.0
+    },
+    "DEFENSE_1": {
+      "type": "DEFENSE",
+      "power": 2,
+      "cost": 50,
+      "rarity": 1,
+      "speed": 5,
+      "dodge": 0,
+      "cooldown": 1000.0
+    },
+    "DEFENSE_2": {
+      "type": "DEFENSE",
+      "power": 3,
+      "cost": 70,
+      "rarity": 3,
+      "speed": 7,
+      "dodge": 0,
+      "cooldown": 880.0
+    },
+    "DEFENSE_2_ENEMY": {
+      "type": "DEFENSE",
+      "noloc": true,
+      "power": 3,
+      "cost": 70,
+      "rarity": 0,
+      "speed": 7,
+      "dodge": 0,
+      "cooldown": 880.0
+    },
+    "BOSS_DEFENSE_2": {
+      "type": "DEFENSE",
+      "noloc": true,
+      "power": 2,
+      "cost": 75,
+      "rarity": 0,
+      "speed": 7,
+      "dodge": 0,
+      "cooldown": 750.0
+    },
+    "REPAIR": {
+      "type": "REPAIR",
+      "power": 1,
+      "cost": 30,
+      "rarity": 1
+    },
+    "BATTLE": {
+      "type": "BATTLE",
+      "power": 2,
+      "cost": 35,
+      "rarity": 2
+    },
+    "BOARDER": {
+      "type": "BOARDER",
+      "power": 3,
+      "cost": 70,
+      "rarity": 4,
+      "speed": 18
+    },
+    "BOARDER_BOSS": {
+      "type": "BOARDER",
+      "noloc": true,
+      "power": 2,
+      "cost": 70,
+      "rarity": 0,
+      "speed": 18
+    },
+    "SHEIKAH_EYE_DRONE": {
+      "type": "COMBAT",
+      "power": 4,
+      "cost": 100,
+      "rarity": 4,
+      "speed": 25,
+      "cooldown": 10.0
+    },
+    "GUARDIAN_DEFENSE_DRONE": {
+      "type": "DEFENSE",
+      "power": 2,
+      "cost": 60,
+      "rarity": 3
+    },
+    "FAIRY_REPAIR_SWARM": {
+      "type": "SHIP_REPAIR",
+      "power": 2,
+      "cost": 50,
+      "rarity": 2
+    },
+    "HOOKSHOT_BOARDING_DRONE": {
+      "type": "BOARDER",
+      "power": 3,
+      "cost": 75,
+      "rarity": 3
+    },
+    "BOARDER_ION": {
+      "type": "BOARDER",
+      "power": 3,
+      "cost": 65,
+      "rarity": 4,
+      "speed": 18
+    },
+    "DRONE_HACKING": {
+      "type": "HACKING",
+      "noloc": true,
+      "power": 1,
+      "cost": 70,
+      "rarity": 0,
+      "speed": 28
+    },
+    "ANTI_DRONE": {
+      "type": "DEFENSE",
+      "power": 1,
+      "cost": 35,
+      "rarity": 1,
+      "speed": 5,
+      "dodge": 0,
+      "cooldown": 7000.0
+    },
+    "COMBAT_BEAM_2": {
+      "type": "COMBAT",
+      "power": 3,
+      "cost": 60,
+      "rarity": 5,
+      "speed": 11,
+      "dodge": 0,
+      "cooldown": 1000.0
+    },
+    "COMBAT_FIRE": {
+      "type": "COMBAT",
+      "power": 3,
+      "cost": 50,
+      "rarity": 4,
+      "speed": 12,
+      "dodge": 0,
+      "cooldown": 1000.0
+    },
+    "DRONE_SHIELD": {
+      "type": "SHIELD",
+      "power": 3,
+      "cost": 60,
+      "rarity": 4,
+      "speed": 5,
+      "dodge": 0,
+      "cooldown": 15000.0
+    },
+    "DRONE_SHIELD_PLAYER": {
+      "type": "SHIELD",
+      "power": 2,
+      "cost": 60,
+      "rarity": 0,
+      "speed": 5,
+      "dodge": 0,
+      "cooldown": 15000.0
     }
   },
   "augments": {
-    "weapons": {
-      "AUTO_COOLDOWN": {
-        "title": "Weapon Pre-Igniter",
-        "desc": "All weapons start every fight fully charged.",
-        "cost": 80,
-        "rarity": 5,
-        "stackable": false
-      },
-      "EXPLOSIVE_REPLICATOR": {
-        "title": "Explosive Replicator",
-        "desc": "Missiles and bombs have a 50% chance of not consuming a missile.",
-        "cost": 60,
-        "rarity": 4,
-        "stackable": false,
-        "value": 0.5
-      },
-      "CLOAKING_ADVANCED": {
-        "title": "Advanced Cloaking",
-        "desc": "You stay cloaked for twice as long.",
-        "cost": 50,
-        "rarity": 4,
-        "stackable": false
-      },
-      "BEAM_PIERCE": {
-        "title": "Beam Enhancer",
-        "desc": "Beams pierce through one shield layer.",
-        "cost": 45,
-        "rarity": 4,
-        "stackable": false
-      }
+    "ROCK_ARMOR": {
+      "cost": 80,
+      "rarity": 0,
+      "stackable": false,
+      "value": 0.15
     },
-    "defense": {
-      "AUTO_SHIELDS": {
-        "title": "Shield Charger",
-        "desc": "Shields recharge 15% faster.",
-        "cost": 50,
-        "rarity": 3,
-        "stackable": false,
-        "value": 0.15
-      },
-      "DRONE_SHIELD": {
-        "title": "Drone Recovery Arm",
-        "desc": "55% chance to recover lost drones.",
-        "cost": 50,
-        "rarity": 3,
-        "stackable": false,
-        "value": 0.55
-      },
-      "TITANIUM_SYSTEM": {
-        "title": "Titanium System Casing",
-        "desc": "All system damage is reduced by 15%.",
-        "cost": 50,
-        "rarity": 3,
-        "stackable": false,
-        "value": 0.15
-      },
-      "AUTO_REPAIR": {
-        "title": "Automated Re-Loader",
-        "desc": "All weapons reload 10% faster.",
-        "cost": 40,
-        "rarity": 2,
-        "stackable": false,
-        "value": 0.1
-      },
-      "BACKUP_BATTERY": {
-        "title": "Backup DNA Bank",
-        "desc": "Clone Bay keeps genetic records even while destroyed.",
-        "cost": 30,
-        "rarity": 2,
-        "stackable": false
-      },
-      "DISTRACTION_BUOYS": {
-        "title": "Distraction Buoys",
-        "desc": "50% chance to negate pursuing ships during an ASB event.",
-        "cost": 40,
-        "rarity": 3,
-        "stackable": false,
-        "value": 0.5
-      }
+    "CRYSTAL_SHARDS": {
+      "cost": 80,
+      "rarity": 0,
+      "stackable": false,
+      "value": 0.1
     },
-    "crew": {
-      "MANTIS_PHEROMONES": {
-        "title": "Mantis Pheromones",
-        "desc": "All crew move 25% faster.",
-        "cost": 25,
-        "rarity": 2,
-        "stackable": false,
-        "value": 0.25
-      },
-      "MEDBAY_BOOST": {
-        "title": "Engi Med-bot Dispersal",
-        "desc": "Heals your crew everywhere on the ship.",
-        "cost": 35,
-        "rarity": 3,
-        "stackable": false
-      },
-      "CREW_BLUEPRINTS": {
-        "title": "Crew Blueprints",
-        "desc": "Clone bay clone speed increased by 50%.",
-        "cost": 30,
-        "rarity": 2,
-        "stackable": false,
-        "value": 0.5
-      }
+    "ENERGY_SHIELD": {
+      "cost": 80,
+      "rarity": 0,
+      "stackable": false,
+      "value": 2.0
     },
-    "ship": {
-      "FTL_BOOSTER": {
-        "title": "FTL Booster",
-        "desc": "FTL charges 25% faster.",
-        "cost": 50,
-        "rarity": 3,
-        "stackable": false,
-        "value": 0.25
-      },
-      "FTL_RECHARGE": {
-        "title": "FTL Recharge Booster",
-        "desc": "FTL charges 15% faster.",
-        "cost": 40,
-        "rarity": 2,
-        "stackable": false,
-        "value": 0.15
-      },
-      "ENGINE_BOOST": {
-        "title": "Engine Boost",
-        "desc": "Engines recharge 15% faster.",
-        "cost": 30,
-        "rarity": 2,
-        "stackable": false,
-        "value": 0.15
-      },
-      "STEALTH_AUGMENT": {
-        "title": "Stealth Weapons",
-        "desc": "Weapons don't uncloak the ship when fired.",
-        "cost": 50,
-        "rarity": 4,
-        "stackable": false
-      },
-      "LIFEFORM_SCANNER": {
-        "title": "Lifeform Scanner",
-        "desc": "Reveals crew and system locations on enemy ships.",
-        "cost": 40,
-        "rarity": 2,
-        "stackable": false
-      },
-      "SCRAP_COLLECTOR": {
-        "title": "Scrap Recovery Arm",
-        "desc": "10% more scrap from all sources.",
-        "cost": 50,
-        "rarity": 3,
-        "stackable": false,
-        "value": 0.1
-      },
-      "REPAIR_ARM": {
-        "title": "Hull Repair Drone",
-        "desc": "3 hull repaired at each jump.",
-        "cost": 65,
-        "rarity": 4,
-        "stackable": false,
-        "value": 3
-      },
-      "FUEL_CONSUMPTION": {
-        "title": "Fuel Compressor",
-        "desc": "30% chance to not consume fuel on a jump.",
-        "cost": 45,
-        "rarity": 3,
-        "stackable": false,
-        "value": 0.3
-      },
-      "REVERSE_ION": {
-        "title": "Ion Intruder",
-        "desc": "While cloaked, enemy ship suffers 1 ion damage to a random system.",
-        "cost": 50,
-        "rarity": 4,
-        "stackable": false,
-        "value": 1
-      },
-      "FIRE_SUPPRESS": {
-        "title": "Fire Suppression",
-        "desc": "Fires are extinguished automatically over time.",
-        "cost": 35,
-        "rarity": 2,
-        "stackable": false
-      },
-      "O2_MASKS": {
-        "title": "Emergency Respirators",
-        "desc": "Crew take 50% less suffocation damage.",
-        "cost": 40,
-        "rarity": 2,
-        "stackable": false,
-        "value": 0.5
-      },
-      "ROCK_PLATING": {
-        "title": "Rock Plating",
-        "desc": "Immune to asteroid damage. 15% chance to negate breach/fire.",
-        "cost": 40,
-        "rarity": 3,
-        "stackable": false,
-        "value": 0.15
-      },
-      "LONG_RANGE_SENSORS": {
-        "title": "Long-Ranged Scanners",
-        "desc": "See map details from adjacent beacons.",
-        "cost": 30,
-        "rarity": 2,
-        "stackable": false
-      },
-      "ENERGY_SHIELD": {
-        "title": "Zoltan Shield",
-        "desc": "Creates a powerful supershield at the start of combat.",
-        "cost": 80,
-        "rarity": 5,
-        "stackable": false,
-        "value": 5
-      },
-      "CRYSTAL_LOCKDOWN": {
-        "title": "Lockdown Bomb",
-        "desc": "Bombs have a chance to lockdown rooms.",
-        "cost": 40,
-        "rarity": 4,
-        "stackable": false
-      },
-      "SLUG_GEL": {
-        "title": "Slug Repair Gel",
-        "desc": "Breaches are sealed 25% faster.",
-        "cost": 30,
-        "rarity": 2,
-        "stackable": false,
-        "value": 0.25
-      },
-      "LANIUS_HULL": {
-        "title": "Ancient Breach Resealer",
-        "desc": "Breaches heal automatically over time.",
-        "cost": 50,
-        "rarity": 4,
-        "stackable": false
-      }
+    "NANO_MEDBAY": {
+      "cost": 60,
+      "rarity": 0,
+      "stackable": false,
+      "value": 0.25
+    },
+    "SLUG_GEL": {
+      "cost": 60,
+      "rarity": 0,
+      "stackable": false,
+      "value": 0.25
+    },
+    "CREW_STIMS": {
+      "cost": 50,
+      "rarity": 0,
+      "stackable": false,
+      "value": 0.25
+    },
+    "DRONE_SPEED": {
+      "cost": 50,
+      "rarity": 0,
+      "stackable": false,
+      "value": 0.25
+    },
+    "SYSTEM_CASING": {
+      "cost": 80,
+      "rarity": 0,
+      "stackable": false,
+      "value": 0.15
+    },
+    "ION_ARMOR": {
+      "cost": 45,
+      "rarity": 2,
+      "stackable": true,
+      "value": 0.5
+    },
+    "CLOAK_FIRE": {
+      "cost": 50,
+      "rarity": 3,
+      "stackable": false,
+      "value": 0.15
+    },
+    "REPAIR_ARM": {
+      "cost": 50,
+      "rarity": 3,
+      "stackable": false,
+      "value": 0.15
+    },
+    "SCRAP_COLLECTOR": {
+      "cost": 50,
+      "rarity": 1,
+      "stackable": true,
+      "value": 0.1
+    },
+    "ADV_SCANNERS": {
+      "cost": 30,
+      "rarity": 1,
+      "stackable": false
+    },
+    "AUTO_COOLDOWN": {
+      "cost": 40,
+      "rarity": 2,
+      "stackable": true,
+      "value": 0.1
+    },
+    "SHIELD_RECHARGE": {
+      "cost": 45,
+      "rarity": 2,
+      "stackable": true,
+      "value": 0.15
+    },
+    "WEAPON_PREIGNITE": {
+      "cost": 120,
+      "rarity": 4,
+      "stackable": false
+    },
+    "FTL_BOOSTER": {
+      "cost": 50,
+      "rarity": 2,
+      "stackable": true,
+      "value": 0.25
+    },
+    "FTL_JUMPER": {
+      "cost": 50,
+      "rarity": 3,
+      "stackable": false
+    },
+    "DRONE_RECOVERY": {
+      "cost": 50,
+      "rarity": 2,
+      "stackable": false
+    },
+    "FTL_JAMMER": {
+      "cost": 30,
+      "rarity": 3,
+      "stackable": false,
+      "value": 2.0
+    },
+    "STASIS_POD": {
+      "cost": 30,
+      "rarity": 0,
+      "stackable": true,
+      "value": 0.15
+    },
+    "TRIFORCE_RESONATOR": {
+      "cost": 80,
+      "rarity": 4,
+      "value": 0.15
+    },
+    "LENS_OF_TRUTH": {
+      "cost": 60,
+      "rarity": 3,
+      "value": 1.0
+    },
+    "SONG_OF_TIME_MODULE": {
+      "cost": 100,
+      "rarity": 5,
+      "value": 1.0
+    },
+    "NAYRUS_LOVE_BARRIER": {
+      "cost": 90,
+      "rarity": 4,
+      "value": 1.0
+    },
+    "O2_MASKS": {
+      "cost": 50,
+      "rarity": 2,
+      "stackable": false,
+      "value": 0.5
+    },
+    "EXPLOSIVE_REPLICATOR": {
+      "cost": 60,
+      "rarity": 3,
+      "stackable": false,
+      "value": 0.5
+    },
+    "FIRE_EXTINGUISHERS": {
+      "cost": 65,
+      "rarity": 3,
+      "stackable": false,
+      "value": 1.0
+    },
+    "FLEET_DISTRACTION": {
+      "cost": 55,
+      "rarity": 3,
+      "stackable": false,
+      "value": 1.0
+    },
+    "TELEPORT_HEAL": {
+      "cost": 70,
+      "rarity": 3,
+      "stackable": false,
+      "value": 1.0
+    },
+    "BATTERY_BOOSTER": {
+      "cost": 40,
+      "rarity": 2,
+      "stackable": false,
+      "value": 0.5
+    },
+    "DEFENSE_SCRAMBLER": {
+      "cost": 80,
+      "rarity": 4,
+      "stackable": false,
+      "value": 0.0
+    },
+    "BACKUP_DNA": {
+      "cost": 40,
+      "rarity": 2,
+      "stackable": false,
+      "value": 0.0
+    },
+    "HACKING_STUN": {
+      "cost": 60,
+      "rarity": 3,
+      "stackable": false,
+      "value": 0.0
+    },
+    "LIFE_SCANNER": {
+      "cost": 40,
+      "rarity": 3,
+      "stackable": false,
+      "value": 0.0
+    },
+    "ZOLTAN_BYPASS": {
+      "cost": 55,
+      "rarity": 3,
+      "stackable": false,
+      "value": 0.0
     }
   },
   "crew": {
@@ -928,7 +1379,8 @@
       "canSuffocate": true,
       "canBurn": true,
       "providePower": false,
-      "cost": 45
+      "cost": 45,
+      "rarity": 1
     },
     "engi": {
       "title": "Engi",
@@ -944,7 +1396,8 @@
       "canSuffocate": true,
       "canBurn": true,
       "providePower": false,
-      "cost": 50
+      "cost": 50,
+      "rarity": 2
     },
     "mantis": {
       "title": "Mantis",
@@ -960,56 +1413,8 @@
       "canSuffocate": true,
       "canBurn": true,
       "providePower": false,
-      "cost": 55
-    },
-    "rockmen": {
-      "title": "Rock",
-      "maxHealth": 150,
-      "moveSpeed": 50,
-      "repairSpeed": 100,
-      "damageMultiplier": 1.0,
-      "fireRepair": 200,
-      "suffocationModifier": 1.0,
-      "canFight": true,
-      "canRepair": true,
-      "canSabotage": true,
-      "canSuffocate": true,
-      "canBurn": false,
-      "providePower": false,
-      "cost": 55
-    },
-    "crystal": {
-      "title": "Crystal",
-      "maxHealth": 125,
-      "moveSpeed": 80,
-      "repairSpeed": 100,
-      "damageMultiplier": 1.0,
-      "fireRepair": 100,
-      "suffocationModifier": 0.5,
-      "canFight": true,
-      "canRepair": true,
-      "canSabotage": true,
-      "canSuffocate": true,
-      "canBurn": true,
-      "providePower": false,
-      "lockdown": true,
-      "cost": 65
-    },
-    "zoltan": {
-      "title": "Zoltan",
-      "maxHealth": 70,
-      "moveSpeed": 100,
-      "repairSpeed": 100,
-      "damageMultiplier": 1.0,
-      "fireRepair": 100,
-      "suffocationModifier": 1.0,
-      "canFight": true,
-      "canRepair": true,
-      "canSabotage": true,
-      "canSuffocate": true,
-      "canBurn": true,
-      "providePower": true,
-      "cost": 60
+      "cost": 55,
+      "rarity": 2
     },
     "slug": {
       "title": "Slug",
@@ -1026,23 +1431,44 @@
       "canBurn": true,
       "providePower": false,
       "telepathic": true,
-      "cost": 50
+      "cost": 45,
+      "rarity": 0
     },
-    "ghost": {
-      "title": "Ghost",
-      "maxHealth": 50,
-      "moveSpeed": 150,
-      "repairSpeed": 150,
-      "damageMultiplier": 0.5,
+    "rock": {
+      "cost": 55,
+      "rarity": 3
+    },
+    "crystal": {
+      "title": "Crystal",
+      "maxHealth": 125,
+      "moveSpeed": 80,
+      "repairSpeed": 100,
+      "damageMultiplier": 1.0,
       "fireRepair": 100,
-      "suffocationModifier": 0.0,
+      "suffocationModifier": 0.5,
       "canFight": true,
       "canRepair": true,
       "canSabotage": true,
-      "canSuffocate": false,
-      "canBurn": false,
+      "canSuffocate": true,
+      "canBurn": true,
       "providePower": false,
-      "cost": 75
+      "lockdown": true,
+      "cost": 60,
+      "rarity": 0
+    },
+    "energy": {
+      "cost": 60,
+      "rarity": 5
+    },
+    "battle": {
+      "noloc": true,
+      "cost": 50,
+      "rarity": 0
+    },
+    "repair": {
+      "noloc": true,
+      "cost": 50,
+      "rarity": 0
     },
     "anaerobic": {
       "title": "Lanius",
@@ -1059,34 +1485,830 @@
       "canBurn": true,
       "providePower": false,
       "drainOxygen": true,
-      "cost": 55
+      "cost": 50,
+      "rarity": 0
+    },
+    "rockmen": {
+      "title": "Rock",
+      "maxHealth": 150,
+      "moveSpeed": 50,
+      "repairSpeed": 100,
+      "damageMultiplier": 1.0,
+      "fireRepair": 200,
+      "suffocationModifier": 1.0,
+      "canFight": true,
+      "canRepair": true,
+      "canSabotage": true,
+      "canSuffocate": true,
+      "canBurn": false,
+      "providePower": false
+    },
+    "zoltan": {
+      "title": "Zoltan",
+      "maxHealth": 70,
+      "moveSpeed": 100,
+      "repairSpeed": 100,
+      "damageMultiplier": 1.0,
+      "fireRepair": 100,
+      "suffocationModifier": 1.0,
+      "canFight": true,
+      "canRepair": true,
+      "canSabotage": true,
+      "canSuffocate": true,
+      "canBurn": true,
+      "providePower": true
+    },
+    "ghost": {
+      "title": "Ghost",
+      "maxHealth": 50,
+      "moveSpeed": 150,
+      "repairSpeed": 150,
+      "damageMultiplier": 0.5,
+      "fireRepair": 100,
+      "suffocationModifier": 0.0,
+      "canFight": true,
+      "canRepair": true,
+      "canSabotage": true,
+      "canSuffocate": false,
+      "canBurn": false,
+      "providePower": false
     }
   },
-  "balance_ranges": {
-    "damage": {"min": 0, "max": 10},
-    "shots": {"min": 1, "max": 10},
-    "fireChance": {"min": 0, "max": 10},
-    "breachChance": {"min": 0, "max": 10},
-    "cooldown": {"min": 1, "max": 30},
-    "power": {"min": 1, "max": 5},
-    "cost": {"min": 10, "max": 200},
-    "rarity": {"min": 0, "max": 5},
-    "ion": {"min": 1, "max": 10},
-    "length": {"min": 10, "max": 100},
-    "sp": {"min": 0, "max": 5},
-    "stun": {"min": 0, "max": 20},
-    "persDamage": {"min": 0, "max": 100}
+  "ships": {
+    "PLAYER_SHIP_EASY": {
+      "layout": "kestral",
+      "img": "kestral",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 8,
+      "weaponCount": 2,
+      "weapons": [
+        "MISSILES_2_PLAYER",
+        "LASER_BURST_3"
+      ],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 3
+        }
+      ]
+    },
+    "PLAYER_SHIP_HARD": {
+      "layout": "kestral",
+      "img": "kestral",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 8,
+      "weaponCount": 2,
+      "weapons": [
+        "LASER_BURST_3",
+        "LIGHT_BOW"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 3
+        }
+      ]
+    },
+    "PLAYER_SHIP_HARD_2": {
+      "layout": "kestral_2",
+      "img": "kestral_2",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 5,
+      "weaponCount": 4,
+      "weapons": [
+        "LASER_BURST_1",
+        "LASER_BURST_1",
+        "LASER_BURST_1",
+        "LASER_BURST_1"
+      ],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 2
+        },
+        {
+          "class": "energy",
+          "amount": 1
+        },
+        {
+          "class": "mantis",
+          "amount": 1
+        }
+      ]
+    },
+    "PLAYER_SHIP_MANTIS": {
+      "layout": "mantis_cruiser",
+      "img": "mantis_cruiser",
+      "weaponSlots": 3,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 7,
+      "missiles": 16,
+      "weaponCount": 2,
+      "weapons": [
+        "BOMB_1",
+        "LASER_BURST_1"
+      ],
+      "augments": [
+        "CREW_STIMS"
+      ],
+      "crew": [
+        {
+          "class": "mantis",
+          "amount": 3
+        },
+        {
+          "class": "engi",
+          "amount": 1
+        }
+      ]
+    },
+    "PLAYER_SHIP_MANTIS_2": {
+      "layout": "mantis_cruiser_2",
+      "img": "mantis_cruiser_2",
+      "weaponSlots": 3,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 11,
+      "missiles": 0,
+      "weaponCount": 0,
+      "weapons": [],
+      "drones_parts": 15,
+      "droneCount": 2,
+      "drones": [
+        "BOARDER",
+        "DEFENSE_1"
+      ],
+      "augments": [
+        "CREW_STIMS"
+      ],
+      "crew": [
+        {
+          "class": "mantis",
+          "amount": 2
+        }
+      ]
+    },
+    "PLAYER_SHIP_STEALTH": {
+      "layout": "stealth",
+      "img": "stealth",
+      "weaponSlots": 3,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 0,
+      "weaponCount": 2,
+      "weapons": [
+        "BEAM_1",
+        "LASER_BURST_2"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "SYSTEM_CASING",
+        "ADV_SCANNERS"
+      ],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 3
+        }
+      ]
+    },
+    "PLAYER_SHIP_STEALTH_2": {
+      "layout": "stealth_2",
+      "img": "stealth_2",
+      "weaponSlots": 3,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 7,
+      "missiles": 0,
+      "weaponCount": 1,
+      "weapons": [
+        "BEAM_3"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "ADV_SCANNERS"
+      ],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 2
+        },
+        {
+          "class": "energy",
+          "amount": 1
+        }
+      ]
+    },
+    "PLAYER_SHIP_CIRCLE": {
+      "layout": "circle_cruiser",
+      "img": "circle_cruiser",
+      "weaponSlots": 3,
+      "droneSlots": 3,
+      "health": 30,
+      "maxPower": 10,
+      "missiles": 0,
+      "weaponCount": 1,
+      "weapons": [
+        "ION_4"
+      ],
+      "drones_parts": 15,
+      "droneCount": 1,
+      "drones": [
+        "COMBAT_1"
+      ],
+      "augments": [
+        "NANO_MEDBAY"
+      ],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 1
+        },
+        {
+          "class": "engi",
+          "amount": 2
+        }
+      ]
+    },
+    "PLAYER_SHIP_CIRCLE_2": {
+      "layout": "circle_cruiser_2",
+      "img": "circle_cruiser_2",
+      "weaponSlots": 3,
+      "droneSlots": 3,
+      "health": 30,
+      "maxPower": 9,
+      "missiles": 0,
+      "weaponCount": 2,
+      "weapons": [
+        "ION_2",
+        "LASER_HEAVY_1"
+      ],
+      "drones_parts": 6,
+      "droneCount": 3,
+      "drones": [
+        "BATTLE",
+        "REPAIR",
+        "REPAIR"
+      ],
+      "augments": [
+        "DRONE_SPEED"
+      ],
+      "crew": [
+        {
+          "class": "engi",
+          "amount": 1
+        }
+      ]
+    },
+    "PLAYER_SHIP_FED": {
+      "layout": "fed_cruiser",
+      "img": "fed_cruiser",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 5,
+      "weaponCount": 1,
+      "weapons": [
+        "LASER_BURST_3"
+      ],
+      "drones_parts": 2,
+      "droneCount": 0,
+      "drones": [],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 1
+        },
+        {
+          "class": "mantis",
+          "amount": 1
+        },
+        {
+          "class": "rock",
+          "amount": 1
+        },
+        {
+          "class": "engi",
+          "amount": 1
+        }
+      ]
+    },
+    "PLAYER_SHIP_FED_2": {
+      "layout": "fed_cruiser_2",
+      "img": "fed_cruiser_2",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 9,
+      "missiles": 9,
+      "weaponCount": 4,
+      "weapons": [
+        "LASER_BURST_2",
+        "MISSILES_1"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 1
+        },
+        {
+          "class": "energy",
+          "amount": 1
+        },
+        {
+          "class": "slug",
+          "amount": 1
+        }
+      ]
+    },
+    "PLAYER_SHIP_JELLY": {
+      "layout": "jelly_cruiser",
+      "img": "jelly_cruiser",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 15,
+      "weaponCount": 3,
+      "weapons": [
+        "BEAM_BIO",
+        "BOMB_BREACH_1",
+        "LASER_BURST_2"
+      ],
+      "augments": [
+        "SLUG_GEL"
+      ],
+      "crew": [
+        {
+          "class": "slug",
+          "amount": 2
+        }
+      ]
+    },
+    "PLAYER_SHIP_JELLY_2": {
+      "layout": "jelly_cruiser_2",
+      "img": "jelly_cruiser_2",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 7,
+      "missiles": 25,
+      "weaponCount": 2,
+      "weapons": [
+        "BOMB_HEAL",
+        "MISSILES_2_PLAYER"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "SLUG_GEL"
+      ],
+      "crew": [
+        {
+          "class": "slug",
+          "amount": 3
+        }
+      ]
+    },
+    "PLAYER_SHIP_ROCK": {
+      "layout": "rock_cruiser",
+      "img": "rock_cruiser",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 28,
+      "weaponCount": 2,
+      "weapons": [
+        "MISSILES_2_PLAYER",
+        "MISSILES_HULL"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "ROCK_ARMOR"
+      ],
+      "crew": [
+        {
+          "class": "rock",
+          "amount": 3
+        }
+      ]
+    },
+    "PLAYER_SHIP_ROCK_2": {
+      "layout": "rock_cruiser_2",
+      "img": "rock_cruiser_2",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 18,
+      "weaponCount": 2,
+      "weapons": [
+        "LASER_HEAVY_1_SP",
+        "BOMB_FIRE",
+        "BOMB_1"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "ROCK_ARMOR"
+      ],
+      "crew": [
+        {
+          "class": "rock",
+          "amount": 4
+        }
+      ]
+    },
+    "PLAYER_SHIP_ENERGY": {
+      "layout": "energy_cruiser",
+      "img": "energy_cruiser",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 5,
+      "missiles": 12,
+      "weaponCount": 4,
+      "weapons": [
+        "BEAM_2",
+        "MISSILES_1"
+      ],
+      "drones_parts": 2,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "ENERGY_SHIELD"
+      ],
+      "crew": [
+        {
+          "class": "energy",
+          "amount": 3
+        }
+      ]
+    },
+    "PLAYER_SHIP_ENERGY_2": {
+      "layout": "energy_cruiser_2",
+      "img": "energy_cruiser_2",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 5,
+      "missiles": 0,
+      "weaponCount": 3,
+      "weapons": [
+        "ION_1",
+        "ION_1",
+        "BEAM_LONG"
+      ],
+      "drones_parts": 2,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "ENERGY_SHIELD"
+      ],
+      "crew": [
+        {
+          "class": "energy",
+          "amount": 3
+        }
+      ]
+    },
+    "PLAYER_SHIP_CRYSTAL": {
+      "layout": "crystal_cruiser",
+      "img": "crystal_cruiser",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 0,
+      "weaponCount": 2,
+      "weapons": [
+        "CRYSTAL_BURST_1",
+        "CRYSTAL_HEAVY_1"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "CRYSTAL_SHARDS"
+      ],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 2
+        },
+        {
+          "class": "crystal",
+          "amount": 2
+        }
+      ]
+    },
+    "PLAYER_SHIP_CRYSTAL_2": {
+      "layout": "crystal_cruiser_2",
+      "img": "crystal_cruiser_2",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 0,
+      "weaponCount": 0,
+      "weapons": [],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "CRYSTAL_SHARDS"
+      ],
+      "crew": [
+        {
+          "class": "crystal",
+          "amount": 3
+        }
+      ]
+    },
+    "PLAYER_SHIP_TUTORIAL": {
+      "layout": "kestral",
+      "img": "kestral",
+      "weaponSlots": 2,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 9,
+      "missiles": 20,
+      "weaponCount": 1,
+      "weapons": [
+        "LASER_BURST_2"
+      ],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 1
+        }
+      ]
+    },
+    "PLAYER_SHIP_ANAEROBIC": {
+      "layout": "anaerobic_cruiser",
+      "img": "anaerobic_cruiser",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 3,
+      "weaponCount": 2,
+      "weapons": [
+        "LASER_CHAINGUN",
+        "ION_STUN"
+      ],
+      "drones_parts": 9,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "O2_MASKS"
+      ],
+      "crew": [
+        {
+          "class": "human",
+          "amount": 1
+        },
+        {
+          "class": "anaerobic",
+          "amount": 2
+        }
+      ]
+    },
+    "PLAYER_SHIP_ANAEROBIC_2": {
+      "layout": "anaerobic_cruiser_2",
+      "img": "anaerobic_cruiser_2",
+      "weaponSlots": 4,
+      "droneSlots": 2,
+      "health": 30,
+      "maxPower": 8,
+      "missiles": 0,
+      "weaponCount": 1,
+      "weapons": [
+        "SHOTGUN_PLAYER"
+      ],
+      "drones_parts": 0,
+      "droneCount": 0,
+      "drones": [],
+      "augments": [
+        "O2_MASKS"
+      ],
+      "crew": [
+        {
+          "class": "engi",
+          "amount": 1
+        },
+        {
+          "class": "anaerobic",
+          "amount": 2
+        }
+      ]
+    }
+  },
+  "blueprint_lists": {
+    "DEMO_LOCKED_ITEMS": [
+      "ARTILLERY_BOSS_4",
+      "ION_1",
+      "ION_2",
+      "ION_4",
+      "BOMB_1",
+      "BOMB_BREACH_1",
+      "BOMB_BREACH_2",
+      "BOMB_FIRE",
+      "BOMB_ION",
+      "BOMB_HEAL",
+      "BOMB_LOCK",
+      "BEAM_3",
+      "BATTLE",
+      "BOARDER",
+      "BATTLE",
+      "BATTLE",
+      "SHIP_REPAIR",
+      "teleporter",
+      "cloaking",
+      "hacking",
+      "mantis",
+      "rock",
+      "energy",
+      "slug",
+      "crystal",
+      "WEAPON_PREIGNITE",
+      "DRONE_RECOVERY",
+      "AUTO_COOLDOWN",
+      "SCRAP_COLLECTOR",
+      "REPAIR_ARM"
+    ],
+    "STARTING_WEAPONS": [
+      "LASER_BURST_1",
+      "LASER_BURST_2",
+      "MISSILES_2_PLAYER",
+      "BEAM_LONG",
+      "ION_1",
+      "ION_2",
+      "ION_4",
+      "BOMB_1",
+      "LASER_BURST_3",
+      "LASER_HEAVY_1",
+      "MISSILES_3",
+      "BEAM_1",
+      "BEAM_FIRE",
+      "LASER_HULL_2",
+      "BOMB_FIRE",
+      "BOMB_ION",
+      "BOMB_HEAL"
+    ],
+    "STARTING_DRONES": [
+      "REPAIR",
+      "DEFENSE_1",
+      "COMBAT_1",
+      "COMBAT_2",
+      "SHIP_REPAIR",
+      "DEFENSE_1"
+    ],
+    "STARTING_AUGS": [
+      "HULL_ARMOR",
+      "ADV_HULL_ARMOR",
+      "NANO_MEDBAY",
+      "ADV_SCANNERS",
+      "AUTO_COOLDOWN",
+      "SHIELD_RECHARGE",
+      "FTL_BOOSTER",
+      "FTL_JAMMER",
+      "CREW_STIMS",
+      "DRONE_RECOVERY",
+      "FTL_JUMPER",
+      "FTL_BOOSTER"
+    ],
+    "DLC_ITEMS": [
+      "BOMB_HEAL_SYSTEM",
+      "SHOTGUN_PLAYER",
+      "SHOTGUN",
+      "SHOTGUN_2",
+      "MISSILE_CHARGEGUN",
+      "LASER_CHAINGUN",
+      "LASER_CHAINGUN_2",
+      "LASER_CHARGEGUN",
+      "LASER_CHARGEGUN_2",
+      "ION_CHAINGUN",
+      "ION_STUN",
+      "ION_CHARGEGUN",
+      "BOMB_STUN",
+      "PDS_SHOT",
+      "DRONE_HACKING",
+      "BOARDER_ION",
+      "DRONE_SHIELD",
+      "DRONE_SHIELD_PLAYER",
+      "ANTI_DRONE",
+      "COMBAT_BEAM_2",
+      "COMBAT_FIRE",
+      "anaerobic",
+      "O2_MASKS",
+      "EXPLOSIVE_REPLICATOR",
+      "FIRE_EXTINGUISHERS",
+      "FLEET_DISTRACTION",
+      "TELEPORT_HEAL",
+      "BATTERY_BOOSTER",
+      "DEFENSE_SCRAMBLER",
+      "BACKUP_DNA",
+      "LIFE_SCANNER",
+      "ZOLTAN_BYPASS",
+      "HACKING_STUN"
+    ],
+    "DLC_WEAPONS": [
+      "BOMB_HEAL_SYSTEM",
+      "SHOTGUN",
+      "SHOTGUN_2",
+      "MISSILE_CHARGEGUN",
+      "LASER_CHAINGUN",
+      "LASER_CHAINGUN_2",
+      "ION_CHAINGUN",
+      "LASER_CHARGEGUN",
+      "LASER_CHARGEGUN_2",
+      "ION_CHARGEGUN",
+      "ION_STUN",
+      "BOMB_STUN"
+    ],
+    "DLC_DRONES": [
+      "BOARDER_ION",
+      "DRONE_SHIELD",
+      "ANTI_DRONE",
+      "COMBAT_BEAM_2",
+      "COMBAT_FIRE"
+    ],
+    "DLC_AUGMENTS": [
+      "O2_MASKS",
+      "EXPLOSIVE_REPLICATOR",
+      "FIRE_EXTINGUISHERS",
+      "FLEET_DISTRACTION",
+      "TELEPORT_HEAL",
+      "BATTERY_BOOSTER",
+      "DEFENSE_SCRAMBLER",
+      "BACKUP_DNA",
+      "LIFE_SCANNER",
+      "ZOLTAN_BYPASS",
+      "HACKING_STUN"
+    ],
+    "SHIPS_LANIUS": [
+      "ANAEROBIC_SCOUT",
+      "ANAEROBIC_BOMBER"
+    ],
+    "WEAPONS_ANAEROBIC": [
+      "LASER_BURST_1",
+      "LASER_BURST_2_A",
+      "LASER_BURST_3",
+      "LASER_BURST_5",
+      "LASER_HEAVY_1",
+      "LASER_HEAVY_2",
+      "SHOTGUN",
+      "SHOTGUN_2",
+      "ION_2",
+      "MISSILES_1",
+      "MISSILES_2",
+      "MISSILES_3",
+      "MISSILES_BREACH",
+      "BEAM_1",
+      "BEAM_2",
+      "BOMB_1"
+    ]
   },
   "crew_races": [
     "human",
     "engi",
     "mantis",
-    "rockmen",
-    "crystal",
-    "zoltan",
     "slug",
-    "ghost",
-    "anaerobic"
+    "rock",
+    "crystal",
+    "energy",
+    "anaerobic",
+    "rockmen",
+    "zoltan",
+    "ghost"
   ],
   "systems": [
     "shields",
@@ -1105,25 +2327,5 @@
     "pilot",
     "sensors",
     "doors"
-  ],
-  "sectors": [
-    "CIVILIAN_SECTOR",
-    "PIRATE_SECTOR",
-    "ENGI_SECTOR",
-    "ENGI_HOME",
-    "REBEL_SECTOR",
-    "REBEL_STRONGHOLD",
-    "MANTIS_SECTOR",
-    "MANTIS_HOME",
-    "NEBULA_SECTOR",
-    "SLUG_SECTOR",
-    "SLUG_HOME",
-    "ROCK_SECTOR",
-    "ROCK_HOME",
-    "ZOLTAN_SECTOR",
-    "ZOLTAN_HOME",
-    "CRYSTAL_HOME",
-    "LANIUS_SECTOR",
-    "FINAL_BOSS"
   ]
 }

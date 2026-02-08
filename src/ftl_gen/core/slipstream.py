@@ -333,5 +333,7 @@ class SlipstreamManager:
             return False
 
         dest = self.mods_dir / mod_path.name
+        if mod_path.resolve() == dest.resolve():
+            return True  # Already in place
         shutil.copy2(mod_path, dest)
         return dest.exists()

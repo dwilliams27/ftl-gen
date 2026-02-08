@@ -53,16 +53,20 @@ export const api = {
     request<import("@/lib/types").ValidationResult>(`/validate?name=${encodeURIComponent(name)}`, {
       method: "POST",
     }),
-  patch: (name: string, testLoadout = false) => {
+  patch: (name: string, opts?: { testWeapon?: boolean; testDrone?: boolean; testAugment?: boolean }) => {
     const params = new URLSearchParams({ name });
-    if (testLoadout) params.set("test_loadout", "true");
+    if (opts?.testWeapon) params.set("test_weapon", "true");
+    if (opts?.testDrone) params.set("test_drone", "true");
+    if (opts?.testAugment) params.set("test_augment", "true");
     return request<import("@/lib/types").PatchResult>(`/patch?${params}`, {
       method: "POST",
     });
   },
-  patchAndRun: (name: string, testLoadout = false) => {
+  patchAndRun: (name: string, opts?: { testWeapon?: boolean; testDrone?: boolean; testAugment?: boolean }) => {
     const params = new URLSearchParams({ name });
-    if (testLoadout) params.set("test_loadout", "true");
+    if (opts?.testWeapon) params.set("test_weapon", "true");
+    if (opts?.testDrone) params.set("test_drone", "true");
+    if (opts?.testAugment) params.set("test_augment", "true");
     return request<import("@/lib/types").PatchResult>(`/patch-and-run?${params}`, {
       method: "POST",
     });

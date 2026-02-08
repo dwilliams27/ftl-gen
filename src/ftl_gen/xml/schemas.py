@@ -1,4 +1,8 @@
-"""Pydantic models for FTL mod blueprints."""
+"""Pydantic models for FTL mod blueprints.
+
+Pydantic validates shape (correct types, required fields).
+BalanceValidator validates values (game balance ranges).
+"""
 
 from typing import Literal
 
@@ -12,7 +16,7 @@ class BlueprintBase(BaseModel):
     title: str = Field(..., description="Display name")
     desc: str = Field(..., description="Description text")
     cost: int = Field(..., description="Scrap cost")
-    rarity: int = Field(default=2, ge=0, le=5, description="Rarity (higher = rarer)")
+    rarity: int = Field(default=2, ge=0, description="Rarity (higher = rarer)")
 
     @field_validator("name")
     @classmethod
@@ -34,19 +38,19 @@ class WeaponBlueprint(BlueprintBase):
     short: str | None = Field(None, description="Short name for UI")
     tooltip: str | None = Field(None, description="Additional tooltip text")
 
-    # Combat stats
-    damage: int = Field(default=1, ge=0, le=10, description="Hull/system damage")
-    shots: int = Field(default=1, ge=1, le=10, description="Number of projectiles")
-    sp: int | None = Field(None, ge=0, le=5, description="Shield piercing")
-    ion: int | None = Field(None, ge=1, le=10, description="Ion damage")
-    stun: float | None = Field(None, ge=0, le=10, description="Stun duration")
+    # Combat stats — no upper bound; BalanceValidator checks ranges
+    damage: int = Field(default=1, ge=0, description="Hull/system damage")
+    shots: int = Field(default=1, ge=1, description="Number of projectiles")
+    sp: int | None = Field(None, ge=0, description="Shield piercing")
+    ion: int | None = Field(None, ge=1, description="Ion damage")
+    stun: float | None = Field(None, ge=0, description="Stun duration")
 
     # Effects
     fire_chance: int = Field(
-        default=0, ge=0, le=10, alias="fireChance", description="Fire chance (10=100%)"
+        default=0, ge=0, alias="fireChance", description="Fire chance (10=100%)"
     )
     breach_chance: int = Field(
-        default=0, ge=0, le=10, alias="breachChance", description="Breach chance (10=100%)"
+        default=0, ge=0, alias="breachChance", description="Breach chance (10=100%)"
     )
     hull_bust: bool = Field(
         default=False, alias="hullBust", description="Bonus damage to hull"
@@ -60,18 +64,18 @@ class WeaponBlueprint(BlueprintBase):
     )
 
     # Beam specific
-    length: int | None = Field(None, ge=10, le=100, description="Beam length in pixels")
+    length: int | None = Field(None, ge=1, description="Beam length in pixels")
 
     # Missile/bomb specific
-    missiles: int | None = Field(None, ge=1, le=3, description="Missiles consumed per shot")
+    missiles: int | None = Field(None, ge=0, description="Missiles consumed per shot")
     explosion: str | None = Field(None, description="Explosion animation for bombs/missiles")
 
     # Timing
-    cooldown: float = Field(..., ge=1, le=30, description="Recharge time in seconds")
+    cooldown: float = Field(..., ge=1, description="Recharge time in seconds")
 
     # Resources
-    power: int = Field(..., ge=1, le=5, description="Power bars required")
-    cost: int = Field(..., ge=10, le=200, description="Scrap cost in stores")
+    power: int = Field(..., ge=1, description="Power bars required")
+    cost: int = Field(..., ge=0, description="Scrap cost in stores")
 
     # Visual
     image: str | None = Field(None, description="Sprite image path")
@@ -86,13 +90,13 @@ class DroneBlueprint(BlueprintBase):
     ] = Field(..., description="Drone type")
     short: str | None = Field(None, description="Short name for UI")
 
-    # Stats
-    power: int = Field(..., ge=1, le=4, description="Power required")
-    cost: int = Field(..., ge=10, le=150, description="Scrap cost")
+    # Stats — no upper bound; BalanceValidator checks ranges
+    power: int = Field(..., ge=0, description="Power required")
+    cost: int = Field(..., ge=0, description="Scrap cost")
 
     # Combat drones
-    cooldown: float | None = Field(None, ge=1, le=30, description="Attack cooldown")
-    speed: int | None = Field(None, ge=1, le=50, description="Movement speed")
+    cooldown: float | None = Field(None, ge=0, description="Attack cooldown")
+    speed: int | None = Field(None, ge=0, description="Movement speed")
 
     # Visual (set by sprite generator)
     drone_image: str | None = Field(None, description="Drone image/animation name")
@@ -101,7 +105,7 @@ class DroneBlueprint(BlueprintBase):
 class AugmentBlueprint(BlueprintBase):
     """Blueprint for an FTL augment."""
 
-    cost: int = Field(..., ge=10, le=100, description="Scrap cost")
+    cost: int = Field(..., ge=0, description="Scrap cost")
     stackable: bool = Field(default=False, description="Can have multiple")
     value: float | None = Field(None, description="Effect magnitude")
 
@@ -109,13 +113,13 @@ class AugmentBlueprint(BlueprintBase):
 class CrewBlueprint(BlueprintBase):
     """Blueprint for a custom crew race."""
 
-    # Stats (0-200, 100 is human baseline)
-    max_health: int = Field(default=100, ge=25, le=200, alias="maxHealth")
-    move_speed: int = Field(default=100, ge=25, le=200, alias="moveSpeed")
-    repair_speed: int = Field(default=100, ge=25, le=200, alias="repairSpeed")
-    damage_multiplier: float = Field(default=1.0, ge=0.5, le=2.5, alias="damageMultiplier")
-    fire_repair: int = Field(default=100, ge=0, le=200, alias="fireRepair")
-    suffocation_modifier: float = Field(default=1.0, ge=0, le=2.0, alias="suffocationModifier")
+    # Stats (0-200, 100 is human baseline) — no upper bound; BalanceValidator checks
+    max_health: int = Field(default=100, ge=1, alias="maxHealth")
+    move_speed: int = Field(default=100, ge=1, alias="moveSpeed")
+    repair_speed: int = Field(default=100, ge=0, alias="repairSpeed")
+    damage_multiplier: float = Field(default=1.0, ge=0, alias="damageMultiplier")
+    fire_repair: int = Field(default=100, ge=0, alias="fireRepair")
+    suffocation_modifier: float = Field(default=1.0, ge=0, alias="suffocationModifier")
 
     # Special abilities
     can_fight: bool = Field(default=True, alias="canFight")
@@ -127,10 +131,10 @@ class CrewBlueprint(BlueprintBase):
     can_suffocate: bool = Field(default=True, alias="canSuffocate")
     can_burn: bool = Field(default=True, alias="canBurn")
     provide_power: bool = Field(default=False, alias="providePower")
-    clone_speed_modifier: float = Field(default=1.0, ge=0.5, le=2.0, alias="cloneSpeedModifier")
+    clone_speed_modifier: float = Field(default=1.0, ge=0, alias="cloneSpeedModifier")
 
     short: str | None = Field(None, description="Short name")
-    cost: int = Field(default=50, ge=20, le=100, description="Scrap cost to hire")
+    cost: int = Field(default=50, ge=0, description="Scrap cost to hire")
 
     @field_validator("name")
     @classmethod
@@ -145,11 +149,11 @@ class EventOutcome(BaseModel):
     text: str | None = Field(None, description="Result text shown to player")
 
     # Rewards/penalties
-    scrap: int | None = Field(None, ge=-999, le=999, description="Scrap reward")
-    fuel: int | None = Field(None, ge=-50, le=50, description="Fuel reward")
-    missiles: int | None = Field(None, ge=-50, le=50, description="Missiles reward")
-    drones: int | None = Field(None, ge=-20, le=20, description="Drone parts reward")
-    hull: int | None = Field(None, ge=-30, le=30, description="Hull damage/repair")
+    scrap: int | None = Field(None, description="Scrap reward")
+    fuel: int | None = Field(None, description="Fuel reward")
+    missiles: int | None = Field(None, description="Missiles reward")
+    drones: int | None = Field(None, description="Drone parts reward")
+    hull: int | None = Field(None, description="Hull damage/repair")
 
     # Items
     weapon: str | None = Field(None, description="Weapon blueprint to give")
@@ -162,7 +166,7 @@ class EventOutcome(BaseModel):
 
     # Damage
     damage_system: str | None = Field(None, alias="damageSystem", description="System to damage")
-    damage_amount: int | None = Field(None, alias="damageAmount", ge=1, le=10)
+    damage_amount: int | None = Field(None, alias="damageAmount", ge=1)
 
     # Chain to another event
     load_event: str | None = Field(None, alias="loadEvent", description="Event to chain to")
@@ -178,7 +182,7 @@ class EventChoice(BaseModel):
 
     text: str = Field(..., description="Choice text shown to player")
     req: str | None = Field(None, description="Requirement (crew race, system, etc.)")
-    level: int | None = Field(None, ge=1, le=8, description="Required system level")
+    level: int | None = Field(None, ge=1, description="Required system level")
     hidden: bool = Field(default=False, description="Hide if requirements not met")
     event: EventOutcome | None = Field(None, description="Outcome if chosen")
 
@@ -217,8 +221,8 @@ class ShipRoom(BaseModel):
     id: int = Field(..., ge=0, description="Room ID")
     x: int = Field(..., ge=0, description="Grid X position")
     y: int = Field(..., ge=0, description="Grid Y position")
-    w: int = Field(default=2, ge=1, le=4, description="Width in tiles")
-    h: int = Field(default=2, ge=1, le=4, description="Height in tiles")
+    w: int = Field(default=2, ge=1, description="Width in tiles")
+    h: int = Field(default=2, ge=1, description="Height in tiles")
     system: str | None = Field(None, description="System installed in room")
 
 
@@ -234,27 +238,27 @@ class ShipBlueprint(BlueprintBase):
     unlock: str | None = Field(None, description="Unlock achievement text")
 
     # Systems (level 0 = not present, 1+ = installed level)
-    shields: int = Field(default=0, ge=0, le=8)
-    engines: int = Field(default=0, ge=0, le=8)
-    oxygen: int = Field(default=0, ge=0, le=3)
-    weapons: int = Field(default=0, ge=0, le=8)
-    drones: int = Field(default=0, ge=0, le=8)
-    medbay: int = Field(default=0, ge=0, le=3)
-    clonebay: int = Field(default=0, ge=0, le=3)
-    teleporter: int = Field(default=0, ge=0, le=3)
-    cloaking: int = Field(default=0, ge=0, le=3)
-    artillery: int = Field(default=0, ge=0, le=4)
-    hacking: int = Field(default=0, ge=0, le=3)
-    mind: int = Field(default=0, ge=0, le=3)
-    battery: int = Field(default=0, ge=0, le=2)
-    pilot: int = Field(default=0, ge=0, le=3)
-    sensors: int = Field(default=0, ge=0, le=3)
-    doors: int = Field(default=0, ge=0, le=3)
+    shields: int = Field(default=0, ge=0)
+    engines: int = Field(default=0, ge=0)
+    oxygen: int = Field(default=0, ge=0)
+    weapons: int = Field(default=0, ge=0)
+    drones: int = Field(default=0, ge=0)
+    medbay: int = Field(default=0, ge=0)
+    clonebay: int = Field(default=0, ge=0)
+    teleporter: int = Field(default=0, ge=0)
+    cloaking: int = Field(default=0, ge=0)
+    artillery: int = Field(default=0, ge=0)
+    hacking: int = Field(default=0, ge=0)
+    mind: int = Field(default=0, ge=0)
+    battery: int = Field(default=0, ge=0)
+    pilot: int = Field(default=0, ge=0)
+    sensors: int = Field(default=0, ge=0)
+    doors: int = Field(default=0, ge=0)
 
     # Resources
-    max_power: int = Field(default=8, ge=5, le=25, alias="maxPower")
-    max_hull: int = Field(default=30, ge=15, le=50, alias="maxHull")
-    max_crew: int = Field(default=8, ge=2, le=12, alias="maxCrew")
+    max_power: int = Field(default=8, ge=1, alias="maxPower")
+    max_hull: int = Field(default=30, ge=1, alias="maxHull")
+    max_crew: int = Field(default=8, ge=1, alias="maxCrew")
 
     # Starting equipment
     weapons_list: list[str] = Field(default_factory=list, alias="weaponsList")
@@ -266,8 +270,8 @@ class ShipBlueprint(BlueprintBase):
 
     # Resources (override base cost since ships don't use scrap cost the same way)
     cost: int = Field(default=0, ge=0, description="Ship cost")
-    missiles: int = Field(default=8, ge=0, le=50)
-    drone_parts: int = Field(default=2, ge=0, le=50, alias="droneParts")
+    missiles: int = Field(default=8, ge=0)
+    drone_parts: int = Field(default=2, ge=0, alias="droneParts")
 
 
 class ModMetadata(BaseModel):

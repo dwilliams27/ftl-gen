@@ -2,18 +2,18 @@
 
 import json
 
-from ftl_gen.constants import BALANCE_RANGES
+from ftl_gen.constants import get_balance_ranges
 from ftl_gen.data.loader import load_vanilla_reference
+
+
+def _ranges():
+    """Get balance ranges lazily to avoid import-time loading issues."""
+    return get_balance_ranges()
+
 
 VANILLA_REFERENCE = load_vanilla_reference()
 
-# Generate range text from BALANCE_RANGES so prompts always match schemas
-_wr = BALANCE_RANGES["weapon"]
-_dr = BALANCE_RANGES["drone"]
-_ar = BALANCE_RANGES["augment"]
-_cr = BALANCE_RANGES["crew"]
-
-SYSTEM_PROMPT = f"""You are an expert FTL: Faster Than Light mod creator. You have deep knowledge of:
+SYSTEM_PROMPT = """You are an expert FTL: Faster Than Light mod creator. You have deep knowledge of:
 - FTL game mechanics, balance, and XML modding structure
 - Creating engaging events with meaningful choices
 - Designing weapons that are balanced yet interesting
@@ -27,7 +27,7 @@ When creating mod content:
 5. Keep descriptions concise but evocative
 
 Reference vanilla balance:
-- Weapons: {_wr["power"][0]}-{_wr["power"][1]} power, {_wr["cost"][0]}-{_wr["cost"][1]} scrap cost, 8-25 second cooldown
+- Weapons: 1-4 power, 0-120 scrap cost, 4-40 second cooldown
 - Most weapons deal 1-3 damage per shot
 - Higher damage weapons have longer cooldowns and higher power costs
 - Rare/powerful weapons have rarity 4-5, common ones have rarity 0-2"""
@@ -79,7 +79,14 @@ Return your response as a JSON object with this structure:
 
 def weapons_prompt(theme: str, concepts: list[dict], count: int = 3) -> str:
     """Prompt to generate weapon blueprints."""
-    vanilla_examples = json.dumps(VANILLA_REFERENCE.get("weapons", {}).get("lasers", {}), indent=2)
+    _wr = _ranges()["weapon"]
+    # Show a few LASER weapons as examples from the flat dict
+    weapons = VANILLA_REFERENCE.get("weapons", {})
+    laser_examples = {k: v for k, v in weapons.items()
+                      if v.get("type") == "LASER" and not v.get("noloc")}
+    # Limit to 5 examples
+    laser_examples = dict(list(laser_examples.items())[:5])
+    vanilla_examples = json.dumps(laser_examples, indent=2)
 
     concepts_text = "\n".join(
         f"- {c['name']}: {c.get('concept', c.get('description', 'No description'))}"
@@ -190,7 +197,12 @@ Return a JSON object:
 
 def single_weapon_prompt(description: str) -> str:
     """Prompt to generate a single weapon."""
-    vanilla_examples = json.dumps(VANILLA_REFERENCE.get("weapons", {}).get("lasers", {}), indent=2)
+    _wr = _ranges()["weapon"]
+    weapons = VANILLA_REFERENCE.get("weapons", {})
+    laser_examples = {k: v for k, v in weapons.items()
+                      if v.get("type") == "LASER" and not v.get("noloc")}
+    laser_examples = dict(list(laser_examples.items())[:5])
+    vanilla_examples = json.dumps(laser_examples, indent=2)
 
     return f"""Create a detailed FTL weapon blueprint based on this description:
 
@@ -273,6 +285,7 @@ Return ONLY a brief visual description, no JSON."""
 
 def drones_prompt(theme: str, concepts: list[dict], count: int = 2) -> str:
     """Prompt to generate drone blueprints."""
+    _dr = _ranges()["drone"]
     concepts_text = "\n".join(
         f"- {c.get('name', 'DRONE')}: {c.get('concept', c.get('description', 'No description'))}"
         for c in concepts[:count]
@@ -321,6 +334,7 @@ Return a JSON object:
 
 def augments_prompt(theme: str, concepts: list[dict], count: int = 2) -> str:
     """Prompt to generate augment blueprints."""
+    _ar = _ranges()["augment"]
     concepts_text = "\n".join(
         f"- {c.get('name', 'AUGMENT')}: {c.get('concept', c.get('description', 'No description'))}"
         for c in concepts[:count]
@@ -363,6 +377,7 @@ Return a JSON object:
 
 def crew_prompt(theme: str, concepts: list[dict], count: int = 1) -> str:
     """Prompt to generate crew race blueprints."""
+    _cr = _ranges()["crew"]
     crew_races = VANILLA_REFERENCE.get("crew_races", [])
 
     concepts_text = "\n".join(
@@ -413,6 +428,7 @@ Return a JSON object:
 
 def single_drone_prompt(description: str) -> str:
     """Prompt to generate a single drone."""
+    _dr = _ranges()["drone"]
     return f"""Create a detailed FTL drone blueprint based on this description:
 
 {description}
@@ -433,6 +449,7 @@ Return ONLY the drone object as JSON (not wrapped in an array)."""
 
 def single_augment_prompt(description: str) -> str:
     """Prompt to generate a single augment."""
+    _ar = _ranges()["augment"]
     return f"""Create a detailed FTL augment blueprint based on this description:
 
 {description}
@@ -451,6 +468,7 @@ Return ONLY the augment object as JSON (not wrapped in an array)."""
 
 def single_crew_prompt(description: str) -> str:
     """Prompt to generate a single crew race."""
+    _cr = _ranges()["crew"]
     return f"""Create a detailed FTL crew race blueprint based on this description:
 
 {description}

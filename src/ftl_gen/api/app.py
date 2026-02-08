@@ -13,6 +13,11 @@ from ftl_gen.api.routes import chaos, config, generate, mods, sprites, validate
 UI_DIST = Path(__file__).resolve().parent.parent.parent.parent / "ui" / "dist"
 
 
+def create_dev_app() -> FastAPI:
+    """Factory for uvicorn --factory in dev mode."""
+    return create_app(dev=True)
+
+
 def create_app(dev: bool = False) -> FastAPI:
     """Create the FastAPI application."""
     app = FastAPI(

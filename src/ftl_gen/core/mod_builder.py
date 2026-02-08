@@ -21,7 +21,9 @@ class ModBuilder:
         sprite_files: dict[str, bytes] | None = None,
         output_name: str | None = None,
         *,
-        test_loadout: bool = False,
+        test_weapon: bool = False,
+        test_drone: bool = False,
+        test_augment: bool = False,
     ) -> Path:
         """Build a complete mod package.
 
@@ -29,7 +31,9 @@ class ModBuilder:
             content: ModContent with all blueprints
             sprite_files: Dict mapping filenames to PNG data
             output_name: Override mod folder/file name
-            test_loadout: If True, add a modified Kestrel loadout with the first weapon
+            test_weapon: If True, replace Engi A weapon with first mod weapon
+            test_drone: If True, replace Engi A drone with first mod drone
+            test_augment: If True, replace Engi A augment with first mod augment
 
         Returns:
             Path to generated .ftl file
@@ -42,7 +46,7 @@ class ModBuilder:
         self._create_directory_structure(mod_dir)
 
         # Generate XML files
-        self._write_xml_files(mod_dir, content, test_loadout=test_loadout)
+        self._write_xml_files(mod_dir, content, test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment)
 
         # Write sprite files if provided
         if sprite_files:
@@ -78,13 +82,23 @@ class ModBuilder:
         (mod_dir / "img" / "ship").mkdir(parents=True)  # For drone sprites in vanilla
         (mod_dir / "mod-appendix").mkdir(parents=True)
 
-    def _write_xml_files(self, mod_dir: Path, content: ModContent, *, test_loadout: bool = False) -> None:
+    def _write_xml_files(
+        self,
+        mod_dir: Path,
+        content: ModContent,
+        *,
+        test_weapon: bool = False,
+        test_drone: bool = False,
+        test_augment: bool = False,
+    ) -> None:
         """Generate and write XML files."""
         data_dir = mod_dir / "data"
 
         # blueprints.xml.append - weapons, drones, augments, crew
         if content.weapons or content.drones or content.augments or content.crew:
-            blueprints_xml = self.xml_builder.build_blueprints_append(content, test_loadout=test_loadout)
+            blueprints_xml = self.xml_builder.build_blueprints_append(
+                content, test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment
+            )
             (data_dir / "blueprints.xml.append").write_text(blueprints_xml)
 
         # events.xml.append - events

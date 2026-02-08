@@ -43,15 +43,17 @@ export function useValidate() {
 
 export function usePatch() {
   return useMutation({
-    mutationFn: ({ name, testLoadout }: { name: string; testLoadout?: boolean }) =>
-      api.patch(name, testLoadout),
+    mutationFn: ({ name, testWeapon, testDrone, testAugment }: {
+      name: string; testWeapon?: boolean; testDrone?: boolean; testAugment?: boolean;
+    }) => api.patch(name, { testWeapon, testDrone, testAugment }),
   });
 }
 
 export function usePatchAndRun() {
   return useMutation({
-    mutationFn: ({ name, testLoadout }: { name: string; testLoadout?: boolean }) =>
-      api.patchAndRun(name, testLoadout),
+    mutationFn: ({ name, testWeapon, testDrone, testAugment }: {
+      name: string; testWeapon?: boolean; testDrone?: boolean; testAugment?: boolean;
+    }) => api.patchAndRun(name, { testWeapon, testDrone, testAugment }),
   });
 }
 

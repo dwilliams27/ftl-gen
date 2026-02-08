@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 
-from ftl_gen.constants import BALANCE_RANGES
+from ftl_gen.constants import get_balance_ranges
 from ftl_gen.data.loader import load_vanilla_reference
 from ftl_gen.xml.schemas import WeaponBlueprint
 
@@ -33,13 +33,7 @@ class BalanceResult:
 
 
 class BalanceValidator:
-    """Validates mod content against balance constraints."""
-
-    DAMAGE_RANGE = BALANCE_RANGES["weapon"]["damage"]
-    COOLDOWN_RANGE = BALANCE_RANGES["weapon"]["cooldown"]
-    POWER_RANGE = BALANCE_RANGES["weapon"]["power"]
-    COST_RANGE = BALANCE_RANGES["weapon"]["cost"]
-    SHOTS_RANGE = BALANCE_RANGES["weapon"]["shots"]
+    """Validates mod content against balance constraints derived from vanilla data."""
 
     # Max damage per second per power before flagging as OP
     MAX_DPS_THRESHOLD = 1.5
@@ -48,38 +42,34 @@ class BalanceValidator:
 
     def __init__(self):
         self._vanilla_data = load_vanilla_reference()
+        ranges = get_balance_ranges()
+        self._wr = ranges["weapon"]
 
     def validate_weapon(self, weapon: WeaponBlueprint) -> BalanceResult:
         """Validate a weapon against balance constraints."""
         issues = []
 
-        # Check stat ranges
-        if not self.DAMAGE_RANGE[0] <= weapon.damage <= self.DAMAGE_RANGE[1]:
-            issues.append(BalanceIssue(
-                severity="error",
-                item_name=weapon.name,
-                message=f"Damage {weapon.damage} outside valid range {self.DAMAGE_RANGE}"
-            ))
+        # Check stat ranges (derived from vanilla data)
+        for stat, attr in [
+            ("damage", weapon.damage),
+            ("cooldown", weapon.cooldown),
+            ("power", weapon.power),
+        ]:
+            lo, hi = self._wr.get(stat, (0, 999))
+            if not lo <= attr <= hi:
+                issues.append(BalanceIssue(
+                    severity="error",
+                    item_name=weapon.name,
+                    message=f"{stat.title()} {attr} outside vanilla range ({lo}, {hi})"
+                ))
 
-        if not self.COOLDOWN_RANGE[0] <= weapon.cooldown <= self.COOLDOWN_RANGE[1]:
-            issues.append(BalanceIssue(
-                severity="error",
-                item_name=weapon.name,
-                message=f"Cooldown {weapon.cooldown} outside valid range {self.COOLDOWN_RANGE}"
-            ))
-
-        if not self.POWER_RANGE[0] <= weapon.power <= self.POWER_RANGE[1]:
-            issues.append(BalanceIssue(
-                severity="error",
-                item_name=weapon.name,
-                message=f"Power {weapon.power} outside valid range {self.POWER_RANGE}"
-            ))
-
-        if not self.COST_RANGE[0] <= weapon.cost <= self.COST_RANGE[1]:
+        # Cost is a warning, not error
+        lo, hi = self._wr.get("cost", (0, 999))
+        if not lo <= weapon.cost <= hi:
             issues.append(BalanceIssue(
                 severity="warning",
                 item_name=weapon.name,
-                message=f"Cost {weapon.cost} outside typical range {self.COST_RANGE}"
+                message=f"Cost {weapon.cost} outside typical range ({lo}, {hi})"
             ))
 
         # Check balance metrics
@@ -150,16 +140,15 @@ class BalanceValidator:
         """
         vanilla_weapons = self._vanilla_data.get("weapons", {})
 
-        # Find weapons of same type
-        same_type = []
-        type_category = weapon.type.lower() + "s"  # e.g., "lasers"
-        if type_category in vanilla_weapons:
-            same_type = list(vanilla_weapons[type_category].values())
+        # Flat dict: filter by type
+        same_type = [
+            w for w in vanilla_weapons.values()
+            if w.get("type") == weapon.type and not w.get("noloc")
+        ]
 
         if not same_type:
             return {}
 
-        # Calculate averages
         avg_damage = sum(w.get("damage", 0) for w in same_type) / len(same_type)
         avg_cooldown = sum(w.get("cooldown", 10) for w in same_type) / len(same_type)
         avg_power = sum(w.get("power", 2) for w in same_type) / len(same_type)

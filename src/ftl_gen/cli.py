@@ -302,7 +302,9 @@ def mod(
     chaos_level: Annotated[Optional[float], typer.Option("--chaos", help="Chaos level 0.0-1.0 (randomizes vanilla items)")] = None,
     seed: Annotated[Optional[int], typer.Option("--seed", help="Random seed for reproducible chaos")] = None,
     unsafe: Annotated[bool, typer.Option("--unsafe", help="Remove safety bounds (allow extreme values)")] = False,
-    test_loadout: Annotated[bool, typer.Option("--test-loadout", help="Add modified Kestrel loadout with first weapon")] = False,
+    test_weapon: Annotated[bool, typer.Option("--test-weapon", help="Replace Engi A weapon with first mod weapon")] = False,
+    test_drone: Annotated[bool, typer.Option("--test-drone", help="Replace Engi A drone with first mod drone")] = False,
+    test_augment: Annotated[bool, typer.Option("--test-augment", help="Replace Engi A augment with first mod augment")] = False,
 ):
     """Generate a complete themed mod.
 
@@ -355,7 +357,9 @@ def mod(
             generate_sprites=sprites,
             use_cached_images=cache_images,
             chaos_config=chaos_config,
-            test_loadout=test_loadout,
+            test_weapon=test_weapon,
+            test_drone=test_drone,
+            test_augment=test_augment,
         )
 
         _validate_patch_run(ftl_path, settings, validate, patch, run)
@@ -467,14 +471,62 @@ def crew_race(
         raise typer.Exit(1)
 
 
+def _rebuild_mod(
+    mod_name: str,
+    mods_dir: Path,
+    *,
+    test_weapon: bool = False,
+    test_drone: bool = False,
+    test_augment: bool = False,
+) -> Path:
+    """Rebuild a mod's .ftl from its directory sources.
+
+    Always rebuilds so the .ftl reflects the current build pipeline.
+    """
+    from ftl_gen.api.services import ModReader
+    from ftl_gen.llm.parsers import build_mod_content
+
+    reader = ModReader(mods_dir)
+    mod = reader.get_mod(mod_name)
+    if not mod:
+        console.print(f"[red]Mod not found: {mod_name}[/]")
+        raise typer.Exit(1)
+
+    # Collect sprite files
+    sprite_files = {}
+    for sprite_path in mod.sprite_files:
+        data = reader.get_sprite_data(mod_name, sprite_path)
+        if data:
+            sprite_files[sprite_path] = data
+
+    content = build_mod_content(
+        mod_name=mod_name,
+        description=mod.description,
+        weapons=mod.weapons,
+        drones=mod.drones,
+        augments=mod.augments,
+        crew=mod.crew,
+        events=mod.events,
+    )
+
+    builder = ModBuilder(mods_dir)
+    return builder.build(
+        content, sprite_files or None,
+        test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment,
+    )
+
+
 @app.command("patch")
 def patch_mod(
     mod_name: Annotated[str, typer.Argument(help="Mod name or path to .ftl file")],
     run: Annotated[bool, typer.Option("--run", help="Launch FTL after patching")] = False,
+    test_weapon: Annotated[bool, typer.Option("--test-weapon", help="Replace Engi A weapon with first mod weapon")] = False,
+    test_drone: Annotated[bool, typer.Option("--test-drone", help="Replace Engi A drone with first mod drone")] = False,
+    test_augment: Annotated[bool, typer.Option("--test-augment", help="Replace Engi A augment with first mod augment")] = False,
 ):
-    """Apply a mod to the game.
+    """Apply a mod to the game. Always rebuilds the .ftl first.
 
-    Example: ftl-gen patch MyMod --run
+    Example: ftl-gen patch MyMod --run --test-weapon --test-drone
     """
     settings = get_settings()
     slipstream = SlipstreamManager(settings)
@@ -483,22 +535,29 @@ def patch_mod(
         console.print("[red]Slipstream not found. Please install it first.[/]")
         raise typer.Exit(1)
 
-    mod_path = Path(mod_name)
-    if not mod_path.exists():
-        mod_path = settings.output_dir / f"{mod_name}.ftl"
-    if not mod_path.exists():
-        mod_path = settings.output_dir / mod_name
-        if mod_path.is_dir():
-            mod_path = settings.output_dir / f"{mod_name}.ftl"
-    if not mod_path.exists():
-        if slipstream.mods_dir:
-            mod_path = slipstream.mods_dir / f"{mod_name}.ftl"
+    # Find the mod — check mods_dir for directory or .ftl
+    mods_dir = settings.output_dir
+    mod_dir = mods_dir / mod_name
+    ftl_path = mods_dir / f"{mod_name}.ftl"
 
-    if not mod_path.exists():
+    if not mod_dir.is_dir() and not ftl_path.exists():
+        # Try slipstream mods dir
+        if slipstream.mods_dir:
+            mods_dir = slipstream.mods_dir
+            mod_dir = mods_dir / mod_name
+            ftl_path = mods_dir / f"{mod_name}.ftl"
+
+    if not mod_dir.is_dir() and not ftl_path.exists():
         console.print(f"[red]Mod not found: {mod_name}[/]")
         console.print(f"[dim]Searched in: {settings.output_dir}[/]")
         raise typer.Exit(1)
 
+    # Always rebuild to pick up latest build pipeline changes
+    console.print(f"[bold]Rebuilding mod:[/] {mod_name}")
+    mod_path = _rebuild_mod(
+        mod_name, mods_dir,
+        test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment,
+    )
     console.print(f"[bold]Patching mod:[/] {mod_path}")
 
     if run:
@@ -624,36 +683,142 @@ def info():
 @app.command()
 def ui(
     port: Annotated[int, typer.Option("--port", "-p", help="Port to serve on")] = 8421,
-    dev: Annotated[bool, typer.Option("--dev", help="Development mode (CORS + reload)")] = False,
+    dev: Annotated[bool, typer.Option("--dev", help="Development mode (CORS + reload + Vite HMR)")] = False,
     host: Annotated[str, typer.Option("--host", help="Host to bind to")] = "127.0.0.1",
 ):
     """Launch the web UI.
 
-    Starts a local web server with mod browser, generator, and more.
+    In dev mode, starts both the Python API server (with auto-reload) and
+    the Vite dev server (with HMR) in a single command.
 
     Examples:
-        ftl-gen ui                # Start on http://localhost:8421
-        ftl-gen ui --dev          # Dev mode with CORS for Vite
-        ftl-gen ui --port 9000    # Custom port
+        ftl-gen ui                # Production: serve built SPA on :8421
+        ftl-gen ui --dev          # Dev: API on :8421 + Vite HMR on :5173
+        ftl-gen ui --port 9000    # Custom API port
     """
     try:
-        import uvicorn
+        import uvicorn  # noqa: F401
     except ImportError:
         console.print("[red]Web UI dependencies not installed.[/]")
         console.print("Install with: [bold]pip install -e \".[ui]\"[/]")
         raise typer.Exit(1)
 
+    if dev:
+        _ui_dev(host, port)
+    else:
+        _ui_prod(host, port)
+
+
+def _ui_prod(host: str, port: int):
+    """Start production server serving built SPA + API."""
+    import uvicorn
+
     from ftl_gen.api.app import create_app
 
-    app_instance = create_app(dev=dev)
-
-    console.print(f"[bold green]FTL-Gen Web UI[/] starting on http://{host}:{port}")
-    if dev:
-        console.print("[dim]Dev mode: CORS enabled for localhost:5173[/]")
-        console.print("[dim]Run 'cd ui && npm run dev' for frontend hot reload[/]")
-    console.print("[dim]API docs: http://{host}:{port}/api/docs[/]")
-
+    app_instance = create_app(dev=False)
+    console.print(f"[bold green]FTL-Gen Web UI[/] http://{host}:{port}")
+    console.print(f"[dim]API docs: http://{host}:{port}/api/docs[/]")
     uvicorn.run(app_instance, host=host, port=port, log_level="info")
+
+
+def _ui_dev(host: str, port: int):
+    """Start dev mode: uvicorn with reload + Vite dev server."""
+    import signal
+    import subprocess
+    import sys
+    import threading
+
+    # Find ui/ directory (sibling to src/)
+    ui_dir = Path(__file__).resolve().parent.parent.parent / "ui"
+    if not (ui_dir / "package.json").exists():
+        console.print(f"[red]ui/ directory not found at {ui_dir}[/]")
+        console.print("[dim]Run from the project root.[/]")
+        raise typer.Exit(1)
+
+    src_dir = str(Path(__file__).resolve().parent.parent)
+
+    console.print("[bold green]FTL-Gen Dev Mode[/]")
+    console.print(f"  [cyan]API:[/]      http://{host}:{port}  (auto-reload)")
+    console.print(f"  [magenta]Frontend:[/] http://localhost:5173  (Vite HMR)")
+    console.print(f"  [dim]API docs:  http://{host}:{port}/api/docs[/]")
+    console.print()
+
+    procs: list[subprocess.Popen] = []
+
+    def stream_output(proc: subprocess.Popen, prefix: str, color: str):
+        """Stream subprocess output with a colored prefix."""
+        assert proc.stdout is not None
+        for line in proc.stdout:
+            text = line.decode("utf-8", errors="replace").rstrip()
+            if text:
+                console.print(f"[{color}]{prefix}[/] {text}")
+
+    def shutdown(*_args):
+        for p in procs:
+            try:
+                p.terminate()
+            except OSError:
+                pass
+        # Give them a moment, then force
+        for p in procs:
+            try:
+                p.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                p.kill()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGTERM, shutdown)
+
+    # Start uvicorn with --reload
+    api_proc = subprocess.Popen(
+        [
+            sys.executable, "-m", "uvicorn",
+            "ftl_gen.api.app:create_dev_app",
+            "--factory",
+            "--host", host,
+            "--port", str(port),
+            "--reload",
+            "--reload-dir", src_dir,
+            "--log-level", "warning",
+            "--header", "X-Dev-Mode:true",
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    procs.append(api_proc)
+
+    # Start Vite dev server
+    vite_proc = subprocess.Popen(
+        ["npm", "run", "dev"],
+        cwd=str(ui_dir),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    procs.append(vite_proc)
+
+    # Stream output from both in background threads
+    api_thread = threading.Thread(
+        target=stream_output, args=(api_proc, "api", "cyan"), daemon=True
+    )
+    vite_thread = threading.Thread(
+        target=stream_output, args=(vite_proc, "vite", "magenta"), daemon=True
+    )
+    api_thread.start()
+    vite_thread.start()
+
+    # Wait for either to exit
+    while True:
+        for p in procs:
+            ret = p.poll()
+            if ret is not None:
+                name = "API" if p is api_proc else "Vite"
+                console.print(f"\n[yellow]{name} process exited (code {ret})[/]")
+                shutdown()
+        try:
+            threading.Event().wait(0.5)
+        except KeyboardInterrupt:
+            shutdown()
 
 
 @app.command()
@@ -667,7 +832,9 @@ def chaos(
     validate: Annotated[bool, typer.Option("--validate", help="Validate with Slipstream")] = False,
     patch: Annotated[bool, typer.Option("--patch", help="Apply mod to game")] = False,
     run: Annotated[bool, typer.Option("--run", help="Launch FTL after patching")] = False,
-    test_loadout: Annotated[bool, typer.Option("--test-loadout", help="Add modified Kestrel loadout with first weapon")] = False,
+    test_weapon: Annotated[bool, typer.Option("--test-weapon", help="Replace Engi A weapon with first chaos weapon")] = False,
+    test_drone: Annotated[bool, typer.Option("--test-drone", help="Replace Engi A drone with first chaos drone")] = False,
+    test_augment: Annotated[bool, typer.Option("--test-augment", help="Replace Engi A augment with first chaos augment")] = False,
 ):
     """Generate a chaos-only mod (no LLM, $0.00 cost).
 
@@ -761,7 +928,10 @@ def chaos(
         )
 
         mod_builder = ModBuilder(settings.output_dir)
-        ftl_path = mod_builder.build(content, sprite_files if sprite_files else None, test_loadout=test_loadout)
+        ftl_path = mod_builder.build(
+            content, sprite_files if sprite_files else None,
+            test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment,
+        )
 
         console.print(f"\n[bold green]Mod generated:[/] {ftl_path}")
 
@@ -770,6 +940,146 @@ def chaos(
     except Exception as e:
         console.print(f"[red]Error: {e}[/]")
         raise typer.Exit(1)
+
+
+@app.command()
+def extract(
+    source: Annotated[Path, typer.Option("--source", "-s", help="Path to Slipstream-extracted directory")] = Path("slipstream-extract"),
+    output: Annotated[Optional[Path], typer.Option("--output", "-o", help="Output path for vanilla_reference.json")] = None,
+):
+    """Extract vanilla game data into vanilla_reference.json.
+
+    Parses blueprints.xml + dlcBlueprints.xml from a Slipstream-extracted
+    FTL data directory and writes a comprehensive reference file.
+
+    Examples:
+        ftl-gen extract --source slipstream-extract/
+        ftl-gen extract --source /path/to/extract --output custom_ref.json
+    """
+    from ftl_gen.data.extractor import extract_vanilla_data, write_vanilla_reference
+
+    if not source.exists():
+        console.print(f"[red]Source directory not found: {source}[/]")
+        console.print("[dim]Extract FTL data with Slipstream first[/]")
+        raise typer.Exit(1)
+
+    try:
+        console.print(f"[bold]Extracting vanilla data from:[/] {source}")
+        data = extract_vanilla_data(source)
+
+        n_weapons = len(data["weapons"])
+        n_drones = len(data["drones"])
+        n_augments = len(data["augments"])
+        n_crew = len(data["crew"])
+        n_ships = len(data["ships"])
+        n_lists = len(data["blueprint_lists"])
+
+        console.print(f"  [green]Weapons:[/] {n_weapons}")
+        console.print(f"  [green]Drones:[/] {n_drones}")
+        console.print(f"  [green]Augments:[/] {n_augments}")
+        console.print(f"  [green]Crew:[/] {n_crew}")
+        console.print(f"  [green]Ships:[/] {n_ships}")
+        console.print(f"  [green]Blueprint lists:[/] {n_lists}")
+
+        out_path = write_vanilla_reference(data, output)
+        console.print(f"\n[bold green]Written to:[/] {out_path}")
+
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/]")
+        raise typer.Exit(1)
+
+
+@app.command("diagnose")
+def diagnose_mod(
+    mod_name: Annotated[str, typer.Argument(help="Mod name")],
+    launch: Annotated[bool, typer.Option("--launch", help="Patch, launch FTL, and monitor")] = False,
+):
+    """Run diagnostic checks on a mod.
+
+    Checks for event loops, dangling references, and crash patterns.
+
+    Examples:
+        ftl-gen diagnose "My Mod"
+        ftl-gen diagnose "My Mod" --launch
+    """
+    settings = get_settings()
+    mod_path = settings.output_dir / f"{mod_name}.ftl"
+    mod_dir = settings.output_dir / mod_name
+
+    if not mod_path.exists() and not mod_dir.exists():
+        console.print(f"[red]Mod not found: {mod_name}[/]")
+        raise typer.Exit(1)
+
+    console.print(f"[bold]Diagnosing:[/] {mod_name}\n")
+
+    events_file = mod_dir / "data" / "events.xml.append"
+    blueprints_file = mod_dir / "data" / "blueprints.xml.append"
+
+    events_xml = events_file.read_text() if events_file.exists() else None
+    blueprints_xml = blueprints_file.read_text() if blueprints_file.exists() else None
+
+    all_ok = True
+
+    # Event loops
+    if events_xml:
+        cycles = detect_event_loops(events_xml)
+        if cycles:
+            console.print("[red]FAIL[/] Event loop detection")
+            for cycle in cycles:
+                console.print(f"  [red]{' -> '.join(cycle)}[/]")
+            all_ok = False
+        else:
+            console.print("[green]PASS[/] No event loops")
+
+        dangling = check_dangling_references(events_xml)
+        if dangling:
+            console.print("[yellow]WARN[/] Dangling event references")
+            for d in dangling:
+                console.print(f"  [yellow]{d}[/]")
+        else:
+            console.print("[green]PASS[/] No dangling references")
+    else:
+        console.print("[dim]SKIP[/] No events file")
+
+    # Crash patterns
+    crash_patterns = check_common_crash_patterns(blueprints_xml, events_xml)
+    if crash_patterns:
+        console.print("[red]FAIL[/] Crash pattern check")
+        for pattern in crash_patterns:
+            console.print(f"  [red]{pattern}[/]")
+        all_ok = False
+    else:
+        console.print("[green]PASS[/] No crash patterns")
+
+    # XML validation
+    validator = XMLValidator()
+    if blueprints_file.exists():
+        result = validator.validate_file(blueprints_file)
+        if result.ok:
+            console.print("[green]PASS[/] Blueprints XML valid")
+        else:
+            console.print("[red]FAIL[/] Blueprints XML invalid")
+            for err in result.errors:
+                console.print(f"  [red]{err}[/]")
+            all_ok = False
+
+    if all_ok:
+        console.print("\n[bold green]All checks passed![/]")
+    else:
+        console.print("\n[bold red]Some checks failed[/]")
+
+    if launch:
+        console.print("\n[bold]Patching and launching...[/]")
+        slipstream = SlipstreamManager(settings)
+        if not slipstream.is_available():
+            console.print("[red]Slipstream not available[/]")
+            raise typer.Exit(1)
+        result = slipstream.patch_and_run([mod_path])
+        if result.success:
+            console.print("[green]Launched successfully[/]")
+        else:
+            console.print(f"[red]Failed: {result.message}[/]")
+            raise typer.Exit(1)
 
 
 if __name__ == "__main__":

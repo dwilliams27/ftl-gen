@@ -77,7 +77,9 @@ class GenerateRequest(BaseModel):
     chaos_level: float | None = None
     seed: int | None = None
     unsafe: bool = False
-    test_loadout: bool = False
+    test_weapon: bool = False
+    test_drone: bool = False
+    test_augment: bool = False
 
 
 class GenerateSingleRequest(BaseModel):
@@ -94,7 +96,9 @@ class ChaosRequest(BaseModel):
     unsafe: bool = False
     mutate_sprites: bool = False
     name: str | None = None
-    test_loadout: bool = False
+    test_weapon: bool = False
+    test_drone: bool = False
+    test_augment: bool = False
 
 
 class ChaosPreviewItem(BaseModel):

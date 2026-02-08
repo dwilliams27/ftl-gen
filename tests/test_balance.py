@@ -37,19 +37,20 @@ class TestBalanceValidator:
         assert result.valid is True
         assert len(result.errors) == 0
 
-    def test_pydantic_validates_damage_range(self):
-        """Pydantic should reject damage > 10."""
-        with pytest.raises(ValidationError):
-            WeaponBlueprint(
-                name="OP_WEAPON",
-                type="LASER",
-                title="OP",
-                desc="Too powerful",
-                damage=15,  # Out of Pydantic range (0-10)
-                cooldown=10,
-                power=2,
-                cost=50,
-            )
+    def test_balance_validator_flags_high_damage(self, validator):
+        """BalanceValidator should flag damage outside vanilla range."""
+        weapon = WeaponBlueprint(
+            name="OP_WEAPON",
+            type="LASER",
+            title="OP",
+            desc="Too powerful",
+            damage=15,
+            cooldown=10,
+            power=2,
+            cost=50,
+        )
+        result = validator.validate_weapon(weapon)
+        assert len(result.errors) > 0 or len(result.warnings) > 0
 
     def test_pydantic_validates_cooldown_range(self):
         """Pydantic should reject cooldown < 1."""
@@ -65,19 +66,20 @@ class TestBalanceValidator:
                 cost=50,
             )
 
-    def test_pydantic_validates_power_range(self):
-        """Pydantic should reject power > 5."""
-        with pytest.raises(ValidationError):
-            WeaponBlueprint(
-                name="POWER_HOG",
-                type="LASER",
-                title="Power Hog",
-                desc="Uses too much power",
-                damage=1,
-                cooldown=10,
-                power=10,  # Out of Pydantic range (1-5)
-                cost=50,
-            )
+    def test_balance_validator_flags_high_power(self, validator):
+        """BalanceValidator should flag power outside vanilla range."""
+        weapon = WeaponBlueprint(
+            name="POWER_HOG",
+            type="LASER",
+            title="Power Hog",
+            desc="Uses too much power",
+            damage=1,
+            cooldown=10,
+            power=10,
+            cost=50,
+        )
+        result = validator.validate_weapon(weapon)
+        assert len(result.errors) > 0
 
     def test_high_dps_warning(self, validator):
         """High DPS per power should generate a warning."""

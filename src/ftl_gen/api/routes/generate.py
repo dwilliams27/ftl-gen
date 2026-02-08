@@ -65,7 +65,9 @@ async def generate_mod(request: GenerateRequest):
                 generate_sprites=request.sprites,
                 use_cached_images=request.cache_images,
                 chaos_config=chaos_config,
-                test_loadout=request.test_loadout,
+                test_weapon=request.test_weapon,
+                test_drone=request.test_drone,
+                test_augment=request.test_augment,
                 progress_callback=callback,
             )
             return str(ftl_path)

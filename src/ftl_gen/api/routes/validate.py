@@ -47,7 +47,12 @@ def _get_mod_xml(name: str) -> tuple[str | None, str | None]:
     return blueprints_xml, events_xml
 
 
-def _rebuild_mod(name: str, test_loadout: bool = False) -> Path:
+def _rebuild_mod(
+    name: str,
+    test_weapon: bool = False,
+    test_drone: bool = False,
+    test_augment: bool = False,
+) -> Path:
     """Rebuild a mod's .ftl from its directory sources.
 
     Always rebuilds so the .ftl reflects the current build pipeline.
@@ -76,7 +81,10 @@ def _rebuild_mod(name: str, test_loadout: bool = False) -> Path:
     )
 
     builder = ModBuilder(mods_dir)
-    return builder.build(content, sprite_files or None, test_loadout=test_loadout)
+    return builder.build(
+        content, sprite_files or None,
+        test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment,
+    )
 
 
 @router.get("/crash-report", response_model=CrashReportResponse)
@@ -158,25 +166,35 @@ def validate_mod(name: str):
 
 
 @router.post("/patch", response_model=PatchResult)
-def patch_mod(name: str, test_loadout: bool = False):
+def patch_mod(
+    name: str,
+    test_weapon: bool = False,
+    test_drone: bool = False,
+    test_augment: bool = False,
+):
     """Patch a mod into the game."""
     slipstream = get_slipstream()
     if not slipstream.is_available():
         raise HTTPException(status_code=503, detail="Slipstream not available")
 
-    ftl_path = _rebuild_mod(name, test_loadout=test_loadout)
+    ftl_path = _rebuild_mod(name, test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment)
     result = slipstream.patch([ftl_path])
     return PatchResult(success=result.success, message=result.message)
 
 
 @router.post("/patch-and-run", response_model=PatchResult)
-def patch_and_run(name: str, test_loadout: bool = False):
+def patch_and_run(
+    name: str,
+    test_weapon: bool = False,
+    test_drone: bool = False,
+    test_augment: bool = False,
+):
     """Patch a mod and launch FTL with log monitoring (non-blocking)."""
     slipstream = get_slipstream()
     if not slipstream.is_available():
         raise HTTPException(status_code=503, detail="Slipstream not available")
 
-    ftl_path = _rebuild_mod(name, test_loadout=test_loadout)
+    ftl_path = _rebuild_mod(name, test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment)
 
     # Patch
     patch_result = slipstream.patch([ftl_path])

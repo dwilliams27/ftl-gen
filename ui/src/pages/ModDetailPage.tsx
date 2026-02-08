@@ -339,7 +339,9 @@ export function ModDetailPage() {
   const patchMod = usePatch();
   const patchAndRun = usePatchAndRun();
   const [tab, setTab] = useState<Tab>("weapons");
-  const [testLoadout, setTestLoadout] = useState(true);
+  const [testWeapon, setTestWeapon] = useState(true);
+  const [testDrone, setTestDrone] = useState(true);
+  const [testAugment, setTestAugment] = useState(true);
   const [launchMenuOpen, setLaunchMenuOpen] = useState(false);
   const [showLaunchMonitor, setShowLaunchMonitor] = useState(false);
   const launchMenuRef = useRef<HTMLDivElement>(null);
@@ -398,7 +400,7 @@ export function ModDetailPage() {
             {validateMod.isPending ? "..." : "Validate"}
           </button>
           <button
-            onClick={() => patchMod.mutate({ name: mod.name, testLoadout })}
+            onClick={() => patchMod.mutate({ name: mod.name, testWeapon, testDrone, testAugment })}
             className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
             disabled={patchMod.isPending}
           >
@@ -408,7 +410,7 @@ export function ModDetailPage() {
           <div ref={launchMenuRef} className="relative flex">
             <button
               onClick={() => {
-                patchAndRun.mutate({ name: mod.name, testLoadout }, {
+                patchAndRun.mutate({ name: mod.name, testWeapon, testDrone, testAugment }, {
                   onSuccess: () => setShowLaunchMonitor(true),
                 });
               }}
@@ -427,14 +429,33 @@ export function ModDetailPage() {
             </button>
             {launchMenuOpen && (
               <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-md border border-border bg-card p-2 shadow-lg">
+                <div className="px-2 py-1 text-xs font-medium text-muted-foreground">Engi Test Ship</div>
                 <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent">
                   <input
                     type="checkbox"
-                    checked={testLoadout}
-                    onChange={(e) => setTestLoadout(e.target.checked)}
+                    checked={testWeapon}
+                    onChange={(e) => setTestWeapon(e.target.checked)}
                     className="rounded"
                   />
-                  Replace Kestrel weapon
+                  Replace weapon
+                </label>
+                <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent">
+                  <input
+                    type="checkbox"
+                    checked={testDrone}
+                    onChange={(e) => setTestDrone(e.target.checked)}
+                    className="rounded"
+                  />
+                  Replace drone
+                </label>
+                <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent">
+                  <input
+                    type="checkbox"
+                    checked={testAugment}
+                    onChange={(e) => setTestAugment(e.target.checked)}
+                    className="rounded"
+                  />
+                  Replace augment
                 </label>
               </div>
             )}

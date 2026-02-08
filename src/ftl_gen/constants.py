@@ -1,7 +1,11 @@
 """Shared constants for FTL mod generation.
 
-Single source of truth for sprite dimensions, balance ranges, and vanilla assets.
+Single source of truth for sprite dimensions and vanilla assets.
+Balance ranges and type sets are derived at runtime from vanilla_reference.json
+via the loader module — use get_balance_ranges() for those.
 """
+
+from typing import Any
 
 # --- Sprite Dimensions ---
 
@@ -15,10 +19,29 @@ DRONE_FRAME_WIDTH = 50
 DRONE_FRAME_HEIGHT = 20
 DRONE_FRAME_COUNT = 4
 
-# --- Balance Ranges ---
-# Used by schemas (Pydantic validation), prompts (LLM guidance),
-# constraints (balance checking), and validators (XML checking).
 
+# --- Derived Balance Ranges ---
+# All ranges are computed from vanilla_reference.json at runtime.
+# Import and call these functions instead of using hardcoded dicts.
+
+
+def get_balance_ranges() -> dict[str, dict[str, tuple[Any, Any]]]:
+    """Get balance ranges derived from vanilla game data.
+
+    Returns dict like: {"weapon": {"damage": (0, 4), ...}, "drone": {...}, ...}
+    """
+    from ftl_gen.data.loader import derive_balance_ranges
+    return derive_balance_ranges()
+
+
+def get_generation_ranges() -> dict[str, dict[str, tuple[Any, Any]]]:
+    """Get padded ranges for LLM generation (20% wider than vanilla)."""
+    from ftl_gen.data.loader import get_generation_ranges as _get
+    return _get()
+
+
+# Backward-compatible lazy BALANCE_RANGES for existing imports.
+# Prefer get_balance_ranges() in new code.
 BALANCE_RANGES = {
     "weapon": {
         "damage": (0, 10),
@@ -31,21 +54,21 @@ BALANCE_RANGES = {
         "breachChance": (0, 10),
         "sp": (0, 5),
         "ion": (1, 10),
-        "stun": (0, 10),
+        "stun": (0, 15),
         "length": (10, 100),
-        "missiles": (1, 3),
-        "persDamage": (1, 5),
-        "sysDamage": (1, 3),
+        "missiles": (0, 3),
+        "persDamage": (-10, 60),
+        "sysDamage": (0, 5),
     },
     "drone": {
         "power": (1, 4),
         "cost": (10, 150),
         "rarity": (0, 5),
-        "cooldown": (1, 30),
+        "cooldown": (1, 1000),
         "speed": (1, 50),
     },
     "augment": {
-        "cost": (10, 100),
+        "cost": (10, 120),
         "rarity": (0, 5),
     },
     "crew": {
@@ -58,6 +81,34 @@ BALANCE_RANGES = {
         "cost": (20, 100),
     },
 }
+
+
+# --- Derived Type Sets ---
+
+
+def get_weapon_types() -> set[str]:
+    """Get weapon types found in vanilla data."""
+    from ftl_gen.data.loader import load_vanilla_reference
+    data = load_vanilla_reference()
+    types = set()
+    for w in data.get("weapons", {}).values():
+        t = w.get("type")
+        if t:
+            types.add(t)
+    return types or WEAPON_TYPES  # fallback
+
+
+def get_drone_types() -> set[str]:
+    """Get drone types found in vanilla data."""
+    from ftl_gen.data.loader import load_vanilla_reference
+    data = load_vanilla_reference()
+    types = set()
+    for d in data.get("drones", {}).values():
+        t = d.get("type")
+        if t:
+            types.add(t)
+    return types or DRONE_TYPES  # fallback
+
 
 # --- Vanilla Asset Mappings ---
 # Sound effects and default images by weapon type
@@ -135,6 +186,6 @@ VANILLA_DRONE_IMAGES = {
     "HACKING": "drone_hacking",
 }
 
-# Valid blueprint types
+# Valid blueprint types (static fallback; prefer get_weapon_types()/get_drone_types())
 WEAPON_TYPES = {"LASER", "MISSILES", "BEAM", "BOMB", "BURST", "ION"}
 DRONE_TYPES = {"COMBAT", "DEFENSE", "SHIP_REPAIR", "BOARDER", "REPAIR", "BATTLE", "HACKING"}

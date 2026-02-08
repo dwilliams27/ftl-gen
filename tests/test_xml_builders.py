@@ -1,6 +1,5 @@
 """Tests for XML schema models and builders."""
 
-import pytest
 from lxml import etree
 
 from ftl_gen.xml.builders import XMLBuilder
@@ -65,18 +64,19 @@ class TestWeaponBlueprint:
         assert weapon.breach_chance == 0
         assert weapon.rarity == 2
 
-    def test_validation_ranges(self):
-        with pytest.raises(ValueError):
-            WeaponBlueprint(
-                name="TEST",
-                type="LASER",
-                title="Test",
-                desc="Test",
-                damage=15,  # Too high
-                cooldown=10,
-                power=2,
-                cost=50,
-            )
+    def test_pydantic_accepts_high_damage(self):
+        """Pydantic no longer rejects high damage; BalanceValidator handles that."""
+        weapon = WeaponBlueprint(
+            name="TEST",
+            type="LASER",
+            title="Test",
+            desc="Test",
+            damage=15,
+            cooldown=10,
+            power=2,
+            cost=50,
+        )
+        assert weapon.damage == 15
 
     def test_beam_weapon(self):
         weapon = WeaponBlueprint(
@@ -246,6 +246,83 @@ class TestXMLBuilder:
         xml_str = etree.tostring(xml, encoding="unicode")
         parsed = etree.fromstring(xml_str)
         assert parsed is not None
+
+
+class TestEngiTestLoadout:
+    """Tests for Engi test loadout matching vanilla PLAYER_SHIP_CIRCLE."""
+
+    def test_loadout_defaults(self):
+        builder = XMLBuilder()
+        ship = builder.build_engi_test_loadout()
+
+        assert ship.tag == "shipBlueprint"
+        assert ship.get("name") == "PLAYER_SHIP_CIRCLE"
+        assert ship.get("layout") == "circle_cruiser"
+        assert ship.get("img") == "circle_cruiser"
+
+    def test_loadout_system_list(self):
+        builder = XMLBuilder()
+        ship = builder.build_engi_test_loadout()
+
+        system_list = ship.find("systemList")
+        assert system_list is not None
+        # Vanilla Engi A has 15 systems
+        assert len(system_list) == 15
+        # Check a few key systems
+        assert system_list.find("pilot") is not None
+        assert system_list.find("shields") is not None
+        assert system_list.find("weapons") is not None
+        assert system_list.find("drones") is not None
+        assert system_list.find("hacking") is not None
+
+    def test_loadout_slots(self):
+        builder = XMLBuilder()
+        ship = builder.build_engi_test_loadout()
+
+        assert ship.find("weaponSlots").text == "3"
+        assert ship.find("droneSlots").text == "3"
+
+    def test_loadout_vanilla_equipment(self):
+        builder = XMLBuilder()
+        ship = builder.build_engi_test_loadout()
+
+        # Vanilla weapon: ION_4
+        weapon_list = ship.find("weaponList")
+        assert weapon_list.get("missiles") == "0"
+        assert weapon_list.find("weapon").get("name") == "ION_4"
+
+        # Vanilla drone: COMBAT_1
+        drone_list = ship.find("droneList")
+        assert drone_list.get("drones") == "15"
+        assert drone_list.find("drone").get("name") == "COMBAT_1"
+
+        # Vanilla augment: NANO_MEDBAY
+        aug = ship.find("aug")
+        assert aug.get("name") == "NANO_MEDBAY"
+
+    def test_loadout_power_and_crew(self):
+        builder = XMLBuilder()
+        ship = builder.build_engi_test_loadout()
+
+        assert ship.find("maxPower").get("amount") == "10"
+
+        crew = ship.findall("crewCount")
+        assert len(crew) == 2
+        # 1 human + 2 engi
+        crew_dict = {c.get("class"): int(c.get("amount")) for c in crew}
+        assert crew_dict == {"human": 1, "engi": 2}
+
+    def test_loadout_custom_items(self):
+        builder = XMLBuilder()
+        ship = builder.build_engi_test_loadout(
+            weapon_name="CUSTOM_GUN",
+            drone_name="CUSTOM_DRONE",
+            augment_name="CUSTOM_AUG",
+        )
+
+        assert ship.find("weaponList").find("weapon").get("name") == "CUSTOM_GUN"
+        assert ship.find("droneList").find("drone").get("name") == "CUSTOM_DRONE"
+        assert ship.find("aug").get("name") == "CUSTOM_AUG"
 
 
 class TestModContent:

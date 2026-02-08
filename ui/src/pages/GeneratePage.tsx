@@ -44,7 +44,9 @@ export function GeneratePage() {
         cache_images: false,
         chaos_level: chaosLevel,
         unsafe: false,
-        test_loadout: false,
+        test_weapon: false,
+        test_drone: false,
+        test_augment: false,
       };
 
       const res = await fetch("/api/v1/generate", {
@@ -103,7 +105,7 @@ export function GeneratePage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Generate Mod</h1>
-        <p className="text-muted-foreground">Create a themed FTL mod with AI</p>
+        <p className="text-muted-foreground">Generate themed FTL mod from scratch</p>
       </div>
 
       <div className="space-y-4 rounded-lg border border-border bg-card p-6">

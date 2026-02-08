@@ -66,7 +66,9 @@ class ModGenerator:
         crew: list[CrewBlueprint] | None = None,
         sprite_files: dict[str, bytes] | None = None,
         *,
-        test_loadout: bool = False,
+        test_weapon: bool = False,
+        test_drone: bool = False,
+        test_augment: bool = False,
     ) -> Path:
         """Save current progress as a partial mod.
 
@@ -81,7 +83,10 @@ class ModGenerator:
             augments=augments or [],
             crew=crew or [],
         )
-        return self.mod_builder.build(content, sprite_files, test_loadout=test_loadout)
+        return self.mod_builder.build(
+            content, sprite_files,
+            test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment,
+        )
 
     def generate_mod(
         self,
@@ -95,7 +100,9 @@ class ModGenerator:
         generate_sprites: bool = True,
         use_cached_images: bool = False,
         chaos_config: ChaosConfig | None = None,
-        test_loadout: bool = False,
+        test_weapon: bool = False,
+        test_drone: bool = False,
+        test_augment: bool = False,
         progress_callback: Callable[..., None] | None = None,
     ) -> Path:
         """Generate a complete mod from a theme.
@@ -111,7 +118,9 @@ class ModGenerator:
             generate_sprites: Whether to generate weapon sprites
             use_cached_images: Whether to use cached sprite images
             chaos_config: Optional chaos configuration for randomizing vanilla items
-            test_loadout: If True, add a modified Kestrel loadout with the first weapon
+            test_weapon: If True, replace Engi A weapon with first mod weapon
+            test_drone: If True, replace Engi A drone with first mod drone
+            test_augment: If True, replace Engi A augment with first mod augment
 
         Returns:
             Path to generated .ftl file
@@ -265,7 +274,7 @@ class ModGenerator:
                 mod_name, description,
                 weapons=all_weapons, drones=all_drones, augments=all_augments,
                 crew=all_crew, events=events, sprite_files=sprite_files,
-                test_loadout=test_loadout,
+                test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment,
             )
             progress.remove_task(task)
             _notify("building", "completed")

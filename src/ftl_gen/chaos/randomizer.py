@@ -337,39 +337,43 @@ def randomize_all(config: ChaosConfig) -> ChaosResult:
     randomizer = ChaosRandomizer(config)
     result = ChaosResult(seed_used=randomizer.seed_used)
 
-    # Randomize weapons (flatten nested structure)
-    for weapon_category in vanilla.get("weapons", {}).values():
-        for weapon_name, weapon_data in weapon_category.items():
-            data = weapon_data.copy()
-            data["name"] = weapon_name
-            try:
-                result.weapons.append(randomizer.randomize_weapon(data))
-            except Exception as e:
-                # Log but continue on validation errors
-                logger.warning("Could not randomize weapon %s: %s", weapon_name, e)
+    # Randomize weapons (flat dict)
+    for weapon_name, weapon_data in vanilla.get("weapons", {}).items():
+        if weapon_data.get("noloc"):
+            continue  # Skip enemy-only weapons
+        data = weapon_data.copy()
+        data["name"] = weapon_name
+        try:
+            result.weapons.append(randomizer.randomize_weapon(data))
+        except Exception as e:
+            logger.warning("Could not randomize weapon %s: %s", weapon_name, e)
 
-    # Randomize drones (flatten nested structure)
-    for drone_category in vanilla.get("drones", {}).values():
-        for drone_name, drone_data in drone_category.items():
-            data = drone_data.copy()
-            data["name"] = drone_name
-            try:
-                result.drones.append(randomizer.randomize_drone(data))
-            except Exception as e:
-                logger.warning("Could not randomize drone %s: %s", drone_name, e)
+    # Randomize drones (flat dict)
+    for drone_name, drone_data in vanilla.get("drones", {}).items():
+        if drone_data.get("noloc"):
+            continue
+        data = drone_data.copy()
+        data["name"] = drone_name
+        try:
+            result.drones.append(randomizer.randomize_drone(data))
+        except Exception as e:
+            logger.warning("Could not randomize drone %s: %s", drone_name, e)
 
-    # Randomize augments (flatten nested structure)
-    for augment_category in vanilla.get("augments", {}).values():
-        for augment_name, augment_data in augment_category.items():
-            data = augment_data.copy()
-            data["name"] = augment_name
-            try:
-                result.augments.append(randomizer.randomize_augment(data))
-            except Exception as e:
-                logger.warning("Could not randomize augment %s: %s", augment_name, e)
+    # Randomize augments (flat dict)
+    for augment_name, augment_data in vanilla.get("augments", {}).items():
+        if augment_data.get("noloc"):
+            continue
+        data = augment_data.copy()
+        data["name"] = augment_name
+        try:
+            result.augments.append(randomizer.randomize_augment(data))
+        except Exception as e:
+            logger.warning("Could not randomize augment %s: %s", augment_name, e)
 
-    # Randomize crew
+    # Randomize crew (flat dict)
     for crew_name, crew_data in vanilla.get("crew", {}).items():
+        if crew_data.get("noloc"):
+            continue
         data = crew_data.copy()
         data["name"] = crew_name
         try:

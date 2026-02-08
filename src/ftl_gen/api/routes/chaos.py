@@ -56,7 +56,10 @@ async def generate_chaos(request: ChaosRequest):
                 events=[],
             )
             mod_builder = ModBuilder(settings.output_dir)
-            ftl_path = mod_builder.build(content, test_loadout=request.test_loadout)
+            ftl_path = mod_builder.build(
+                content,
+                test_weapon=request.test_weapon, test_drone=request.test_drone, test_augment=request.test_augment,
+            )
             put({"step": "building", "status": "completed"})
             return str(ftl_path)
 
