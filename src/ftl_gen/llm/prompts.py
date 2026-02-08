@@ -172,6 +172,11 @@ Outcome objects have:
 - removeCrew: true to lose a crew member
 - damageSystem: system name, damageAmount: 1-5
 
+CRITICAL - EVENT STRUCTURE RULES:
+- NEVER create circular event references. Event A must not chain to Event B if B chains back to A.
+- Self-referencing events (A loads A) will freeze the game.
+- Every <choice> MUST have an <event> outcome with at least a <text> element. Missing outcomes crash the game.
+
 Create events with:
 1. 2-4 meaningful choices each
 2. Risk/reward tradeoffs

@@ -18,8 +18,8 @@ Validated and patched into FTL
 
 ```
 src/ftl_gen/
-├── cli.py              # Typer CLI commands (shared helpers for single-item + validate/patch/run)
-├── config.py           # Settings singleton, env vars, Slipstream discovery
+├── cli.py              # Typer CLI commands (shared helpers for single-item + validate/patch/run + diagnose)
+├── config.py           # Settings singleton, env vars, Slipstream/FTL discovery
 ├── constants.py        # Single source of truth: sprite dims, balance ranges, vanilla assets, type sets
 ├── api/                # FastAPI web UI backend
 │   ├── app.py          # FastAPI app factory, static file serving, CORS
@@ -32,11 +32,12 @@ src/ftl_gen/
 │       ├── sprites.py  # Serve sprite PNGs from mods
 │       ├── generate.py # Mod generation with SSE progress streaming
 │       ├── chaos.py    # Chaos mode endpoints
-│       └── validate.py # Slipstream validation + patching
+│       └── validate.py # Validation, diagnostics, crash report, patching
 ├── core/
 │   ├── generator.py    # Main orchestrator (chaos/LLM tracked separately, sprites extracted, progress_callback)
+│   ├── launcher.py     # FTLLauncher: monitored FTL launch with log tailing + hang/crash detection
 │   ├── mod_builder.py  # .ftl packaging
-│   └── slipstream.py   # Slipstream integration
+│   └── slipstream.py   # Slipstream integration + patch_and_launch()
 ├── chaos/              # Chaos mode - FREE local transforms
 │   ├── randomizer.py   # Stat randomization with seed support
 │   ├── sprites.py      # Sprite mutations + vanilla sprite extraction
@@ -99,7 +100,32 @@ ui/                     # React frontend (Vite + TypeScript + Tailwind)
 - Items appear in stores in-game
 - Image caching (`--cache-images`) and cost tracking
 - **Chaos mode** - randomize vanilla game data (FREE, no LLM calls)
-- **Web UI** - local mod browser, generator, chaos mode, validate/patch/run (http://localhost:8421)
+- **Debugging toolkit** - event loop detection, crash pattern checks, monitored FTL launch, crash reporting
+- **Web UI** - local mod browser, generator, chaos mode, diagnose/validate/patch/run (http://localhost:8421)
+
+## Debugging Toolkit
+
+```bash
+# Static analysis - checks for freezes/crashes before patching
+ftl-gen diagnose "ModName"
+
+# With monitored launch - patches, launches, watches for hangs
+ftl-gen diagnose "ModName" --launch
+```
+
+**Static checks (`validators.py`):**
+- `detect_event_loops()` — DFS cycle detection on event graph (prevents startup freezes)
+- `check_dangling_references()` — flags `<event load="X">` where X is undefined
+- `check_common_crash_patterns()` — choices missing outcomes, BEAM without `<length>`, MISSILES without `<missiles>`
+
+**Monitored launch (`core/launcher.py`):**
+- `FTLLauncher` — Popen + background log tailing from FTL.log bookmark
+- Detects early crash (process exits), hang (no activity 15s after "Blueprints Loaded!"), or success
+- `get_crash_report()` — snapshots log lines, errors, process status, macOS .ips crash reports
+
+**Web UI:**
+- "Diagnose" button — runs all static checks, shows pass/fail/warn checklist
+- "Report Crash" button — appears after Patch & Run, shows FTL.log snapshot with copy-to-clipboard
 
 ## What's limited
 

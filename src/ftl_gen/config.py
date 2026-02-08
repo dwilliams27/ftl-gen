@@ -45,6 +45,26 @@ class Settings(BaseSettings):
                 raise ValueError("OPENAI_API_KEY is required when using OpenAI")
             return self.openai_api_key
 
+    @property
+    def ftl_log_path(self) -> Path:
+        """Path to FTL's log file."""
+        return Path.home() / "Library" / "Application Support" / "FasterThanLight" / "FTL.log"
+
+    def find_ftl_executable(self) -> Path | None:
+        """Auto-detect FTL executable on macOS."""
+        search_paths = [
+            # Steam install
+            Path.home() / "Library" / "Application Support" / "Steam"
+            / "steamapps" / "common" / "FTL Faster Than Light"
+            / "FTL.app" / "Contents" / "MacOS" / "FTL",
+            # Direct /Applications install
+            Path("/Applications/FTL.app/Contents/MacOS/FTL"),
+        ]
+        for path in search_paths:
+            if path.exists():
+                return path
+        return None
+
     def find_slipstream(self) -> Path | None:
         """Auto-detect Slipstream installation path."""
         if self.slipstream_path and self.slipstream_path.exists():

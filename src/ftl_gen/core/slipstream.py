@@ -1,11 +1,17 @@
 """Slipstream Mod Manager integration."""
 
+from __future__ import annotations
+
 import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ftl_gen.config import Settings
+
+if TYPE_CHECKING:
+    from ftl_gen.core.launcher import CrashReport, FTLLauncher, LaunchResult
 
 
 @dataclass
@@ -37,6 +43,7 @@ class SlipstreamManager:
     def __init__(self, settings: Settings | None = None):
         self.settings = settings or Settings()
         self._path: Path | None = None
+        self._launcher: FTLLauncher | None = None
 
     @property
     def path(self) -> Path | None:
@@ -244,6 +251,29 @@ class SlipstreamManager:
 
         # Then run
         return self.run_ftl()
+
+    def patch_and_launch(
+        self, mod_paths: list[Path], mod_name: str | None = None
+    ) -> tuple[PatchResult, LaunchResult | None]:
+        """Patch mods and launch FTL with monitoring.
+
+        Returns the patch result and (if patch succeeds) a monitored launch result.
+        """
+        from ftl_gen.core.launcher import FTLLauncher, LaunchResult
+
+        patch_result = self.patch(mod_paths)
+        if not patch_result.success:
+            return patch_result, None
+
+        self._launcher = FTLLauncher(self.settings, mod_name=mod_name)
+        launch_result = self._launcher.launch()
+        return patch_result, launch_result
+
+    def get_crash_report(self) -> CrashReport | None:
+        """Get crash report from the last monitored launch, if any."""
+        if self._launcher is None:
+            return None
+        return self._launcher.get_crash_report()
 
     def run_ftl(self) -> PatchResult:
         """Launch FTL."""

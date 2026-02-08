@@ -68,6 +68,14 @@ export const api = {
     });
   },
 
+  // Diagnostics
+  diagnose: (name: string) =>
+    request<import("@/lib/types").DiagnosticReport>(`/diagnose?name=${encodeURIComponent(name)}`, {
+      method: "POST",
+    }),
+  getCrashReport: () =>
+    request<import("@/lib/types").CrashReportResponse>("/crash-report"),
+
   // Generation (SSE)
   generateMod: (body: import("@/lib/types").GenerateRequest) => {
     return new EventSource(

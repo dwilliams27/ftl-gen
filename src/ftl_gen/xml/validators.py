@@ -1,6 +1,7 @@
 """XML validation for FTL mod files."""
 
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from lxml import etree
@@ -20,6 +21,177 @@ class ValidationResult:
     @property
     def ok(self) -> bool:
         return self.valid and not self.errors
+
+
+@dataclass
+class DiagnosticCheck:
+    """A single diagnostic check result."""
+
+    name: str
+    status: str  # "pass" | "fail" | "warn"
+    message: str = ""
+
+
+@dataclass
+class DiagnosticResult:
+    """Result of running all diagnostic checks on a mod."""
+
+    checks: list[DiagnosticCheck] = field(default_factory=list)
+    event_cycles: list[list[str]] = field(default_factory=list)
+    dangling_refs: list[str] = field(default_factory=list)
+
+    @property
+    def ok(self) -> bool:
+        return all(c.status != "fail" for c in self.checks)
+
+
+def detect_event_loops(events_xml: str) -> list[list[str]]:
+    """Detect circular references in event chains.
+
+    Parses events XML, builds a directed graph of event references,
+    and finds all cycles using DFS with white/gray/black coloring.
+
+    Returns list of cycles, each cycle is a list of event names.
+    """
+    try:
+        root = etree.fromstring(events_xml.encode())
+    except etree.XMLSyntaxError:
+        return []
+
+    # Build adjacency graph: event name -> set of referenced event names
+    graph: dict[str, set[str]] = defaultdict(set)
+    defined_events: set[str] = set()
+
+    for event_elem in root.findall(".//event[@name]"):
+        event_name = event_elem.get("name")
+        if not event_name:
+            continue
+        defined_events.add(event_name)
+
+        # Find all <event load="X"> descendants (references to other events)
+        for load_elem in event_elem.findall(".//event[@load]"):
+            target = load_elem.get("load")
+            if target:
+                graph[event_name].add(target)
+
+    # DFS cycle detection (white=unvisited, gray=in-progress, black=done)
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color: dict[str, int] = {name: WHITE for name in defined_events}
+    cycles: list[list[str]] = []
+    path: list[str] = []
+
+    def dfs(node: str) -> None:
+        if node not in color:
+            return
+        color[node] = GRAY
+        path.append(node)
+
+        for neighbor in graph.get(node, set()):
+            if neighbor not in color:
+                continue
+            if color[neighbor] == GRAY:
+                # Found a cycle - extract it from path
+                cycle_start = path.index(neighbor)
+                cycle = path[cycle_start:] + [neighbor]
+                cycles.append(cycle)
+            elif color[neighbor] == WHITE:
+                dfs(neighbor)
+
+        path.pop()
+        color[node] = BLACK
+
+    for event_name in defined_events:
+        if color[event_name] == WHITE:
+            dfs(event_name)
+
+    return cycles
+
+
+def check_dangling_references(events_xml: str) -> list[str]:
+    """Find event references that point to undefined events.
+
+    Returns list of strings like "EVENT_A -> undefined EVENT_B".
+    """
+    try:
+        root = etree.fromstring(events_xml.encode())
+    except etree.XMLSyntaxError:
+        return []
+
+    # Collect all defined top-level event names
+    defined: set[str] = set()
+    for event_elem in root.findall(".//event[@name]"):
+        name = event_elem.get("name")
+        if name:
+            defined.add(name)
+
+    # Find all references
+    dangling: list[str] = []
+    for event_elem in root.findall(".//event[@name]"):
+        source = event_elem.get("name")
+        for load_elem in event_elem.findall(".//event[@load]"):
+            target = load_elem.get("load")
+            if target and target not in defined:
+                dangling.append(f"{source} -> undefined {target}")
+
+    return dangling
+
+
+def check_common_crash_patterns(
+    blueprints_xml: str | None, events_xml: str | None
+) -> list[str]:
+    """Check for patterns known to cause FTL crashes.
+
+    Returns list of warning/error strings.
+    """
+    issues: list[str] = []
+
+    # Check events for choices without outcomes
+    if events_xml:
+        try:
+            root = etree.fromstring(events_xml.encode())
+            for event_elem in root.findall(".//event[@name]"):
+                event_name = event_elem.get("name")
+                for i, choice in enumerate(event_elem.findall("choice"), 1):
+                    # A choice must have an <event> child (the outcome)
+                    outcome = choice.find("event")
+                    if outcome is None:
+                        issues.append(
+                            f"Event '{event_name}' choice {i} has no <event> outcome "
+                            f"(crashes: 'Choice does not have an event')"
+                        )
+                    elif outcome.get("load") is None and outcome.find("text") is None:
+                        issues.append(
+                            f"Event '{event_name}' choice {i} has empty outcome "
+                            f"(no text and no load reference)"
+                        )
+        except etree.XMLSyntaxError:
+            issues.append("Events XML has syntax errors")
+
+    # Check weapon blueprints for type-specific required fields
+    if blueprints_xml:
+        try:
+            root = etree.fromstring(blueprints_xml.encode())
+            for weapon in root.findall(".//weaponBlueprint"):
+                name = weapon.get("name", "(unnamed)")
+                type_elem = weapon.find("type")
+                if type_elem is None:
+                    continue
+                wtype = type_elem.text
+
+                if wtype == "BEAM":
+                    if weapon.find("length") is None:
+                        issues.append(
+                            f"BEAM weapon '{name}' missing <length> (required for beams)"
+                        )
+                if wtype == "MISSILES" or wtype == "BOMB":
+                    if weapon.find("missiles") is None:
+                        issues.append(
+                            f"{wtype} weapon '{name}' missing <missiles> (ammo cost)"
+                        )
+        except etree.XMLSyntaxError:
+            issues.append("Blueprints XML has syntax errors")
+
+    return issues
 
 
 class XMLValidator:

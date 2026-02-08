@@ -1,10 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { useMod, useDeleteMod, useValidate, usePatch, usePatchAndRun } from "@/api/hooks.ts";
+import { useMod, useDeleteMod, useValidate, usePatch, usePatchAndRun, useDiagnose, useCrashReport } from "@/api/hooks.ts";
 import { api } from "@/api/client.ts";
-import { ArrowLeft, Download, Trash2, CheckCircle, Play, Rocket, ChevronDown } from "lucide-react";
+import { ArrowLeft, Download, Trash2, CheckCircle, Play, Rocket, ChevronDown, Stethoscope, AlertTriangle, Copy, X } from "lucide-react";
 import { cn } from "@/lib/utils.ts";
-import type { ModDetail } from "@/lib/types.ts";
+import type { ModDetail, DiagnosticReport, CrashReportResponse } from "@/lib/types.ts";
 
 type Tab = "weapons" | "drones" | "augments" | "crew" | "events" | "sprites" | "xml";
 
@@ -246,6 +246,118 @@ function XmlTab({ mod }: { mod: ModDetail }) {
   );
 }
 
+function DiagnosticPanel({ report }: { report: DiagnosticReport }) {
+  return (
+    <div className="rounded-md border border-border bg-card p-4">
+      <div className="mb-3 flex items-center gap-2">
+        <Stethoscope className="h-4 w-4" />
+        <h3 className="font-medium">Diagnostic Results</h3>
+        <span className={cn(
+          "rounded px-2 py-0.5 text-xs",
+          report.ok ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
+        )}>
+          {report.ok ? "All Clear" : "Issues Found"}
+        </span>
+      </div>
+      <div className="space-y-1.5">
+        {report.checks.map((check, i) => (
+          <div key={i} className="flex items-start gap-2 text-sm">
+            <span className={cn(
+              "mt-0.5 inline-block w-12 shrink-0 rounded px-1.5 py-0.5 text-center text-xs font-medium",
+              check.status === "pass" && "bg-success/10 text-success",
+              check.status === "fail" && "bg-destructive/10 text-destructive",
+              check.status === "warn" && "bg-warning/10 text-warning",
+            )}>
+              {check.status.toUpperCase()}
+            </span>
+            <span className="font-medium">{check.name}</span>
+            {check.message && (
+              <span className="text-muted-foreground">{check.message}</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CrashReportPanel({ report, onClose }: { report: CrashReportResponse; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  function copyToClipboard() {
+    const text = [
+      `FTL Crash Report${report.mod_name ? ` - ${report.mod_name}` : ""}`,
+      `Process: ${report.process_alive ? "Running" : `Exited (code ${report.exit_code})`}`,
+      "",
+      report.errors.length > 0 ? `ERRORS:\n${report.errors.join("\n")}` : "",
+      "",
+      `LOG (${report.log_lines.length} lines):`,
+      report.log_lines.join("\n"),
+    ].filter(Boolean).join("\n");
+
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <div className="rounded-md border border-warning/50 bg-card p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 text-warning" />
+          <h3 className="font-medium">Crash Report{report.mod_name ? `: ${report.mod_name}` : ""}</h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={copyToClipboard}
+            className="flex items-center gap-1 rounded border border-border px-2 py-1 text-xs transition-colors hover:bg-accent"
+          >
+            <Copy className="h-3 w-3" />
+            {copied ? "Copied!" : "Copy to clipboard"}
+          </button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-3 flex gap-4 text-sm">
+        <div>
+          <span className="text-muted-foreground">Status: </span>
+          <span className={report.process_alive ? "text-success" : "text-destructive"}>
+            {report.process_alive ? "Running" : `Exited (code ${report.exit_code})`}
+          </span>
+        </div>
+        <div>
+          <span className="text-muted-foreground">Log lines: </span>
+          {report.log_lines.length}
+        </div>
+      </div>
+
+      {report.errors.length > 0 && (
+        <div className="mb-3">
+          <div className="mb-1 text-xs font-medium text-destructive">Errors in log:</div>
+          <div className="max-h-32 overflow-auto rounded border border-destructive/30 bg-destructive/5 p-2">
+            {report.errors.map((line, i) => (
+              <div key={i} className="font-mono text-xs text-destructive">{line}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <div className="mb-1 text-xs font-medium text-muted-foreground">FTL.log since launch:</div>
+        <pre className="max-h-64 overflow-auto rounded border border-border bg-background p-2 font-mono text-xs">
+          {report.log_lines.length > 0
+            ? report.log_lines.join("\n")
+            : "(no log output captured)"}
+        </pre>
+      </div>
+    </div>
+  );
+}
+
 export function ModDetailPage() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
@@ -254,9 +366,12 @@ export function ModDetailPage() {
   const validateMod = useValidate();
   const patchMod = usePatch();
   const patchAndRun = usePatchAndRun();
+  const diagnoseMod = useDiagnose();
+  const crashReport = useCrashReport();
   const [tab, setTab] = useState<Tab>("weapons");
   const [testLoadout, setTestLoadout] = useState(false);
   const [launchMenuOpen, setLaunchMenuOpen] = useState(false);
+  const [showCrashReport, setShowCrashReport] = useState(false);
   const launchMenuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -305,6 +420,14 @@ export function ModDetailPage() {
 
         <div className="flex gap-2">
           <button
+            onClick={() => diagnoseMod.mutate(mod.name)}
+            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
+            disabled={diagnoseMod.isPending}
+          >
+            <Stethoscope className="h-3.5 w-3.5" />
+            {diagnoseMod.isPending ? "..." : "Diagnose"}
+          </button>
+          <button
             onClick={() => validateMod.mutate(mod.name)}
             className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
             disabled={validateMod.isPending}
@@ -350,6 +473,20 @@ export function ModDetailPage() {
               </div>
             )}
           </div>
+          {patchAndRun.data && (
+            <button
+              onClick={() => {
+                crashReport.mutate(undefined, {
+                  onSuccess: () => setShowCrashReport(true),
+                });
+              }}
+              className="flex items-center gap-1.5 rounded-md border border-warning/50 bg-warning/10 px-3 py-1.5 text-sm text-warning transition-colors hover:bg-warning/20"
+              disabled={crashReport.isPending}
+            >
+              <AlertTriangle className="h-3.5 w-3.5" />
+              {crashReport.isPending ? "..." : "Report Crash"}
+            </button>
+          )}
           {mod.has_ftl && (
             <a
               href={api.getModDownloadUrl(mod.name)}
@@ -371,6 +508,14 @@ export function ModDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* Diagnostic results */}
+      {diagnoseMod.data && <DiagnosticPanel report={diagnoseMod.data} />}
+
+      {/* Crash report */}
+      {showCrashReport && crashReport.data && (
+        <CrashReportPanel report={crashReport.data} onClose={() => setShowCrashReport(false)} />
+      )}
 
       {/* Status messages */}
       {validateMod.data && (
