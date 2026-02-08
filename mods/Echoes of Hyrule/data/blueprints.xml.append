@@ -5,15 +5,21 @@
     <short>Light</short>
     <desc>Ancient Hylian weapon that fires a piercing beam of concentrated light through multiple rooms. Sacred arrows blessed by the Goddesses strike true.</desc>
     <damage>1</damage>
+    <sp>0</sp>
+    <fireChance>0</fireChance>
+    <breachChance>0</breachChance>
     <length>90</length>
     <cooldown>13</cooldown>
     <power>2</power>
     <cost>65</cost>
     <rarity>3</rarity>
+    <speed>3</speed>
     <image>beam_contact</image>
     <weaponArt>light_bow</weaponArt>
+    <iconImage>beam</iconImage>
     <launchSounds>
       <sound>beam1</sound>
+      <sound>beam1_2</sound>
     </launchSounds>
   </weaponBlueprint>
   <weaponBlueprint name="BOMBCHU_LAUNCHER">
@@ -22,24 +28,30 @@
     <short>Bombchu</short>
     <desc>Launches self-propelled explosive drones that seek their target. Deals heavy damage to systems and hull. Consumes missile ammunition.</desc>
     <damage>3</damage>
+    <sp>0</sp>
+    <fireChance>0</fireChance>
+    <breachChance>0</breachChance>
     <missiles>1</missiles>
     <shots>1</shots>
-    <sp>0</sp>
-    <explosion>explosion_random</explosion>
     <cooldown>17</cooldown>
     <power>3</power>
     <cost>80</cost>
     <rarity>4</rarity>
     <image>missile_2</image>
     <weaponArt>bombchu_launcher</weaponArt>
+    <iconImage>missile</iconImage>
     <launchSounds>
-      <sound>missileLaunch</sound>
+      <sound>smallMissile1</sound>
+      <sound>smallMissile2</sound>
     </launchSounds>
     <hitShipSounds>
-      <sound>explosion2</sound>
-      <sound>explosion3</sound>
-      <sound>explosion1</sound>
+      <sound>smallExplosion</sound>
     </hitShipSounds>
+    <hitShieldSounds>
+      <sound>hitShield1</sound>
+      <sound>hitShield2</sound>
+      <sound>hitShield3</sound>
+    </hitShieldSounds>
     <missSounds>
       <sound>miss</sound>
     </missSounds>
@@ -52,6 +64,7 @@
     <damage>3</damage>
     <sp>5</sp>
     <fireChance>4</fireChance>
+    <breachChance>0</breachChance>
     <missiles>1</missiles>
     <shots>1</shots>
     <explosion>explosion_random</explosion>
@@ -59,8 +72,9 @@
     <power>1</power>
     <cost>70</cost>
     <rarity>4</rarity>
-    <image>bomb_1</image>
+    <image>bomb1</image>
     <weaponArt>dins_fire_projector</weaponArt>
+    <iconImage>bomb</iconImage>
     <launchSounds>
       <sound>bombTeleport</sound>
     </launchSounds>
@@ -74,15 +88,21 @@
     <short>Master</short>
     <desc>The legendary Blade of Evil's Bane projects devastating energy when wielded by a worthy vessel. Only fires at full hull integrity—the sword resonates with the ship's vitality.</desc>
     <damage>3</damage>
+    <sp>0</sp>
+    <fireChance>0</fireChance>
+    <breachChance>0</breachChance>
     <length>90</length>
     <cooldown>22</cooldown>
     <power>4</power>
     <cost>120</cost>
     <rarity>5</rarity>
+    <speed>3</speed>
     <image>beam_contact</image>
     <weaponArt>master_sword_beam</weaponArt>
+    <iconImage>beam</iconImage>
     <launchSounds>
       <sound>beam1</sound>
+      <sound>beam1_2</sound>
     </launchSounds>
   </weaponBlueprint>
   <droneBlueprint name="SHEIKAH_EYE_DRONE">
@@ -151,32 +171,55 @@
     <rarity>4</rarity>
     <value>1.0</value>
   </augBlueprint>
-  <shipBlueprint name="PLAYER_SHIP_HARD" layout="kestral" img="kestral">
-    <class>Kestrel Cruiser</class>
-    <name>The Kestrel</name>
-    <desc>This class of ship was decommissioned from the Federation fleet years ago. After a number of refits and adjustments, this classic ship is ready for battle.</desc>
+  <shipBlueprint name="PLAYER_SHIP_CIRCLE" layout="circle_cruiser" img="circle_cruiser">
+    <class id="ship_PLAYER_SHIP_CIRCLE_class"/>
+    <name id="ship_PLAYER_SHIP_CIRCLE_name"/>
+    <unlock id="ship_PLAYER_SHIP_CIRCLE_unlock"/>
+    <desc id="ship_PLAYER_SHIP_CIRCLE_desc"/>
     <systemList>
-      <pilot power="1" room="0" start="true" img="room_pilot"/>
-      <doors power="1" room="2" start="true" img="room_doors"/>
-      <sensors power="1" room="3" start="true" img="room_sensors"/>
-      <medbay power="1" room="4" start="true" img="room_medbay"/>
-      <oxygen power="1" room="13" start="true" img="room_oxygen"/>
-      <shields power="2" room="5" start="true" img="room_shields"/>
-      <engines power="2" room="14" start="true" img="room_engines"/>
-      <weapons power="3" room="11" start="true" img="room_weapons"/>
-      <drones power="0" room="8" start="false"/>
-      <teleporter power="0" room="1" start="false"/>
-      <cloaking power="0" room="6" start="false"/>
+      <pilot power="1" room="8" start="true"/>
+      <doors power="1" room="5" start="true" img="room_doors_4">
+        <slot>
+          <direction>right</direction>
+          <number>0</number>
+        </slot>
+      </doors>
+      <sensors power="1" room="4" start="true" img="room_sensors_4">
+        <slot>
+          <direction>left</direction>
+          <number>1</number>
+        </slot>
+      </sensors>
+      <oxygen power="1" room="15" start="true" img="room_oxygen_4"/>
+      <engines power="2" room="2" start="true" img="room_engines_2"/>
+      <shields power="2" room="3" start="true" img="room_shields_4"/>
+      <weapons power="3" room="11" start="true"/>
+      <drones power="3" room="0" start="true"/>
+      <medbay power="1" room="7" start="true"/>
+      <clonebay power="1" room="7" start="false"/>
+      <teleporter power="1" room="9" start="false"/>
+      <cloaking power="1" room="12" start="false" img="room_cloaking_4"/>
+      <battery power="1" room="1" start="false" img="room_battery_6"/>
+      <mind power="1" room="6" start="false" img="room_mind_6"/>
+      <hacking power="1" room="14" start="false" img="room_hacking_2">
+        <slot>
+          <direction>down</direction>
+          <number>0</number>
+        </slot>
+      </hacking>
     </systemList>
-    <weaponSlots>4</weaponSlots>
-    <droneSlots>2</droneSlots>
-    <weaponList missiles="8" count="2">
-      <weapon name="LASER_BURST_3"/>
+    <weaponSlots>3</weaponSlots>
+    <droneSlots>3</droneSlots>
+    <weaponList missiles="0" count="1">
       <weapon name="LIGHT_BOW"/>
     </weaponList>
-    <droneList drones="0" count="0"/>
+    <droneList drones="15" count="1">
+      <drone name="SHEIKAH_EYE_DRONE"/>
+    </droneList>
+    <aug name="TRIFORCE_RESONATOR"/>
     <health amount="30"/>
-    <maxPower amount="8"/>
-    <crewCount amount="3" max="8" class="human"/>
+    <maxPower amount="10"/>
+    <crewCount amount="1" class="human"/>
+    <crewCount amount="2" class="engi"/>
   </shipBlueprint>
 </FTL>
