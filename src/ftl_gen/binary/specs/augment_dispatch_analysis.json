@@ -1,0 +1,89 @@
+{
+  "goal_name": "augment_dispatch",
+  "conclusion": {
+    "dispatch_pattern": "scattered_checks",
+    "primary_function_addr": "0x1000a2740",
+    "secondary_function_addr": "0x1000a2870",
+    "string_comparison_method": "Augment presence stored in ShipInfo as std::map<std::string,int>; lookup via libc++ std::__tree::find/__find_equal using std::less<std::string> (lexicographic compare). No strcmp; comparisons happen inside std::string operator< used by map comparator.",
+    "calling_convention": "x86_64 macOS: decompiler labels __thiscall, but actually System V AMD64 ABI. this in RDI; std::string passed by pointer in RSI (caller often constructs a temporary std::string on stack and passes its address). Return: HasAugmentation returns int (count). GetAugmentationValue returns float in XMM0 (ShipInfo) but ShipObject wrapper shows it as ulong due to decompiler type confusion; treat as float.",
+    "function_prologue_bytes": "HasAugmentation(ShipInfo) 0x1000a2240: 55 48 89 e5 41 57 41 56 41 54 53 48 83 ec 10 49 89 f7 49 89 fe e8 f6 17 f7 ff ...; GetAugmentationValue(ShipInfo) 0x1000a2520: 55 48 89 e5 41 57 41 56 53 48 83 ec 58 49 89 f7 49 89 fe 48 8d 5d 98 48 89 df e8 49 0b 21 00 ...",
+    "recommended_patch_strategy": "Trampoline/detour ShipObject::HasAugmentation (0x1000a2740) and ShipObject::GetAugmentationValue (0x1000a2870) for global augment behavior overrides, since most gameplay code calls through ShipObject. Alternatively hook ShipInfo::HasAugmentation (0x1000a2240) to intercept map lookups/insertions. Be aware ShipInfo::HasAugmentation has side effect: inserts missing key with value 0 (due to __find_equal + node allocation), so hooks should preserve this behavior if game relies on it.",
+    "key_functions": [
+      {
+        "name": "ShipInfo::HasAugmentation(std::string)",
+        "address": "0x1000a2240",
+        "role": "Core augment presence/count lookup in ShipInfo; uses std::map<string,int>",
+        "pseudocode_summary": "Calls std::__tree::find; if not found returns 0. If found, uses __find_equal and returns node->value (int). If key not present, allocates/inserts new node with value 0 (side effect)."
+      },
+      {
+        "name": "ShipInfo::GetAugmentationValue(std::string)",
+        "address": "0x1000a2520",
+        "role": "Core augment value computation",
+        "pseudocode_summary": "If HasAugmentation(name)==0 return 0. Else value = BlueprintManager::GetAugmentValue(name); then multiplies by HasAugmentation(name) (count/stacking) and returns float."
+      },
+      {
+        "name": "ShipObject::HasAugmentation(std::string)",
+        "address": "0x1000a2740",
+        "role": "Wrapper selecting correct ShipInfo (player/enemy) then forwarding",
+        "pseudocode_summary": "Selects ShipInfo from global shipInfoList based on *(int*)(this+8)==0; constructs temp std::string; calls ShipInfo::HasAugmentation."
+      },
+      {
+        "name": "ShipObject::GetAugmentationValue(std::string)",
+        "address": "0x1000a2870",
+        "role": "Wrapper forwarding to ShipInfo::GetAugmentationValue",
+        "pseudocode_summary": "Same ShipInfo selection; constructs temp std::string; calls ShipInfo::GetAugmentationValue and returns it (float)."
+      },
+      {
+        "name": "ShipManager::CheckCrystalAugment(Pointf)",
+        "address": "0x100092310",
+        "role": "Example of scattered augment check affecting gameplay",
+        "pseudocode_summary": "Builds string \"CRYSTAL_SHARDS\" and checks ShipObject::HasAugmentation; if present, uses ShipObject::GetAugmentationValue(\"CRYSTAL_SHARDS\") as chance multiplier to spawn crystal shard projectile."
+      },
+      {
+        "name": "ShipManager::ModifyScrapCount(int,bool)",
+        "address": "0x1000898c0",
+        "role": "Example of augment affecting scrap gain",
+        "pseudocode_summary": "If gaining scrap: bonus = GetAugmentationValue(\"SCRAP_COLLECTOR\"); subtract REPAIR_ARM value in some condition; param_1 = param_1 + param_1*bonus; also checks HasAugmentation(\"REPAIR_ARM\") to apply hull damage side effect."
+      }
+    ]
+  },
+  "key_functions": [
+    {
+      "name": "ShipInfo::HasAugmentation(std::string)",
+      "address": "0x1000a2240",
+      "role": "Core augment presence/count lookup in ShipInfo; uses std::map<string,int>",
+      "pseudocode_summary": "Calls std::__tree::find; if not found returns 0. If found, uses __find_equal and returns node->value (int). If key not present, allocates/inserts new node with value 0 (side effect)."
+    },
+    {
+      "name": "ShipInfo::GetAugmentationValue(std::string)",
+      "address": "0x1000a2520",
+      "role": "Core augment value computation",
+      "pseudocode_summary": "If HasAugmentation(name)==0 return 0. Else value = BlueprintManager::GetAugmentValue(name); then multiplies by HasAugmentation(name) (count/stacking) and returns float."
+    },
+    {
+      "name": "ShipObject::HasAugmentation(std::string)",
+      "address": "0x1000a2740",
+      "role": "Wrapper selecting correct ShipInfo (player/enemy) then forwarding",
+      "pseudocode_summary": "Selects ShipInfo from global shipInfoList based on *(int*)(this+8)==0; constructs temp std::string; calls ShipInfo::HasAugmentation."
+    },
+    {
+      "name": "ShipObject::GetAugmentationValue(std::string)",
+      "address": "0x1000a2870",
+      "role": "Wrapper forwarding to ShipInfo::GetAugmentationValue",
+      "pseudocode_summary": "Same ShipInfo selection; constructs temp std::string; calls ShipInfo::GetAugmentationValue and returns it (float)."
+    },
+    {
+      "name": "ShipManager::CheckCrystalAugment(Pointf)",
+      "address": "0x100092310",
+      "role": "Example of scattered augment check affecting gameplay",
+      "pseudocode_summary": "Builds string \"CRYSTAL_SHARDS\" and checks ShipObject::HasAugmentation; if present, uses ShipObject::GetAugmentationValue(\"CRYSTAL_SHARDS\") as chance multiplier to spawn crystal shard projectile."
+    },
+    {
+      "name": "ShipManager::ModifyScrapCount(int,bool)",
+      "address": "0x1000898c0",
+      "role": "Example of augment affecting scrap gain",
+      "pseudocode_summary": "If gaining scrap: bonus = GetAugmentationValue(\"SCRAP_COLLECTOR\"); subtract REPAIR_ARM value in some condition; param_1 = param_1 + param_1*bonus; also checks HasAugmentation(\"REPAIR_ARM\") to apply hull damage side effect."
+    }
+  ],
+  "iterations_used": 4
+}

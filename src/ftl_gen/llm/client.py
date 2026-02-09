@@ -25,8 +25,9 @@ MODEL_PRICING: dict[str, dict[str, float]] = {
     "claude-3-5-sonnet-20241022": {"input": 3.0, "output": 15.0},
     "claude-3-5-haiku-20241022": {"input": 0.80, "output": 4.0},
     # GPT-5 series (current)
-    "gpt-5": {"input": 1.25, "output": 10.0},
+    "gpt-5.2-codex": {"input": 1.25, "output": 10.0},
     "gpt-5.2": {"input": 1.25, "output": 10.0},
+    "gpt-5": {"input": 1.25, "output": 10.0},
     "gpt-5-pro": {"input": 15.0, "output": 120.0},
     "gpt-5-mini": {"input": 0.25, "output": 2.0},
     "gpt-5-nano": {"input": 0.05, "output": 0.40},

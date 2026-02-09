@@ -1,0 +1,925 @@
+{
+  "goal_name": "get_event",
+  "model": "gpt-5.2",
+  "max_iterations": 10,
+  "total_duration_s": 102.59,
+  "num_iterations": 8,
+  "num_tool_calls": 15,
+  "entries": [
+    {
+      "iteration": 0,
+      "time": 4.42,
+      "type": "seed",
+      "duration_s": 4.42,
+      "data": {
+        "seed_strings_found": 4,
+        "seed_message_len": 1357
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 9.06,
+      "type": "llm_call",
+      "duration_s": 4.64,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 5,
+        "tool_calls": [
+          {
+            "id": "call_5DAbYeCsBlCS3EA3ETPls5qY",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x10019f540",
+              "reason": "Primary target: EventGenerator::GetEvent; determine signature, return type, behavior."
+            }
+          },
+          {
+            "id": "call_0maBNI8VJU1SJ8XvmWFY0mL0",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x100047ca0",
+              "reason": "Compare TutorialManager::GetEvent behavior/calling patterns."
+            }
+          },
+          {
+            "id": "call_ClwUjzuFpUysqyzUKv3BMtzx",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x100001e70",
+              "reason": "Global GetEvent at low address; may be wrapper/dispatcher."
+            }
+          },
+          {
+            "id": "call_Z5fU6RuXN562BAtsoFlHL0Od",
+            "name": "get_bytes",
+            "args": {
+              "address": "0x10019f540",
+              "length": 32,
+              "reason": "Capture prologue bytes for EventGenerator::GetEvent."
+            }
+          },
+          {
+            "id": "call_BT9aCHMvr5fBewSMNsg6CtHx",
+            "name": "get_xrefs_to",
+            "args": {
+              "address": "0x10019f540",
+              "reason": "Find callers of EventGenerator::GetEvent."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 13.28,
+      "type": "tool_exec",
+      "duration_s": 4.22,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x10019f540",
+          "reason": "Primary target: EventGenerator::GetEvent; determine signature, return type, behavior."
+        },
+        "result_preview": "{\"function\": \"GetEvent\", \"address\": \"0x10019f540\", \"size\": 201, \"section\": \"__text\", \"pseudocode\": \"\\n/* EventGenerator::GetEvent(std::string const&, int, bool) */\\n\\nlong __thiscall\\nEventGenerator::GetEvent(EventGenerator *this,string *param_1,int param_2,bool param_3)\\n\\n{\\n  string sVar1;\\n  long lVar2;\\n  long lVar3;\\n  ulong uVar4;\\n  string *psVar5;\\n  string local_50 [16];\\n  void *local_40;\\n  int local_34;\\n  \\n  local_34 = param_2;\\n  lVar2 = std::\\n          __hash_table<std::__hash_value_type<std::string,EventTemplate*>,std::__unordered_map_hasher<std::string,std::__hash_value_type<std::string,EventTemplate*>,std::hash<std::string>,true>,std::__unordered_map_equal<std::string,std::__hash_value_type<std::string,EventTemplate*>,std::equal_to<std::string>,true>,std::allocator<std::__hash_value_type<std::string,EventTemplate*>>>\\n          ::find<std::string>((__hash_table<std::__hash_value_type<std::string,EventTemplate*>,std::__unordered_map_hasher<std::string,std::__hash_value_type<std::string,EventTemplate*>,std::hash<std::string>,true>,std::__unordered_map_equal<std::string,std::__hash_value_type<std::string,EventTemplate*>,std::equal_to<std::string>,true>,std::allocator<std::__hash_value_type<std::string,EventTemplate*>>>\\n                               *)(this + 0x90),param_1);\\n  lVar3 = std::\\n          __hash_table<std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::__unordered_map_hasher<std::string,std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::hash<std::string>,true>,std::__unordered_map_equal<std::string,std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::equal_to<std::string>,true>,std::allocator<std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>>>\\n          ::find<std::string>((__hash_table<std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 17.21,
+      "type": "tool_exec",
+      "duration_s": 3.93,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x100047ca0",
+          "reason": "Compare TutorialManager::GetEvent behavior/calling patterns."
+        },
+        "result_preview": "{\"function\": \"GetEvent\", \"address\": \"0x100047ca0\", \"size\": 134, \"section\": \"__text\", \"pseudocode\": \"\\n/* TutorialManager::GetEvent() */\\n\\nundefined8 __thiscall TutorialManager::GetEvent(TutorialManager *this)\\n\\n{\\n  undefined8 uVar1;\\n  string local_28;\\n  undefined7 uStack_27;\\n  undefined1 uStack_20;\\n  undefined7 uStack_1f;\\n  undefined1 uStack_18;\\n  undefined1 uStack_17;\\n  undefined6 uStack_16;\\n  \\n  if (this[0x238] == (TutorialManager)0x0) {\\n    uVar1 = 0;\\n  }\\n  else {\\n    this[0x238] = (TutorialManager)0x0;\\n    uStack_16 = 0;\\n    local_28 = (string)0x20;\\n    uStack_1f = 0x4c495353494d5f;\\n    uStack_18 = 0x45;\\n    uStack_27 = 0x4149524f545554;\\n    uStack_20 = 0x4c;\\n    uStack_17 = 0;\\n    uVar1 = EventGenerator::GetBaseEvent\\n                      ((EventGenerator *)&EventGenerator::Generator,&local_28,0,false,-1);\\n    if (((byte)local_28 & 1) != 0) {\\n      operator_delete((void *)CONCAT62(uStack_16,CONCAT11(uStack_17,uStack_18)));\\n    }\\n  }\\n  return uVar1;\\n}\\n\\n\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 21.52,
+      "type": "tool_exec",
+      "duration_s": 4.31,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x100001e70",
+          "reason": "Global GetEvent at low address; may be wrapper/dispatcher."
+        },
+        "result_preview": "{\"function\": \"GetEvent\", \"address\": \"0x100001e70\", \"size\": 245, \"section\": \"__text\", \"pseudocode\": \"\\n/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */\\n/* BossShip::GetEvent() */\\n\\nlong BossShip::GetEvent(void)\\n\\n{\\n  undefined8 *puVar1;\\n  undefined8 uVar2;\\n  ulong *puVar3;\\n  long lVar4;\\n  byte local_40 [16];\\n  void *local_30;\\n  ulong local_28;\\n  ulong uStack_20;\\n  void *local_18;\\n  \\n  to_string<int>((int *)local_40);\\n  puVar3 = (ulong *)std::string::insert((ulong)local_40,(char *)0x0);\\n  local_18 = (void *)puVar3[2];\\n  local_28 = *puVar3;\\n  uStack_20 = puVar3[1];\\n  puVar3[2] = 0;\\n  puVar3[1] = 0;\\n  *puVar3 = 0;\\n  lVar4 = EventGenerator::GetBaseEvent\\n                    ((EventGenerator *)&EventGenerator::Generator,(string *)&local_28,0,false,-1);\\n  if ((local_28 & 1) != 0) {\\n    operator_delete(local_18);\\n  }\\n  if ((local_40[0] & 1) != 0) {\\n    operator_delete(local_30);\\n  }\\n  *(undefined1 *)(lVar4 + 0x20) = 1;\\n  *(undefined4 *)(lVar4 + 0x74c) = 1;\\n  uVar2 = _DAT_1002b4010;\\n  local_28 = _DAT_1002b4010;\\n  uStack_20 = _UNK_1002b4018;\\n  puVar1 = *(undefined8 **)(lVar4 + 0x798);\\n  if (puVar1 == *(undefined8 **)(lVar4 + 0x7a0)) {\\n    std::vector<StatusEffect,std::allocator<StatusEffect>>::\\n    __push_back_slow_path<StatusEffect_const&>\\n              ((vector<StatusEffect,std::allocator<StatusEffect>> *)(lVar4 + 0x790),\\n               (StatusEffect *)&local_28);\\n  }\\n  else {\\n    puVar1[1] = _UNK_1002b4018;\\n    *puVar1 = uVar2;\\n    *(long *)(lVar4 + 0x798) = *(long *)(lVar4 + 0x798) + 0x10;\\n  }\\n  return lVar4;\\n}\\n\\n\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 25.2,
+      "type": "tool_exec",
+      "duration_s": 3.67,
+      "data": {
+        "tool": "get_bytes",
+        "args": {
+          "address": "0x10019f540",
+          "length": 32,
+          "reason": "Capture prologue bytes for EventGenerator::GetEvent."
+        },
+        "result_preview": "{\"address\": \"0x10019f540\", \"length\": 32, \"hex\": \"554889e54157415641554154534883ec284189ce8955d44989f74989fc498dbc\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 29.18,
+      "type": "tool_exec",
+      "duration_s": 3.98,
+      "data": {
+        "tool": "get_xrefs_to",
+        "args": {
+          "address": "0x10019f540",
+          "reason": "Find callers of EventGenerator::GetEvent."
+        },
+        "result_preview": "[{\"from_address\": \"0x10036822d\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x10019f539\", \"from_function\": \"GetBaseEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 32.85,
+      "type": "llm_call",
+      "duration_s": 3.67,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 5,
+        "tool_calls": [
+          {
+            "id": "call_y9Jcp61kBMtfozv9F3eR5GLe",
+            "name": "list_functions",
+            "args": {
+              "pattern": "GetBaseEvent",
+              "max_results": 20,
+              "reason": "Locate EventGenerator::GetBaseEvent code address for context and relationship to GetEvent."
+            }
+          },
+          {
+            "id": "call_9vPOwwue4XuBCqtetKpG0sXL",
+            "name": "get_xrefs_to",
+            "args": {
+              "address": "0x100001e70",
+              "reason": "Find callers of BossShip::GetEvent."
+            }
+          },
+          {
+            "id": "call_hKhkU1mqNKrWmzdFgUJjZkjG",
+            "name": "get_xrefs_to",
+            "args": {
+              "address": "0x100047ca0",
+              "reason": "Find callers of TutorialManager::GetEvent."
+            }
+          },
+          {
+            "id": "call_F0PM9dFpQ0kVZbw440UEa0NT",
+            "name": "get_bytes",
+            "args": {
+              "address": "0x100001e70",
+              "length": 32,
+              "reason": "Capture prologue bytes for BossShip::GetEvent."
+            }
+          },
+          {
+            "id": "call_RrBBhJ3B8MzlAmdZ8QSyIYgn",
+            "name": "get_bytes",
+            "args": {
+              "address": "0x100047ca0",
+              "length": 32,
+              "reason": "Capture prologue bytes for TutorialManager::GetEvent."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 36.97,
+      "type": "tool_exec",
+      "duration_s": 4.12,
+      "data": {
+        "tool": "list_functions",
+        "args": {
+          "pattern": "GetBaseEvent",
+          "max_results": 20,
+          "reason": "Locate EventGenerator::GetBaseEvent code address for context and relationship to GetEvent."
+        },
+        "result_preview": "[{\"name\": \"GetBaseEvent\", \"address\": \"0x10019f4e0\", \"size\": 94, \"signature\": \"undefined __thiscall GetBaseEvent(EventGenerator * this, string * param_1, int param_2, bool param_3, int param_4)\", \"calling_convention\": \"__thiscall\", \"is_thunk\": false, \"is_external\": false, \"param_count\": 5}]",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 41.07,
+      "type": "tool_exec",
+      "duration_s": 4.09,
+      "data": {
+        "tool": "get_xrefs_to",
+        "args": {
+          "address": "0x100001e70",
+          "reason": "Find callers of BossShip::GetEvent."
+        },
+        "result_preview": "[{\"from_address\": \"0x100366a31\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1001db3a5\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001db3b3\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001db7b9\", \"from_function\": \"CreateLocation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 44.78,
+      "type": "tool_exec",
+      "duration_s": 3.71,
+      "data": {
+        "tool": "get_xrefs_to",
+        "args": {
+          "address": "0x100047ca0",
+          "reason": "Find callers of TutorialManager::GetEvent."
+        },
+        "result_preview": "[{\"from_address\": \"0x100366f5b\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1001e4b09\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 48.84,
+      "type": "tool_exec",
+      "duration_s": 4.07,
+      "data": {
+        "tool": "get_bytes",
+        "args": {
+          "address": "0x100001e70",
+          "length": 32,
+          "reason": "Capture prologue bytes for BossShip::GetEvent."
+        },
+        "result_preview": "{\"address\": \"0x100001e70\", \"length\": 32, \"hex\": \"554889e5534883ec38488db724020000488d5dc84889dfe8e4000000488d1538\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 52.81,
+      "type": "tool_exec",
+      "duration_s": 3.97,
+      "data": {
+        "tool": "get_bytes",
+        "args": {
+          "address": "0x100047ca0",
+          "length": 32,
+          "reason": "Capture prologue bytes for TutorialManager::GetEvent."
+        },
+        "result_preview": "{\"address\": \"0x100047ca0\", \"length\": 32, \"hex\": \"554889e5534883ec1880bf38020000007468c68738020000000f57c00f2945e0\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 3,
+      "time": 55.19,
+      "type": "llm_call",
+      "duration_s": 2.38,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 1,
+        "tool_calls": [
+          {
+            "id": "call_A84KndSkWuo8NX4H93DJKjxN",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x10019f4e0",
+              "reason": "Decompile EventGenerator::GetBaseEvent to understand how it differs from GetEvent and what it returns."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 3,
+      "time": 59.53,
+      "type": "tool_exec",
+      "duration_s": 4.34,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x10019f4e0",
+          "reason": "Decompile EventGenerator::GetBaseEvent to understand how it differs from GetEvent and what it returns."
+        },
+        "result_preview": "{\"function\": \"GetBaseEvent\", \"address\": \"0x10019f4e0\", \"size\": 94, \"section\": \"__text\", \"pseudocode\": \"\\n/* EventGenerator::GetBaseEvent(std::string const&, int, bool, int) */\\n\\nvoid __thiscall\\nEventGenerator::GetBaseEvent\\n          (EventGenerator *this,string *param_1,int param_2,bool param_3,int param_4)\\n\\n{\\n  if (param_4 != -1) {\\n    if (Globals::RNG == '\\\\0') {\\n      _srandom32(param_4);\\n    }\\n    else {\\n      _srand(param_4);\\n    }\\n  }\\n  *(undefined2 *)(this + 0x214) = 1;\\n  GetEvent(this,param_1,param_2,param_3);\\n  return;\\n}\\n\\n\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 4,
+      "time": 60.77,
+      "type": "llm_call",
+      "duration_s": 1.24,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 1,
+        "tool_calls": [
+          {
+            "id": "call_4z2Fq9f6PiX2MnMyDt7kcTDn",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1001db3a5",
+              "reason": "Decompile LoadGame caller xref to BossShip::GetEvent to see context."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 4,
+      "time": 65.37,
+      "type": "tool_exec",
+      "duration_s": 4.6,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1001db3a5",
+          "reason": "Decompile LoadGame caller xref to BossShip::GetEvent to see context."
+        },
+        "result_preview": "{\"function\": \"LoadGame\", \"address\": \"0x1001da810\", \"size\": 3124, \"section\": \"__text\", \"pseudocode\": \"\\n/* WorldManager::LoadGame(std::string) */\\n\\nvoid __thiscall WorldManager::LoadGame(WorldManager *this,string *param_2)\\n\\n{\\n  WorldManager *pWVar1;\\n  CommandGui *pCVar2;\\n  int *piVar3;\\n  void *pvVar4;\\n  bool bVar5;\\n  int iVar6;\\n  int iVar7;\\n  undefined4 uVar8;\\n  uint uVar9;\\n  ShipManager *pSVar10;\\n  CompleteShip *pCVar11;\\n  Location *pLVar12;\\n  ulong uVar13;\\n  long lVar14;\\n  void *pvVar15;\\n  LocationEvent *pLVar16;\\n  undefined8 uVar17;\\n  long lVar18;\\n  string *psVar19;\\n  size_t sVar20;\\n  ulong uVar21;\\n  undefined8 local_328;\\n  undefined8 uStack_320;\\n  undefined4 local_318;\\n  undefined1 local_313;\\n  ulong local_310;\\n  undefined8 local_308;\\n  void *local_300;\\n  undefined1 local_2f8;\\n  ulong local_2f0;\\n  undefined8 local_2e8;\\n  void *local_2e0;\\n  undefined8 local_2d8;\\n  undefined8 uStack_2d0;\\n  undefined8 local_2c8;\\n  CrewBlueprint local_2c0 [384];\\n  undefined4 local_140;\\n  undefined8 local_13c;\\n  undefined2 local_134;\\n  undefined8 local_130;\\n  undefined8 local_128;\\n  undefined4 local_120;\\n  ulong local_118;\\n  undefined8 uStack_110;\\n  void *local_108;\\n  string local_100 [16];\\n  void *local_f0;\\n  undefined8 local_e8;\\n  undefined8 uStack_e0;\\n  undefined8 local_d8;\\n  ulong local_c8;\\n  undefined8 uStack_c0;\\n  void *local_b8;\\n  FileHelper local_b0 [16];\\n  void *local_a0;\\n  WorldManager *local_98;\\n  WorldManager *local_90;\\n  LocationEvent *local_88;\\n  string *local_80;\\n  SpaceManager *local_78;\\n  int local_6c;\\n  ulong local_68;\\n  int local_5c;\\n  string local_58;\\n  undefined4 uStack_57;\\n  undefined1 uStack_53;\\n  undefined1 uStack_52;\\n  undefined1 uStack_51;\\n  undefined1 uStack_50;\\n  undefined2 uStack_4f;\\n  undefined1 uStack_4d;\\n  undefined1 uStack_4c;\\n  undefined1 uStack_4b;\\n  undefined2 uStack_4a;\\n  void *local_48;\\n  WorldManager local_40;\\n  \\n  *(undefined8 *)(this + 0x1728) = *(undefined8 *)(thi...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 5,
+      "time": 67.37,
+      "type": "llm_call",
+      "duration_s": 2.0,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 1,
+        "tool_calls": [
+          {
+            "id": "call_SYHh8H4COIhx6T4cGSuSxQQH",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1001e4b09",
+              "reason": "Decompile OnLoop caller of TutorialManager::GetEvent to see how tutorial events are injected."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 5,
+      "time": 73.79,
+      "type": "tool_exec",
+      "duration_s": 6.42,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1001e4b09",
+          "reason": "Decompile OnLoop caller of TutorialManager::GetEvent to see how tutorial events are injected."
+        },
+        "result_preview": "{\"function\": \"OnLoop\", \"address\": \"0x1001e4470\", \"size\": 8263, \"section\": \"__text\", \"pseudocode\": \"\\n/* WorldManager::OnLoop() */\\n\\nvoid __thiscall WorldManager::OnLoop(WorldManager *this)\\n\\n{\\n  SpaceManager *this_00;\\n  StarMap *this_01;\\n  WorldManager *pWVar1;\\n  long *plVar2;\\n  long lVar3;\\n  void *pvVar4;\\n  undefined7 *puVar5;\\n  byte bVar6;\\n  char cVar7;\\n  bool bVar8;\\n  undefined1 uVar9;\\n  int iVar10;\\n  int iVar11;\\n  ShipSystem *pSVar12;\\n  LocationEvent *pLVar13;\\n  undefined8 uVar14;\\n  long *plVar15;\\n  undefined7 *puVar16;\\n  undefined8 extraout_RAX;\\n  undefined8 *puVar17;\\n  CrewMember *pCVar18;\\n  undefined4 uVar19;\\n  ulong uVar20;\\n  long lVar21;\\n  uint uVar22;\\n  int extraout_EDX;\\n  ulong uVar23;\\n  ShipAI *this_02;\\n  ulong uVar24;\\n  WorldManager *pWVar25;\\n  long lVar26;\\n  ShipManager *this_03;\\n  undefined7 *puVar27;\\n  CompleteShip *pCVar28;\\n  byte local_3e0;\\n  undefined6 local_3df;\\n  undefined2 uStack_3d9;\\n  undefined6 uStack_3d7;\\n  undefined1 local_3d1;\\n  void *local_3d0;\\n  byte local_3c8;\\n  undefined6 local_3c7;\\n  undefined2 uStack_3c1;\\n  undefined6 uStack_3bf;\\n  undefined1 local_3b9;\\n  void *local_3b8;\\n  byte local_3b0;\\n  undefined6 local_3af;\\n  undefined2 uStack_3a9;\\n  undefined6 uStack_3a7;\\n  undefined1 local_3a1;\\n  void *local_3a0;\\n  undefined1 local_398 [16];\\n  void *local_388;\\n  undefined1 local_378 [16];\\n  void *local_368;\\n  byte local_358;\\n  undefined8 uStack_357;\\n  undefined7 uStack_34f;\\n  undefined1 uStack_348;\\n  undefined2 uStack_347;\\n  undefined1 uStack_345;\\n  undefined4 uStack_344;\\n  undefined1 local_338 [16];\\n  void *local_328;\\n  byte local_318;\\n  undefined8 uStack_317;\\n  undefined7 uStack_30f;\\n  undefined1 uStack_308;\\n  undefined4 uStack_307;\\n  undefined1 uStack_303;\\n  undefined2 uStack_302;\\n  undefined1 local_2f8 [16];\\n  void *local_2e8;\\n  byte local_2d8;\\n  undefined8 uStack_2d7;\\n  undefined7 uStack_2cf;\\n  undefined1 uStack_2c8;\\n  undefined1 uStack_2c7;\\n  undefined6 u...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 6,
+      "time": 75.56,
+      "type": "llm_call",
+      "duration_s": 1.77,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 1,
+        "tool_calls": [
+          {
+            "id": "call_fK60AZnyF2kPVmjI7aPax9Uy",
+            "name": "get_xrefs_to",
+            "args": {
+              "address": "0x10019f4e0",
+              "reason": "Find callers of EventGenerator::GetBaseEvent (wrapper around GetEvent) to identify contexts."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 6,
+      "time": 79.53,
+      "type": "tool_exec",
+      "duration_s": 3.98,
+      "data": {
+        "tool": "get_xrefs_to",
+        "args": {
+          "address": "0x10019f4e0",
+          "reason": "Find callers of EventGenerator::GetBaseEvent (wrapper around GetEvent) to identify contexts."
+        },
+        "result_preview": "[{\"from_address\": \"0x10036822b\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x100001ee0\", \"from_function\": \"GetEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100002233\", \"from_function\": \"GetSubEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100002320\", \"from_function\": \"GetSubEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000023ca\", \"from_function\": \"GetSubEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd06f\", \"from_function\": \"TurnIntoFleetLocation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd111\", \"from_function\": \"TurnIntoFleetLocation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd2b1\", \"from_function\": \"SetupNoFuel\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd45f\", \"from_function\": \"SetupNoFuel\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001dadec\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001db035\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001db096\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cb57e\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cc125\", \"from_function\": \"GenerateMap\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cc587\", \"from_function\": \"GenerateMap\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001ccbf0\", \"from_function\": \"GenerateMap\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001ccc7d\", \"from_function\": \"GenerateMap\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001c8dd2\", \"from_function\": \"AddQuest\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001ce7ab\", \"from_function\": \"GenerateEvents\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cebcf\", \"from_function\": \"GenerateEvents\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cecbf...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 7,
+      "time": 80.98,
+      "type": "llm_call",
+      "duration_s": 1.45,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 1,
+        "tool_calls": [
+          {
+            "id": "call_rZ4sWJ6PhL1j8E2jFnZP4boN",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x100002233",
+              "reason": "Decompile BossShip::GetSubEvent which calls EventGenerator::GetBaseEvent; related boss event handling."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 7,
+      "time": 85.38,
+      "type": "tool_exec",
+      "duration_s": 4.4,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x100002233",
+          "reason": "Decompile BossShip::GetSubEvent which calls EventGenerator::GetBaseEvent; related boss event handling."
+        },
+        "result_preview": "{\"function\": \"GetSubEvent\", \"address\": \"0x1000021d0\", \"size\": 552, \"section\": \"__text\", \"pseudocode\": \"\\n/* WARNING: Removing unreachable block (ram,0x0001000022c1) */\\n/* BossShip::GetSubEvent() */\\n\\nlong __thiscall BossShip::GetSubEvent(BossShip *this)\\n\\n{\\n  char cVar1;\\n  undefined1 uVar2;\\n  int iVar3;\\n  long lVar4;\\n  string local_38;\\n  undefined6 uStack_37;\\n  undefined1 uStack_31;\\n  undefined1 uStack_30;\\n  undefined4 uStack_2f;\\n  undefined1 uStack_2b;\\n  undefined1 uStack_2a;\\n  undefined1 uStack_29;\\n  void *local_28;\\n  \\n  cVar1 = CompleteShip::DeadCrew((CompleteShip *)this);\\n  lVar4 = *(long *)(this + 0x10);\\n  if (cVar1 == '\\\\0') {\\n    if ((*(char *)(lVar4 + 0x695) == '\\\\0') ||\\n       (cVar1 = Ship::DestroyedDone((Ship *)(lVar4 + 0x118)), cVar1 == '\\\\0')) {\\n      return 0;\\n    }\\n    iVar3 = ShipManager::CountCrew(*(ShipManager **)(this + 0x10),true);\\n    if (0 < iVar3) {\\n      AchievementTracker::SetFlag((AchievementTracker *)&AchievementTracker::Tracker);\\n    }\\n    ShipManager::KillEveryone(*(ShipManager **)(this + 0x10),false);\\n    if (this[0x15a] == (BossShip)0x0) {\\n      if (*(int *)(this + 0x1ec) == 3) {\\n        local_38 = (string)0x1c;\\n        uStack_2f = 0x594f5254;\\n        uStack_2b = 0x45;\\n        uStack_2a = 0x44;\\n        uStack_37 = 0x445f53534f42;\\n        uStack_31 = 0x45;\\n        uStack_30 = 0x53;\\n      }\\n      else {\\n        uStack_2a = 0;\\n        local_38 = (string)0x18;\\n        uStack_37 = 0x455f53534f42;\\n        uStack_31 = 0x53;\\n        uStack_30 = 0x43;\\n        uStack_2f = 0x44455041;\\n        uStack_2b = 0;\\n      }\\n      uStack_29 = 0;\\n      local_28 = (void *)0x0;\\n      lVar4 = EventGenerator::GetBaseEvent\\n                        ((EventGenerator *)&EventGenerator::Generator,&local_38,0,false,-1);\\n      if (((byte)local_38 & 1) != 0) {\\n        operator_delete(local_28);\\n      }\\n    }\\n    else {\\n      local_28 = (void *)0x0;\\n      local_38 = (string)0x1c;\\n      uStack_2f = 0x414d454c;\\n ...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 8,
+      "time": 102.59,
+      "type": "llm_call",
+      "duration_s": 17.21,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 1,
+        "tool_calls": [
+          {
+            "id": "call_0xJOw0sJs9HrS02wadbSH0Sg",
+            "name": "conclude_analysis",
+            "args": {
+              "get_event_addr": "0x10019f540",
+              "get_event_signature": "LocationEvent* __thiscall EventGenerator::GetEvent(const std::string& eventName, int worldLevelOrSector, bool param3)",
+              "get_event_purpose": "Looks up an event name in EventGenerator's internal maps; if known, repeatedly calls CreateEvent(...) until it returns a non-null LocationEvent*. If the name is unknown/nonexistent, logs an error and returns null.",
+              "callers": [
+                {
+                  "name": "EventGenerator::GetBaseEvent",
+                  "address": "0x10019f4e0",
+                  "context": "Wrapper that optionally seeds RNG (param_4), sets a flag at this+0x214, then calls GetEvent(eventName,param_2,param_3). Used widely to fetch events with deterministic seeds."
+                },
+                {
+                  "name": "TutorialManager::GetEvent",
+                  "address": "0x100047ca0",
+                  "context": "When tutorial is running and a one-shot flag at this+0x238 is set, constructs string \"TUTORIAL_MISSILE\" and calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1)."
+                },
+                {
+                  "name": "BossShip::GetEvent",
+                  "address": "0x100001e70",
+                  "context": "Builds a boss event name by inserting an int-to-string into a base string, then calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); marks returned event as boss-related and pushes a StatusEffect."
+                },
+                {
+                  "name": "BossShip::GetSubEvent",
+                  "address": "0x1000021d0",
+                  "context": "Chooses among boss subevent names (e.g., BOSS_* variants) based on boss stage/death state and calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1)."
+                },
+                {
+                  "name": "WorldManager::OnLoop",
+                  "address": "0x1001e4470",
+                  "context": "Calls TutorialManager::GetEvent() to inject tutorial events during combat resolution; also calls EventGenerator::GetBaseEvent for many combat outcome events (escape, dead crew, destroyed, etc.)."
+                },
+                {
+                  "name": "WorldManager::LoadGame",
+                  "address": "0x1001da810",
+                  "context": "After loading, if a flag indicates boss encounter, calls BossShip::GetEvent() and then CheckStatusEffects on the event's status effect vector."
+                }
+              ],
+              "function_prologue_bytes": "55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 28 41 89 ce 89 55 d4 49 89 f7 49 89 fc 49 8d bc",
+              "related_functions": "EventGenerator::GetBaseEvent @0x10019f4e0 (seeds RNG, sets flag this+0x214, calls GetEvent); BossShip::GetEvent @0x100001e70; BossShip::GetSubEvent @0x1000021d0; TutorialManager::GetEvent @0x100047ca0; WorldManager::OnLoop @0x1001e4470; WorldManager::LoadGame @0x1001da810",
+              "key_functions": [
+                {
+                  "name": "EventGenerator::GetEvent",
+                  "address": "0x10019f540",
+                  "role": "Core event lookup/instantiation by name",
+                  "pseudocode_summary": "Finds eventName in two unordered_maps at this+0x90 (string->EventTemplate*) and this+0x68 (string->vector<string>?), logs error if missing; otherwise loops: copy name to temp string; call CreateEvent(this,temp,param_2,param_3) until non-null; returns created event pointer."
+                },
+                {
+                  "name": "EventGenerator::GetBaseEvent",
+                  "address": "0x10019f4e0",
+                  "role": "Wrapper around GetEvent with optional RNG seeding",
+                  "pseudocode_summary": "If seed != -1, seeds RNG via _srandom32 or _srand depending on Globals::RNG; sets *(uint16*)(this+0x214)=1; calls GetEvent(this,name,param_2,param_3)."
+                },
+                {
+                  "name": "BossShip::GetEvent",
+                  "address": "0x100001e70",
+                  "role": "Creates boss event and annotates it",
+                  "pseudocode_summary": "Builds boss event name using to_string<int> and string::insert; calls EventGenerator::GetBaseEvent(&Generator,name,0,false,-1); sets event flags at +0x20 and +0x74c; pushes a StatusEffect into vector at +0x790."
+                },
+                {
+                  "name": "BossShip::GetSubEvent",
+                  "address": "0x1000021d0",
+                  "role": "Boss subevent selection",
+                  "pseudocode_summary": "If boss dead crew vs destroyed, selects among BOSS_* event names (e.g., BOSS_AUTO_DEFEATED, BOSS_ESCAPED, BOSS_DESTROYED, BOSS_LAST_STAND) and calls EventGenerator::GetBaseEvent; sets event flags at +0x20 and +0x420."
+                },
+                {
+                  "name": "TutorialManager::GetEvent",
+                  "address": "0x100047ca0",
+                  "role": "Tutorial event injection",
+                  "pseudocode_summary": "If one-shot flag at this+0x238 set, clears it and requests base event \"TUTORIAL_MISSILE\" via EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); else returns 0."
+                },
+                {
+                  "name": "WorldManager::OnLoop",
+                  "address": "0x1001e4470",
+                  "role": "Main loop; triggers events based on combat outcomes and tutorial",
+                  "pseudocode_summary": "During combat resolution, generates outcome events via EventGenerator::GetBaseEvent using stored string fields (this+0x15f0/0x1608/0x1620/0x1638/0x1650 etc.); if no event and tutorial running, calls TutorialManager::GetEvent and updates location with returned event."
+                },
+                {
+                  "name": "WorldManager::LoadGame",
+                  "address": "0x1001da810",
+                  "role": "Load save; may trigger boss event",
+                  "pseudocode_summary": "After loading boss state, if boss encounter flag set, clears environment, calls BossShip::GetEvent twice and then CheckStatusEffects on event's status effects vector."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 8,
+      "time": 102.59,
+      "type": "conclude",
+      "duration_s": 0.0,
+      "data": {
+        "conclusion_args": {
+          "get_event_addr": "0x10019f540",
+          "get_event_signature": "LocationEvent* __thiscall EventGenerator::GetEvent(const std::string& eventName, int worldLevelOrSector, bool param3)",
+          "get_event_purpose": "Looks up an event name in EventGenerator's internal maps; if known, repeatedly calls CreateEvent(...) until it returns a non-null LocationEvent*. If the name is unknown/nonexistent, logs an error and returns null.",
+          "callers": [
+            {
+              "name": "EventGenerator::GetBaseEvent",
+              "address": "0x10019f4e0",
+              "context": "Wrapper that optionally seeds RNG (param_4), sets a flag at this+0x214, then calls GetEvent(eventName,param_2,param_3). Used widely to fetch events with deterministic seeds."
+            },
+            {
+              "name": "TutorialManager::GetEvent",
+              "address": "0x100047ca0",
+              "context": "When tutorial is running and a one-shot flag at this+0x238 is set, constructs string \"TUTORIAL_MISSILE\" and calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1)."
+            },
+            {
+              "name": "BossShip::GetEvent",
+              "address": "0x100001e70",
+              "context": "Builds a boss event name by inserting an int-to-string into a base string, then calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); marks returned event as boss-related and pushes a StatusEffect."
+            },
+            {
+              "name": "BossShip::GetSubEvent",
+              "address": "0x1000021d0",
+              "context": "Chooses among boss subevent names (e.g., BOSS_* variants) based on boss stage/death state and calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1)."
+            },
+            {
+              "name": "WorldManager::OnLoop",
+              "address": "0x1001e4470",
+              "context": "Calls TutorialManager::GetEvent() to inject tutorial events during combat resolution; also calls EventGenerator::GetBaseEvent for many combat outcome events (escape, dead crew, destroyed, etc.)."
+            },
+            {
+              "name": "WorldManager::LoadGame",
+              "address": "0x1001da810",
+              "context": "After loading, if a flag indicates boss encounter, calls BossShip::GetEvent() and then CheckStatusEffects on the event's status effect vector."
+            }
+          ],
+          "function_prologue_bytes": "55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 28 41 89 ce 89 55 d4 49 89 f7 49 89 fc 49 8d bc",
+          "related_functions": "EventGenerator::GetBaseEvent @0x10019f4e0 (seeds RNG, sets flag this+0x214, calls GetEvent); BossShip::GetEvent @0x100001e70; BossShip::GetSubEvent @0x1000021d0; TutorialManager::GetEvent @0x100047ca0; WorldManager::OnLoop @0x1001e4470; WorldManager::LoadGame @0x1001da810",
+          "key_functions": [
+            {
+              "name": "EventGenerator::GetEvent",
+              "address": "0x10019f540",
+              "role": "Core event lookup/instantiation by name",
+              "pseudocode_summary": "Finds eventName in two unordered_maps at this+0x90 (string->EventTemplate*) and this+0x68 (string->vector<string>?), logs error if missing; otherwise loops: copy name to temp string; call CreateEvent(this,temp,param_2,param_3) until non-null; returns created event pointer."
+            },
+            {
+              "name": "EventGenerator::GetBaseEvent",
+              "address": "0x10019f4e0",
+              "role": "Wrapper around GetEvent with optional RNG seeding",
+              "pseudocode_summary": "If seed != -1, seeds RNG via _srandom32 or _srand depending on Globals::RNG; sets *(uint16*)(this+0x214)=1; calls GetEvent(this,name,param_2,param_3)."
+            },
+            {
+              "name": "BossShip::GetEvent",
+              "address": "0x100001e70",
+              "role": "Creates boss event and annotates it",
+              "pseudocode_summary": "Builds boss event name using to_string<int> and string::insert; calls EventGenerator::GetBaseEvent(&Generator,name,0,false,-1); sets event flags at +0x20 and +0x74c; pushes a StatusEffect into vector at +0x790."
+            },
+            {
+              "name": "BossShip::GetSubEvent",
+              "address": "0x1000021d0",
+              "role": "Boss subevent selection",
+              "pseudocode_summary": "If boss dead crew vs destroyed, selects among BOSS_* event names (e.g., BOSS_AUTO_DEFEATED, BOSS_ESCAPED, BOSS_DESTROYED, BOSS_LAST_STAND) and calls EventGenerator::GetBaseEvent; sets event flags at +0x20 and +0x420."
+            },
+            {
+              "name": "TutorialManager::GetEvent",
+              "address": "0x100047ca0",
+              "role": "Tutorial event injection",
+              "pseudocode_summary": "If one-shot flag at this+0x238 set, clears it and requests base event \"TUTORIAL_MISSILE\" via EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); else returns 0."
+            },
+            {
+              "name": "WorldManager::OnLoop",
+              "address": "0x1001e4470",
+              "role": "Main loop; triggers events based on combat outcomes and tutorial",
+              "pseudocode_summary": "During combat resolution, generates outcome events via EventGenerator::GetBaseEvent using stored string fields (this+0x15f0/0x1608/0x1620/0x1638/0x1650 etc.); if no event and tutorial running, calls TutorialManager::GetEvent and updates location with returned event."
+            },
+            {
+              "name": "WorldManager::LoadGame",
+              "address": "0x1001da810",
+              "role": "Load save; may trigger boss event",
+              "pseudocode_summary": "After loading boss state, if boss encounter flag set, clears environment, calls BossShip::GetEvent twice and then CheckStatusEffects on event's status effects vector."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "final_messages": [
+    {
+      "role": "system",
+      "content": "You are a reverse engineer analyzing the FTL: Faster Than Light game binary (macOS, x86_64).\n\nYour goal: Find and characterize the GetEvent function and related event-handling code.\n\nIMPORTANT TIPS:\n- Use list_functions to find CODE addresses. String xrefs often point to RTTI data, not code.\n- The seed data already contains function matches from list_functions \u2014 decompile those directly.\n- If decompile returns an error about \"non-executable section\", the address is data, not code.\n  Use list_functions with a different pattern to find the actual code.\n\nStrategy:\n1. Start from the seed function list \u2014 decompile the most relevant functions directly\n2. Focus on EventGenerator::GetEvent if present (it takes a string event name + params)\n3. Also look at BossShip::GetEvent, TutorialManager::GetEvent for comparison\n4. Follow xrefs UP (get_xrefs_to) to find callers\n5. Get prologue bytes (get_bytes) for key functions\n\nCall conclude_analysis when you can describe:\n- What GetEvent does (its signature, return type, purpose)\n- Who calls it and in what context\n- The function addresses and prologue bytes"
+    },
+    {
+      "role": "user",
+      "content": "Here are functions matching 'GetEvent' found in the FTL binary:\n\n[\n  {\n    \"name\": \"GetEvent\",\n    \"address\": \"0x100001e70\",\n    \"size\": 245,\n    \"signature\": \"undefined __stdcall GetEvent(void)\",\n    \"calling_convention\": \"__stdcall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 0\n  },\n  {\n    \"name\": \"GetEvent\",\n    \"address\": \"0x100047ca0\",\n    \"size\": 134,\n    \"signature\": \"undefined __thiscall GetEvent(TutorialManager * this)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 1\n  },\n  {\n    \"name\": \"GetEvent\",\n    \"address\": \"0x10019f540\",\n    \"size\": 201,\n    \"signature\": \"undefined __thiscall GetEvent(EventGenerator * this, string * param_1, int param_2, bool param_3)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 4\n  },\n  {\n    \"name\": \"GetEventName\",\n    \"address\": \"0x1001ae110\",\n    \"size\": 37,\n    \"signature\": \"undefined __thiscall GetEventName(EventsParser * this)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 1\n  }\n]\n\nThese are actual CODE entry points (from Ghidra's function manager). Start by decompiling the most interesting ones \u2014 especially any on EventGenerator or BossShip. The addresses are decompilable directly."
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_5DAbYeCsBlCS3EA3ETPls5qY",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x10019f540\", \"reason\": \"Primary target: EventGenerator::GetEvent; determine signature, return type, behavior.\"}"
+          }
+        },
+        {
+          "id": "call_0maBNI8VJU1SJ8XvmWFY0mL0",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x100047ca0\", \"reason\": \"Compare TutorialManager::GetEvent behavior/calling patterns.\"}"
+          }
+        },
+        {
+          "id": "call_ClwUjzuFpUysqyzUKv3BMtzx",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x100001e70\", \"reason\": \"Global GetEvent at low address; may be wrapper/dispatcher.\"}"
+          }
+        },
+        {
+          "id": "call_Z5fU6RuXN562BAtsoFlHL0Od",
+          "type": "function",
+          "function": {
+            "name": "get_bytes",
+            "arguments": "{\"address\": \"0x10019f540\", \"length\": 32, \"reason\": \"Capture prologue bytes for EventGenerator::GetEvent.\"}"
+          }
+        },
+        {
+          "id": "call_BT9aCHMvr5fBewSMNsg6CtHx",
+          "type": "function",
+          "function": {
+            "name": "get_xrefs_to",
+            "arguments": "{\"address\": \"0x10019f540\", \"reason\": \"Find callers of EventGenerator::GetEvent.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_5DAbYeCsBlCS3EA3ETPls5qY",
+      "content": "{\"function\": \"GetEvent\", \"address\": \"0x10019f540\", \"size\": 201, \"section\": \"__text\", \"pseudocode\": \"\\n/* EventGenerator::GetEvent(std::string const&, int, bool) */\\n\\nlong __thiscall\\nEventGenerator::GetEvent(EventGenerator *this,string *param_1,int param_2,bool param_3)\\n\\n{\\n  string sVar1;\\n  long lVar2;\\n  long lVar3;\\n  ulong uVar4;\\n  string *psVar5;\\n  string local_50 [16];\\n  void *local_40;\\n  int local_34;\\n  \\n  local_34 = param_2;\\n  lVar2 = std::\\n          __hash_table<std::__hash_value_type<std::string,EventTemplate*>,std::__unordered_map_hasher<std::string,std::__hash_value_type<std::string,EventTemplate*>,std::hash<std::string>,true>,std::__unordered_map_equal<std::string,std::__hash_value_type<std::string,EventTemplate*>,std::equal_to<std::string>,true>,std::allocator<std::__hash_value_type<std::string,EventTemplate*>>>\\n          ::find<std::string>((__hash_table<std::__hash_value_type<std::string,EventTemplate*>,std::__unordered_map_hasher<std::string,std::__hash_value_type<std::string,EventTemplate*>,std::hash<std::string>,true>,std::__unordered_map_equal<std::string,std::__hash_value_type<std::string,EventTemplate*>,std::equal_to<std::string>,true>,std::allocator<std::__hash_value_type<std::string,EventTemplate*>>>\\n                               *)(this + 0x90),param_1);\\n  lVar3 = std::\\n          __hash_table<std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::__unordered_map_hasher<std::string,std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::hash<std::string>,true>,std::__unordered_map_equal<std::string,std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::equal_to<std::string>,true>,std::allocator<std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>>>\\n          ::find<std::string>((__hash_table<std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::__unordered_map_hasher<std::string,std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::hash<std::string>,true>,std::__unordered_map_equal<std::string,std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>,std::equal_to<std::string>,true>,std::allocator<std::__hash_value_type<std::string,std::vector<std::string,std::allocator<std::string>>>>>\\n                               *)(this + 0x68),param_1);\\n  if ((lVar2 == 0) && (lVar3 == 0)) {\\n    sVar1 = *param_1;\\n    uVar4 = (ulong)((byte)sVar1 >> 1);\\n    if (((byte)sVar1 & 1) != 0) {\\n      uVar4 = *(ulong *)(param_1 + 8);\\n    }\\n    if (uVar4 == 0) {\\n      lVar2 = 0;\\n    }\\n    else {\\n      psVar5 = param_1 + 1;\\n      if (((byte)sVar1 & 1) != 0) {\\n        psVar5 = *(string **)(param_1 + 0x10);\\n      }\\n      lVar2 = 0;\\n      ftl_log(\\\"ERROR: Supplied unknown event name: %s\\\\n\\\",psVar5);\\n    }\\n  }\\n  else {\\n    do {\\n      std::string::string(local_50,param_1);\\n      lVar2 = CreateEvent(this,local_50,local_34,param_3);\\n      if (((byte)local_50[0] & 1) != 0) {\\n        operator_delete(local_40);\\n      }\\n    } while (lVar2 == 0);\\n  }\\n  return lVar2;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_0maBNI8VJU1SJ8XvmWFY0mL0",
+      "content": "{\"function\": \"GetEvent\", \"address\": \"0x100047ca0\", \"size\": 134, \"section\": \"__text\", \"pseudocode\": \"\\n/* TutorialManager::GetEvent() */\\n\\nundefined8 __thiscall TutorialManager::GetEvent(TutorialManager *this)\\n\\n{\\n  undefined8 uVar1;\\n  string local_28;\\n  undefined7 uStack_27;\\n  undefined1 uStack_20;\\n  undefined7 uStack_1f;\\n  undefined1 uStack_18;\\n  undefined1 uStack_17;\\n  undefined6 uStack_16;\\n  \\n  if (this[0x238] == (TutorialManager)0x0) {\\n    uVar1 = 0;\\n  }\\n  else {\\n    this[0x238] = (TutorialManager)0x0;\\n    uStack_16 = 0;\\n    local_28 = (string)0x20;\\n    uStack_1f = 0x4c495353494d5f;\\n    uStack_18 = 0x45;\\n    uStack_27 = 0x4149524f545554;\\n    uStack_20 = 0x4c;\\n    uStack_17 = 0;\\n    uVar1 = EventGenerator::GetBaseEvent\\n                      ((EventGenerator *)&EventGenerator::Generator,&local_28,0,false,-1);\\n    if (((byte)local_28 & 1) != 0) {\\n      operator_delete((void *)CONCAT62(uStack_16,CONCAT11(uStack_17,uStack_18)));\\n    }\\n  }\\n  return uVar1;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_ClwUjzuFpUysqyzUKv3BMtzx",
+      "content": "{\"function\": \"GetEvent\", \"address\": \"0x100001e70\", \"size\": 245, \"section\": \"__text\", \"pseudocode\": \"\\n/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */\\n/* BossShip::GetEvent() */\\n\\nlong BossShip::GetEvent(void)\\n\\n{\\n  undefined8 *puVar1;\\n  undefined8 uVar2;\\n  ulong *puVar3;\\n  long lVar4;\\n  byte local_40 [16];\\n  void *local_30;\\n  ulong local_28;\\n  ulong uStack_20;\\n  void *local_18;\\n  \\n  to_string<int>((int *)local_40);\\n  puVar3 = (ulong *)std::string::insert((ulong)local_40,(char *)0x0);\\n  local_18 = (void *)puVar3[2];\\n  local_28 = *puVar3;\\n  uStack_20 = puVar3[1];\\n  puVar3[2] = 0;\\n  puVar3[1] = 0;\\n  *puVar3 = 0;\\n  lVar4 = EventGenerator::GetBaseEvent\\n                    ((EventGenerator *)&EventGenerator::Generator,(string *)&local_28,0,false,-1);\\n  if ((local_28 & 1) != 0) {\\n    operator_delete(local_18);\\n  }\\n  if ((local_40[0] & 1) != 0) {\\n    operator_delete(local_30);\\n  }\\n  *(undefined1 *)(lVar4 + 0x20) = 1;\\n  *(undefined4 *)(lVar4 + 0x74c) = 1;\\n  uVar2 = _DAT_1002b4010;\\n  local_28 = _DAT_1002b4010;\\n  uStack_20 = _UNK_1002b4018;\\n  puVar1 = *(undefined8 **)(lVar4 + 0x798);\\n  if (puVar1 == *(undefined8 **)(lVar4 + 0x7a0)) {\\n    std::vector<StatusEffect,std::allocator<StatusEffect>>::\\n    __push_back_slow_path<StatusEffect_const&>\\n              ((vector<StatusEffect,std::allocator<StatusEffect>> *)(lVar4 + 0x790),\\n               (StatusEffect *)&local_28);\\n  }\\n  else {\\n    puVar1[1] = _UNK_1002b4018;\\n    *puVar1 = uVar2;\\n    *(long *)(lVar4 + 0x798) = *(long *)(lVar4 + 0x798) + 0x10;\\n  }\\n  return lVar4;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_Z5fU6RuXN562BAtsoFlHL0Od",
+      "content": "{\"address\": \"0x10019f540\", \"length\": 32, \"hex\": \"554889e54157415641554154534883ec284189ce8955d44989f74989fc498dbc\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_BT9aCHMvr5fBewSMNsg6CtHx",
+      "content": "[{\"from_address\": \"0x10036822d\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x10019f539\", \"from_function\": \"GetBaseEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_y9Jcp61kBMtfozv9F3eR5GLe",
+          "type": "function",
+          "function": {
+            "name": "list_functions",
+            "arguments": "{\"pattern\": \"GetBaseEvent\", \"max_results\": 20, \"reason\": \"Locate EventGenerator::GetBaseEvent code address for context and relationship to GetEvent.\"}"
+          }
+        },
+        {
+          "id": "call_9vPOwwue4XuBCqtetKpG0sXL",
+          "type": "function",
+          "function": {
+            "name": "get_xrefs_to",
+            "arguments": "{\"address\": \"0x100001e70\", \"reason\": \"Find callers of BossShip::GetEvent.\"}"
+          }
+        },
+        {
+          "id": "call_hKhkU1mqNKrWmzdFgUJjZkjG",
+          "type": "function",
+          "function": {
+            "name": "get_xrefs_to",
+            "arguments": "{\"address\": \"0x100047ca0\", \"reason\": \"Find callers of TutorialManager::GetEvent.\"}"
+          }
+        },
+        {
+          "id": "call_F0PM9dFpQ0kVZbw440UEa0NT",
+          "type": "function",
+          "function": {
+            "name": "get_bytes",
+            "arguments": "{\"address\": \"0x100001e70\", \"length\": 32, \"reason\": \"Capture prologue bytes for BossShip::GetEvent.\"}"
+          }
+        },
+        {
+          "id": "call_RrBBhJ3B8MzlAmdZ8QSyIYgn",
+          "type": "function",
+          "function": {
+            "name": "get_bytes",
+            "arguments": "{\"address\": \"0x100047ca0\", \"length\": 32, \"reason\": \"Capture prologue bytes for TutorialManager::GetEvent.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_y9Jcp61kBMtfozv9F3eR5GLe",
+      "content": "[{\"name\": \"GetBaseEvent\", \"address\": \"0x10019f4e0\", \"size\": 94, \"signature\": \"undefined __thiscall GetBaseEvent(EventGenerator * this, string * param_1, int param_2, bool param_3, int param_4)\", \"calling_convention\": \"__thiscall\", \"is_thunk\": false, \"is_external\": false, \"param_count\": 5}]"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_9vPOwwue4XuBCqtetKpG0sXL",
+      "content": "[{\"from_address\": \"0x100366a31\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1001db3a5\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001db3b3\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001db7b9\", \"from_function\": \"CreateLocation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_hKhkU1mqNKrWmzdFgUJjZkjG",
+      "content": "[{\"from_address\": \"0x100366f5b\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1001e4b09\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_F0PM9dFpQ0kVZbw440UEa0NT",
+      "content": "{\"address\": \"0x100001e70\", \"length\": 32, \"hex\": \"554889e5534883ec38488db724020000488d5dc84889dfe8e4000000488d1538\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_RrBBhJ3B8MzlAmdZ8QSyIYgn",
+      "content": "{\"address\": \"0x100047ca0\", \"length\": 32, \"hex\": \"554889e5534883ec1880bf38020000007468c68738020000000f57c00f2945e0\"}"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_A84KndSkWuo8NX4H93DJKjxN",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\":\"0x10019f4e0\",\"reason\":\"Decompile EventGenerator::GetBaseEvent to understand how it differs from GetEvent and what it returns.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_A84KndSkWuo8NX4H93DJKjxN",
+      "content": "{\"function\": \"GetBaseEvent\", \"address\": \"0x10019f4e0\", \"size\": 94, \"section\": \"__text\", \"pseudocode\": \"\\n/* EventGenerator::GetBaseEvent(std::string const&, int, bool, int) */\\n\\nvoid __thiscall\\nEventGenerator::GetBaseEvent\\n          (EventGenerator *this,string *param_1,int param_2,bool param_3,int param_4)\\n\\n{\\n  if (param_4 != -1) {\\n    if (Globals::RNG == '\\\\0') {\\n      _srandom32(param_4);\\n    }\\n    else {\\n      _srand(param_4);\\n    }\\n  }\\n  *(undefined2 *)(this + 0x214) = 1;\\n  GetEvent(this,param_1,param_2,param_3);\\n  return;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_4z2Fq9f6PiX2MnMyDt7kcTDn",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\":\"0x1001db3a5\",\"reason\":\"Decompile LoadGame caller xref to BossShip::GetEvent to see context.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_4z2Fq9f6PiX2MnMyDt7kcTDn",
+      "content": "{\"function\": \"LoadGame\", \"address\": \"0x1001da810\", \"size\": 3124, \"section\": \"__text\", \"pseudocode\": \"\\n/* WorldManager::LoadGame(std::string) */\\n\\nvoid __thiscall WorldManager::LoadGame(WorldManager *this,string *param_2)\\n\\n{\\n  WorldManager *pWVar1;\\n  CommandGui *pCVar2;\\n  int *piVar3;\\n  void *pvVar4;\\n  bool bVar5;\\n  int iVar6;\\n  int iVar7;\\n  undefined4 uVar8;\\n  uint uVar9;\\n  ShipManager *pSVar10;\\n  CompleteShip *pCVar11;\\n  Location *pLVar12;\\n  ulong uVar13;\\n  long lVar14;\\n  void *pvVar15;\\n  LocationEvent *pLVar16;\\n  undefined8 uVar17;\\n  long lVar18;\\n  string *psVar19;\\n  size_t sVar20;\\n  ulong uVar21;\\n  undefined8 local_328;\\n  undefined8 uStack_320;\\n  undefined4 local_318;\\n  undefined1 local_313;\\n  ulong local_310;\\n  undefined8 local_308;\\n  void *local_300;\\n  undefined1 local_2f8;\\n  ulong local_2f0;\\n  undefined8 local_2e8;\\n  void *local_2e0;\\n  undefined8 local_2d8;\\n  undefined8 uStack_2d0;\\n  undefined8 local_2c8;\\n  CrewBlueprint local_2c0 [384];\\n  undefined4 local_140;\\n  undefined8 local_13c;\\n  undefined2 local_134;\\n  undefined8 local_130;\\n  undefined8 local_128;\\n  undefined4 local_120;\\n  ulong local_118;\\n  undefined8 uStack_110;\\n  void *local_108;\\n  string local_100 [16];\\n  void *local_f0;\\n  undefined8 local_e8;\\n  undefined8 uStack_e0;\\n  undefined8 local_d8;\\n  ulong local_c8;\\n  undefined8 uStack_c0;\\n  void *local_b8;\\n  FileHelper local_b0 [16];\\n  void *local_a0;\\n  WorldManager *local_98;\\n  WorldManager *local_90;\\n  LocationEvent *local_88;\\n  string *local_80;\\n  SpaceManager *local_78;\\n  int local_6c;\\n  ulong local_68;\\n  int local_5c;\\n  string local_58;\\n  undefined4 uStack_57;\\n  undefined1 uStack_53;\\n  undefined1 uStack_52;\\n  undefined1 uStack_51;\\n  undefined1 uStack_50;\\n  undefined2 uStack_4f;\\n  undefined1 uStack_4d;\\n  undefined1 uStack_4c;\\n  undefined1 uStack_4b;\\n  undefined2 uStack_4a;\\n  void *local_48;\\n  WorldManager local_40;\\n  \\n  *(undefined8 *)(this + 0x1728) = *(undefined8 *)(this + 0x1720);\\n  pCVar2 = *(CommandGui **)(this + 0x11d0);\\n  local_c8 = 0;\\n  uStack_c0 = 0;\\n  local_b8 = (void *)0x0;\\n  local_e8 = 0;\\n  uStack_e0 = 0;\\n  local_d8 = 0;\\n  local_313 = 0;\\n  local_328 = 0;\\n  uStack_320 = 0;\\n  local_318 = 0;\\n  local_300 = (void *)0x0;\\n  local_308 = 0;\\n  local_310 = 0;\\n  local_2f8 = 1;\\n  local_2e0 = (void *)0x0;\\n  local_2e8 = 0;\\n  local_2f0 = 0;\\n  local_2d8 = 0;\\n  uStack_2d0 = 0;\\n  local_2c8 = 0;\\n  CrewBlueprint::CrewBlueprint(local_2c0);\\n  local_140 = 0xffffffff;\\n  local_134 = 0;\\n  local_13c = 0;\\n  local_120 = 0;\\n  local_128 = 0;\\n  local_130 = 0;\\n  uStack_110 = 0;\\n  local_108 = (void *)0x0;\\n  local_118 = 0;\\n  CommandGui::NewLocation(pCVar2,&local_c8,&local_e8,&local_328,0);\\n  if ((local_118 & 1) != 0) {\\n    operator_delete(local_108);\\n  }\\n  CrewBlueprint::~CrewBlueprint(local_2c0);\\n  if ((local_2f0 & 1) != 0) {\\n    operator_delete(local_2e0);\\n  }\\n  if ((local_310 & 1) != 0) {\\n    operator_delete(local_300);\\n  }\\n  std::__vector_base<ChoiceText,std::allocator<ChoiceText>>::~__vector_base\\n            ((__vector_base<ChoiceText,std::allocator<ChoiceText>> *)&local_e8);\\n  if ((local_c8 & 1) != 0) {\\n    operator_delete(local_b8);\\n  }\\n  iVar6 = FileHelper::readBinaryFile(param_2);\\n  if (iVar6 == -1) {\\n    return;\\n  }\\n  DAT_100347ac8 = 1;\\n  DAT_10034797c = FileHelper::readInteger(iVar6);\\n  if (DAT_10034797c < 10) {\\n    Globals::RNG = true;\\n    if (2 < DAT_10034797c) goto LAB_1001daa37;\\n    DAT_1003479f1 = false;\\n  }\\n  else {\\n    iVar7 = FileHelper::readInteger(iVar6);\\n    Globals::RNG = iVar7 != 0;\\nLAB_1001daa37:\\n    iVar7 = FileHelper::readInteger(iVar6);\\n    DAT_1003479f1 = iVar7 != 0;\\n  }\\n  local_80 = param_2;\\n  local_5c = iVar6;\\n  ScoreKeeper::LoadGame((ScoreKeeper *)&ScoreKeeper::Keeper,iVar6);\\n  if (*(long **)this != (long *)0x0) {\\n    (**(code **)(**(long **)this + 8))();\\n  }\\n  pSVar10 = operator_new(0xbf8);\\n  ShipManager::ShipManager(pSVar10,0);\\n  iVar6 = local_5c;\\n  ShipManager::ImportShip(pSVar10,local_5c);\\n  BossShip::ClearLocation(*(BossShip **)(this + 8));\\n  (**(code **)(**(long **)(this + 8) + 0x28))();\\n  pCVar11 = operator_new(0x1f0);\\n  local_78 = (SpaceManager *)(this + 0x10);\\n  CompleteShip::CompleteShip(pCVar11,local_78,true,0);\\n  *(CompleteShip **)this = pCVar11;\\n  CompleteShip::SetShip(pCVar11,pSVar10);\\n  *(ShipManager **)(this + 0xd48) = pSVar10;\\n  CommandGui::LinkShip(*(CommandGui **)(this + 0x11d0),*(CompleteShip **)this);\\n  CommandGui::ImportData(*(CommandGui **)(this + 0x11d0),iVar6);\\n  Ship::ClearImages((Ship *)(*(long *)(*(long *)this + 0x10) + 0x118));\\n  std::string::string(&local_58,(string *)(*(long *)(*(long *)this + 0x10) + 0x8f8));\\n  ResourceControl::LoadEnemyShips((ResourceControl *)&ResourceControl::GlobalResources,&local_58);\\n  if (((byte)local_58 & 1) != 0) {\\n    operator_delete(local_48);\\n  }\\n  Ship::LoadImages((Ship *)(*(long *)(*(long *)this + 0x10) + 0x118));\\n  *(undefined8 *)(this + 0x4c8) = *(undefined8 *)(this + 0x4c0);\\n  SpaceManager::Clear(local_78);\\n  ClearLocation(this);\\n  pLVar12 = (Location *)StarMap::LoadGame((StarMap *)(this + 0x4d8),iVar6);\\n  psVar19 = local_80;\\n  this[0x1719] = (WorldManager)0x1;\\n  if (DAT_10034797c < 3) {\\n    CreateLocation(this,pLVar12);\\n    goto LAB_1001db18a;\\n  }\\n  ShipEvent::Load((ShipEvent *)(this + 0x11e8),iVar6);\\n  *(undefined8 *)(this + 0x11d8) = *(undefined8 *)(pLVar12 + 0x30);\\n  CreateLocation(this,pLVar12);\\n  FileHelper::readString((FileHelper *)&local_58,iVar6);\\n  psVar19 = (string *)(this + 0x1738);\\n  if (((byte)this[0x1738] & 1) == 0) {\\n    *(undefined2 *)psVar19 = 0;\\n  }\\n  else {\\n    **(undefined1 **)(this + 0x1748) = 0;\\n    *(undefined8 *)(this + 0x1740) = 0;\\n  }\\n  std::string::reserve((ulong)psVar19);\\n  *(void **)(this + 0x1748) = local_48;\\n  *(ulong *)(this + 0x1740) =\\n       CONCAT26(uStack_4a,\\n                CONCAT15(uStack_4b,\\n                         CONCAT14(uStack_4c,CONCAT13(uStack_4d,CONCAT21(uStack_4f,uStack_50)))));\\n  *(ulong *)psVar19 =\\n       CONCAT17(uStack_51,CONCAT16(uStack_52,CONCAT15(uStack_53,CONCAT41(uStack_57,local_58))));\\n  if (DAT_10034797c < 0xb) {\\n    FileHelper::readString(local_b0,iVar6);\\n    std::string::string(&local_58,(string *)local_b0);\\n    local_40 = (WorldManager)0x1;\\n    pWVar1 = this + 0x1750;\\n    if (((byte)this[0x1750] & 1) == 0) {\\n      *(undefined2 *)pWVar1 = 0;\\n    }\\n    else {\\n      **(undefined1 **)(this + 0x1760) = 0;\\n      *(undefined8 *)(this + 0x1758) = 0;\\n    }\\n    std::string::reserve((ulong)pWVar1);\\n    *(void **)(this + 0x1760) = local_48;\\n    *(ulong *)(this + 0x1758) =\\n         CONCAT26(uStack_4a,\\n                  CONCAT15(uStack_4b,\\n                           CONCAT14(uStack_4c,CONCAT13(uStack_4d,CONCAT21(uStack_4f,uStack_50)))));\\n    *(ulong *)pWVar1 =\\n         CONCAT17(uStack_51,CONCAT16(uStack_52,CONCAT15(uStack_53,CONCAT41(uStack_57,local_58))));\\n    this[0x1768] = local_40;\\n  }\\n  else {\\n    iVar7 = FileHelper::readInteger(iVar6);\\n    FileHelper::readString(local_b0,iVar6);\\n    std::string::string(&local_58,(string *)local_b0);\\n    local_40 = (WorldManager)(iVar7 != 0);\\n    pWVar1 = this + 0x1750;\\n    if (((byte)this[0x1750] & 1) == 0) {\\n      *(undefined2 *)pWVar1 = 0;\\n    }\\n    else {\\n      **(undefined1 **)(this + 0x1760) = 0;\\n      *(undefined8 *)(this + 0x1758) = 0;\\n    }\\n    std::string::reserve((ulong)pWVar1);\\n    *(void **)(this + 0x1760) = local_48;\\n    *(ulong *)(this + 0x1758) =\\n         CONCAT26(uStack_4a,\\n                  CONCAT15(uStack_4b,\\n                           CONCAT14(uStack_4c,CONCAT13(uStack_4d,CONCAT21(uStack_4f,uStack_50)))));\\n    *(ulong *)pWVar1 =\\n         CONCAT17(uStack_51,CONCAT16(uStack_52,CONCAT15(uStack_53,CONCAT41(uStack_57,local_58))));\\n    this[0x1768] = local_40;\\n    iVar6 = local_5c;\\n  }\\n  uStack_4a = 0;\\n  uStack_4b = 0;\\n  uStack_4c = 0;\\n  uStack_4d = 0;\\n  uStack_4f = 0;\\n  uStack_50 = 0;\\n  uStack_51 = 0;\\n  uStack_52 = 0;\\n  uStack_53 = 0;\\n  uStack_57 = 0;\\n  local_58 = (string)0x0;\\n  local_48 = (void *)0x0;\\n  if (((byte)local_b0[0] & 1) != 0) {\\n    local_48 = (void *)0x0;\\n    uStack_4a = 0;\\n    uStack_4b = 0;\\n    uStack_4c = 0;\\n    uStack_4d = 0;\\n    uStack_4f = 0;\\n    uStack_50 = 0;\\n    uStack_51 = 0;\\n    uStack_52 = 0;\\n    uStack_53 = 0;\\n    uStack_57 = 0;\\n    local_58 = (string)0x0;\\n    operator_delete(local_a0);\\n  }\\n  uVar8 = FileHelper::readInteger(iVar6);\\n  *(undefined4 *)(this + 0x1798) = uVar8;\\n  local_6c = FileHelper::readInteger(iVar6);\\n  pLVar16 = *(LocationEvent **)(pLVar12 + 0x30);\\n  if (((byte)this[0x1738] & 1) == 0) {\\n    if ((byte)this[0x1738] >> 1 != 0) {\\nLAB_1001dadd2:\\n      pLVar16 = (LocationEvent *)\\n                EventGenerator::GetBaseEvent\\n                          ((EventGenerator *)&EventGenerator::Generator,psVar19,\\n                           *(int *)(this + 0xa20),false,*(int *)(this + 0x16dc));\\n    }\\n  }\\n  else if (*(long *)(this + 0x1740) != 0) goto LAB_1001dadd2;\\n  *(LocationEvent **)(this + 0x11e0) = pLVar16;\\n  if (0 < local_6c) {\\n    local_90 = this + 0x1720;\\n    uVar13 = 0;\\n    local_98 = this;\\n    do {\\n      local_68 = uVar13;\\n      iVar7 = FileHelper::readInteger(iVar6);\\n      piVar3 = *(int **)(this + 0x1728);\\n      if (piVar3 == *(int **)(this + 0x1730)) {\\n        pvVar4 = *(void **)local_90;\\n        sVar20 = (long)piVar3 - (long)pvVar4;\\n        lVar18 = (long)sVar20 >> 2;\\n        uVar13 = lVar18 + 1;\\n        if (0x3fffffffffffffff < uVar13) {\\n                    /* WARNING: Subroutine does not return */\\n          std::__vector_base_common<true>::__throw_length_error();\\n        }\\n        lVar14 = (long)*(int **)(this + 0x1730) - (long)pvVar4;\\n        uVar21 = 0x3fffffffffffffff;\\n        local_88 = pLVar16;\\n        if ((ulong)(lVar14 >> 2) < 0x1fffffffffffffff) {\\n          uVar21 = lVar14 >> 1;\\n          if (uVar21 < uVar13) {\\n            uVar21 = uVar13;\\n          }\\n          if (uVar21 != 0) {\\n            if (0x3fffffffffffffff < uVar21) {\\n                    /* WARNING: Subroutine does not return */\\n              _abort();\\n            }\\n            goto LAB_1001daee4;\\n          }\\n          uVar21 = 0;\\n          pvVar15 = (void *)0x0;\\n        }\\n        else {\\nLAB_1001daee4:\\n          pvVar15 = operator_new(uVar21 * 4);\\n        }\\n        *(int *)((long)pvVar15 + lVar18 * 4) = iVar7;\\n        if (0 < (long)sVar20) {\\n          _memcpy(pvVar15,pvVar4,sVar20);\\n        }\\n        iVar6 = local_5c;\\n        pLVar16 = local_88;\\n        this = local_98;\\n        *(void **)(local_98 + 0x1720) = pvVar15;\\n        *(long *)(local_98 + 0x1728) = (long)pvVar15 + lVar18 * 4 + 4;\\n        *(void **)(local_98 + 0x1730) = (void *)((long)pvVar15 + uVar21 * 4);\\n        if (pvVar4 != (void *)0x0) {\\n          operator_delete(pvVar4);\\n        }\\n        if (iVar7 < 0x65) goto LAB_1001dafb0;\\nLAB_1001daf5a:\\n        if (iVar7 == 0x67) {\\n          uStack_4c = 0;\\n          local_58 = (string)0x14;\\n          uStack_57 = 0x49555145;\\n          uStack_53 = 0x50;\\n          uStack_52 = 0x5f;\\n          uStack_51 = 0x46;\\n          uStack_50 = 0x55;\\n          uStack_4f = 0x4c4c;\\n          uStack_4d = 0;\\nLAB_1001db07c:\\n          uStack_4b = 0;\\n          local_48 = (void *)0x0;\\n          uStack_4a = 0;\\n          pLVar16 = (LocationEvent *)\\n                    EventGenerator::GetBaseEvent\\n                              ((EventGenerator *)&EventGenerator::Generator,&local_58,\\n                               *(int *)(this + 0xa20),false,-1);\\n          if (((byte)local_58 & 1) != 0) {\\n            operator_delete(local_48);\\n          }\\n          *(undefined4 *)(pLVar16 + 0x524) = 0x19;\\n        }\\n        else {\\n          if (iVar7 != 0x66) {\\n            if (iVar7 != 0x65) goto LAB_1001db0c8;\\n            local_58 = (string)0x18;\\n            uStack_57 = 0x4d475541;\\n            uStack_53 = 0x45;\\n            uStack_52 = 0x4e;\\n            uStack_51 = 0x54;\\n            uStack_50 = 0x5f;\\n            uStack_4f = 0x5546;\\n            uStack_4d = 0x4c;\\n            uStack_4c = 0x4c;\\n            goto LAB_1001db07c;\\n          }\\n          uStack_51 = 0;\\n          uStack_50 = 0;\\n          uStack_4f = 0;\\n          uStack_4d = 0;\\n          uStack_4c = 0;\\n          uStack_4b = 0;\\n          uStack_4a = 0;\\n          local_48 = (void *)0x0;\\n          local_58 = (string)0xa;\\n          uStack_53 = 0x59;\\n          uStack_57 = 0x4d4d5544;\\n          uStack_52 = 0;\\n          pLVar16 = (LocationEvent *)\\n                    EventGenerator::GetBaseEvent\\n                              ((EventGenerator *)&EventGenerator::Generator,&local_58,\\n                               *(int *)(this + 0xa20),false,-1);\\n          if (((byte)local_58 & 1) != 0) {\\n            operator_delete(local_48);\\n          }\\n        }\\n        **(undefined8 **)(pLVar16 + 0xa58) = *(undefined8 *)(this + 0x11e0);\\n      }\\n      else {\\n        *piVar3 = iVar7;\\n        *(int **)(this + 0x1728) = piVar3 + 1;\\n        if (100 < iVar7) goto LAB_1001daf5a;\\nLAB_1001dafb0:\\n        if (((pLVar16 != (LocationEvent *)0x0) && (-1 < iVar7)) &&\\n           (iVar7 < (int)((ulong)(*(long *)(pLVar16 + 0xa60) - *(long *)(pLVar16 + 0xa58)) >> 3) *\\n                    -0x45d1745d)) {\\n          pLVar16 = *(LocationEvent **)(*(long *)(pLVar16 + 0xa58) + (long)iVar7 * 0x58);\\n        }\\n      }\\nLAB_1001db0c8:\\n      *(LocationEvent **)(this + 0x11e0) = pLVar16;\\n      uVar9 = (int)local_68 + 1;\\n      uVar13 = (ulong)uVar9;\\n    } while ((int)uVar9 < local_6c);\\n  }\\n  psVar19 = local_80;\\n  local_88 = pLVar16;\\n  if (pLVar16 == (LocationEvent *)0x0) goto LAB_1001db18a;\\n  if (this[0x1768] == (WorldManager)0x0) {\\n    TextLibrary::GetText(&local_58,(string *)&Globals::Library);\\n    if (((byte)local_58 & 1) == 0) goto LAB_1001db11e;\\nLAB_1001db14e:\\n    lVar18 = CONCAT26(uStack_4a,\\n                      CONCAT15(uStack_4b,\\n                               CONCAT14(uStack_4c,CONCAT13(uStack_4d,CONCAT21(uStack_4f,uStack_50)))\\n                              ));\\n    operator_delete(local_48);\\n    pLVar16 = local_88;\\n    if (lVar18 != 0) {\\nLAB_1001db164:\\n      pLVar16 = local_88;\\n      std::string::operator=((string *)local_88,(string *)(this + 0x1750));\\n      *(WorldManager *)(pLVar16 + 0x18) = this[0x1768];\\n    }\\n  }\\n  else {\\n    std::string::string(&local_58,(string *)(this + 0x1750));\\n    if (((byte)local_58 & 1) != 0) goto LAB_1001db14e;\\nLAB_1001db11e:\\n    pLVar16 = local_88;\\n    if ((byte)local_58 >> 1 != 0) goto LAB_1001db164;\\n  }\\n  CreateChoiceBox(this,pLVar16);\\n  psVar19 = local_80;\\nLAB_1001db18a:\\n  this[0x1719] = (WorldManager)0x0;\\n  iVar7 = FileHelper::readInteger(iVar6);\\n  if (iVar7 == 0) {\\n    local_68 = local_68 & 0xffffffff00000000;\\n  }\\n  else {\\n    if ((DAT_10034797c < 3) || (uVar17 = FileHelper::readInteger(iVar6), (int)uVar17 == 0)) {\\n      pCVar11 = operator_new(0x1f0);\\n      local_68 = local_68 & 0xffffffff00000000;\\n      CompleteShip::CompleteShip(pCVar11,local_78,false,1);\\n    }\\n    else {\\n      pCVar11 = *(CompleteShip **)(this + 8);\\n      local_68 = CONCAT44(local_68._4_4_,(int)CONCAT71((int7)((ulong)uVar17 >> 8),1));\\n    }\\n    pSVar10 = operator_new(0xbf8);\\n    ShipManager::ShipManager(pSVar10,1);\\n    ShipManager::ImportShip(pSVar10,iVar6);\\n    CompleteShip::SetShip(pCVar11,pSVar10);\\n    if (2 < DAT_10034797c) {\\n      ShipAI::Load((ShipAI *)(pCVar11 + 0x30),iVar6);\\n    }\\n    lVar18 = *(long *)(this + 0x16e0);\\n    if (*(long *)(this + 0x16e8) != lVar18) {\\n      uVar17 = *(undefined8 *)(pCVar11 + 0x10);\\n      uVar13 = 0;\\n      uVar21 = 1;\\n      do {\\n        ModifyStatusEffect(this,*(undefined8 *)(lVar18 + uVar13 * 0x10),\\n                           *(undefined8 *)(lVar18 + 8 + uVar13 * 0x10),uVar17,1);\\n        lVar18 = *(long *)(this + 0x16e0);\\n        bVar5 = uVar21 < (ulong)(*(long *)(this + 0x16e8) - lVar18 >> 4);\\n        uVar13 = uVar21;\\n        uVar21 = (ulong)((int)uVar21 + 1);\\n      } while (bVar5);\\n    }\\n    AddShip(this,pCVar11);\\n    psVar19 = local_80;\\n    iVar6 = local_5c;\\n  }\\n  if (2 < DAT_10034797c) {\\n    SpaceManager::LoadSpace(local_78,iVar6);\\n    ShipManager::ImportBattleState(*(ShipManager **)(*(long *)this + 0x10),iVar6);\\n    if (iVar7 != 0) {\\n      ShipManager::ImportBattleState(*(ShipManager **)(**(long **)(this + 0x4c0) + 0x10),iVar6);\\n    }\\n    if (4 < DAT_10034797c) {\\n      CompleteShip::LoadState(*(CompleteShip **)this,iVar6);\\n      if (iVar7 != 0) {\\n        CompleteShip::LoadState((CompleteShip *)**(undefined8 **)(this + 0x4c0),iVar6);\\n      }\\n      if (6 < DAT_10034797c) {\\n        CombatControl::LoadState((CombatControl *)(*(long *)(this + 0x11d0) + 0x598),iVar6);\\n      }\\n    }\\n    ShipManager::OnLoop(*(ShipManager **)(*(long *)this + 0x10));\\n    if (iVar7 != 0) {\\n      ShipManager::OnLoop(*(ShipManager **)(**(long **)(this + 0x4c0) + 0x10));\\n    }\\n  }\\n  BossShip::LoadBoss(*(BossShip **)(this + 8),iVar6);\\n  FileHelper::closeBinaryFile(iVar6);\\n  FileHelper::deleteFile(psVar19);\\n  if ((char)local_68 != '\\\\0') {\\n    SpaceManager::ClearEnvironment(local_78);\\n    lVar18 = BossShip::GetEvent();\\n    if (lVar18 != 0) {\\n      lVar18 = BossShip::GetEvent();\\n      CheckStatusEffects(this,(vector *)(lVar18 + 0x790));\\n    }\\n  }\\n  this[0x1718] = (WorldManager)0x1;\\n  std::string::string(local_100,(string *)(*(long *)(*(long *)this + 0x10) + 0x888));\\n  std::string::operator=((string *)(PTR_Tracker_10032f058 + 0xa8),local_100);\\n  if (((byte)local_100[0] & 1) != 0) {\\n    operator_delete(local_f0);\\n  }\\n  CommandGui::OnLoop(*(CommandGui **)(this + 0x11d0));\\n  DAT_100347ac8 = 0;\\n  return;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_SYHh8H4COIhx6T4cGSuSxQQH",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\":\"0x1001e4b09\",\"reason\":\"Decompile OnLoop caller of TutorialManager::GetEvent to see how tutorial events are injected.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_SYHh8H4COIhx6T4cGSuSxQQH",
+      "content": "{\"function\": \"OnLoop\", \"address\": \"0x1001e4470\", \"size\": 8263, \"section\": \"__text\", \"pseudocode\": \"\\n/* WorldManager::OnLoop() */\\n\\nvoid __thiscall WorldManager::OnLoop(WorldManager *this)\\n\\n{\\n  SpaceManager *this_00;\\n  StarMap *this_01;\\n  WorldManager *pWVar1;\\n  long *plVar2;\\n  long lVar3;\\n  void *pvVar4;\\n  undefined7 *puVar5;\\n  byte bVar6;\\n  char cVar7;\\n  bool bVar8;\\n  undefined1 uVar9;\\n  int iVar10;\\n  int iVar11;\\n  ShipSystem *pSVar12;\\n  LocationEvent *pLVar13;\\n  undefined8 uVar14;\\n  long *plVar15;\\n  undefined7 *puVar16;\\n  undefined8 extraout_RAX;\\n  undefined8 *puVar17;\\n  CrewMember *pCVar18;\\n  undefined4 uVar19;\\n  ulong uVar20;\\n  long lVar21;\\n  uint uVar22;\\n  int extraout_EDX;\\n  ulong uVar23;\\n  ShipAI *this_02;\\n  ulong uVar24;\\n  WorldManager *pWVar25;\\n  long lVar26;\\n  ShipManager *this_03;\\n  undefined7 *puVar27;\\n  CompleteShip *pCVar28;\\n  byte local_3e0;\\n  undefined6 local_3df;\\n  undefined2 uStack_3d9;\\n  undefined6 uStack_3d7;\\n  undefined1 local_3d1;\\n  void *local_3d0;\\n  byte local_3c8;\\n  undefined6 local_3c7;\\n  undefined2 uStack_3c1;\\n  undefined6 uStack_3bf;\\n  undefined1 local_3b9;\\n  void *local_3b8;\\n  byte local_3b0;\\n  undefined6 local_3af;\\n  undefined2 uStack_3a9;\\n  undefined6 uStack_3a7;\\n  undefined1 local_3a1;\\n  void *local_3a0;\\n  undefined1 local_398 [16];\\n  void *local_388;\\n  undefined1 local_378 [16];\\n  void *local_368;\\n  byte local_358;\\n  undefined8 uStack_357;\\n  undefined7 uStack_34f;\\n  undefined1 uStack_348;\\n  undefined2 uStack_347;\\n  undefined1 uStack_345;\\n  undefined4 uStack_344;\\n  undefined1 local_338 [16];\\n  void *local_328;\\n  byte local_318;\\n  undefined8 uStack_317;\\n  undefined7 uStack_30f;\\n  undefined1 uStack_308;\\n  undefined4 uStack_307;\\n  undefined1 uStack_303;\\n  undefined2 uStack_302;\\n  undefined1 local_2f8 [16];\\n  void *local_2e8;\\n  byte local_2d8;\\n  undefined8 uStack_2d7;\\n  undefined7 uStack_2cf;\\n  undefined1 uStack_2c8;\\n  undefined1 uStack_2c7;\\n  undefined6 uStack_2c6;\\n  byte local_2b8;\\n  undefined8 uStack_2b7;\\n  undefined7 uStack_2af;\\n  undefined1 uStack_2a8;\\n  undefined1 uStack_2a7;\\n  undefined6 uStack_2a6;\\n  undefined1 local_298 [16];\\n  void *local_288;\\n  byte local_278;\\n  undefined8 uStack_277;\\n  undefined7 uStack_26f;\\n  undefined1 uStack_268;\\n  undefined2 uStack_267;\\n  undefined1 uStack_265;\\n  undefined4 uStack_264;\\n  byte local_258;\\n  undefined8 uStack_257;\\n  undefined7 uStack_24f;\\n  undefined1 uStack_248;\\n  undefined2 uStack_247;\\n  undefined1 uStack_245;\\n  undefined4 uStack_244;\\n  byte local_238;\\n  undefined8 uStack_237;\\n  undefined7 uStack_22f;\\n  undefined1 uStack_228;\\n  undefined1 uStack_227;\\n  undefined1 uStack_226;\\n  undefined5 uStack_225;\\n  byte local_218;\\n  undefined8 uStack_217;\\n  undefined7 uStack_20f;\\n  undefined1 uStack_208;\\n  undefined1 uStack_207;\\n  undefined1 uStack_206;\\n  undefined5 uStack_205;\\n  undefined1 local_1f8 [16];\\n  void *local_1e8;\\n  undefined1 local_1d8 [16];\\n  void *local_1c8;\\n  byte local_1c0;\\n  undefined4 local_1bf;\\n  undefined2 local_1bb;\\n  undefined1 local_1b9;\\n  undefined8 local_1b8;\\n  void *local_1b0;\\n  byte local_1a8;\\n  undefined4 local_1a7;\\n  undefined2 local_1a3;\\n  undefined1 local_1a1;\\n  undefined8 local_1a0;\\n  void *local_198;\\n  ulong local_190;\\n  ulong local_188;\\n  WorldManager *local_180;\\n  undefined1 local_178 [16];\\n  void *local_168;\\n  undefined1 local_158 [16];\\n  void *local_148;\\n  byte local_138;\\n  undefined8 uStack_137;\\n  undefined7 uStack_12f;\\n  undefined1 uStack_128;\\n  undefined4 uStack_127;\\n  undefined1 uStack_123;\\n  undefined2 uStack_122;\\n  byte local_120;\\n  undefined4 local_11f;\\n  undefined2 local_11b;\\n  undefined1 local_119;\\n  undefined8 local_118;\\n  void *local_110;\\n  int local_104;\\n  ulong local_100;\\n  StarMap *local_f8;\\n  WorldManager *local_f0;\\n  undefined1 local_e8 [9];\\n  undefined2 uStack_df;\\n  undefined5 uStack_dd;\\n  void *local_d8;\\n  undefined1 local_c8 [16];\\n  undefined7 *local_b8;\\n  string local_b0;\\n  undefined7 uStack_af;\\n  ulong local_a8;\\n  undefined7 *puStack_a0;\\n  uint local_94;\\n  undefined4 local_90;\\n  uint local_8c;\\n  undefined1 local_88 [16];\\n  undefined8 *local_78;\\n  undefined1 local_70;\\n  LocationEvent *local_60;\\n  string local_58;\\n  undefined7 uStack_57;\\n  string sStack_50;\\n  undefined7 uStack_4f;\\n  undefined1 uStack_48;\\n  undefined2 uStack_47;\\n  undefined1 uStack_45;\\n  undefined4 uStack_44;\\n  ulong local_40;\\n  ulong local_38;\\n  \\n  cVar7 = CheckForNewLocation(this,false);\\n  if (cVar7 != '\\\\0') {\\n    return;\\n  }\\n  local_110 = (void *)0x0;\\n  local_118 = 0;\\n  local_120 = 0xc;\\n  local_11b = 0x616c;\\n  local_11f = 0x7562656e;\\n  local_119 = 0;\\n  iVar10 = AchievementTracker::GetFlagValue\\n                     ((AchievementTracker *)&AchievementTracker::Tracker,&local_120);\\n  pvVar4 = local_110;\\n  bVar6 = local_120;\\n  if (iVar10 < 0x1e) {\\njoined_r0x0001001e4588:\\n    if ((bVar6 & 1) != 0) {\\n      operator_delete(pvVar4);\\n    }\\n  }\\n  else {\\n    iVar10 = *(int *)(this + 0xa20);\\n    if ((local_120 & 1) != 0) {\\n      operator_delete(local_110);\\n    }\\n    if (iVar10 < 9) {\\n      local_178._1_8_ = 0x47554c535f484341;\\n      local_178[0] = 0x1e;\\n      local_178._9_7_ = 0x414c5542454e5f;\\n      local_168 = (void *)0x0;\\n      AchievementTracker::SetAchievement\\n                ((AchievementTracker *)&AchievementTracker::Tracker,local_178,0,1);\\n      pvVar4 = local_168;\\n      bVar6 = local_178[0];\\n      goto joined_r0x0001001e4588;\\n    }\\n  }\\n  this_01 = (StarMap *)(this + 0x4d8);\\n  cVar7 = StarMap::StartBeacon(this_01);\\n  if ((cVar7 == '\\\\0') &&\\n     (iVar10 = ShipManager::GetOxygenPercentage(*(ShipManager **)(*(long *)this + 0x10)),\\n     0x14 < iVar10)) {\\n    local_1b0 = (void *)0x0;\\n    local_1b8 = 0;\\n    local_1c0 = 0xc;\\n    local_1bb = 0x326f;\\n    local_1bf = 0x68676968;\\n    local_1b9 = 0;\\n    iVar10 = AchievementTracker::GetFlagValue\\n                       ((AchievementTracker *)&AchievementTracker::Tracker,&local_1c0);\\n    if ((local_1c0 & 1) != 0) {\\n      operator_delete(local_1b0);\\n    }\\n    if (iVar10 == 0) {\\n      local_198 = (void *)0x0;\\n      local_1a0 = 0;\\n      local_1a8 = 0xc;\\n      local_1a3 = 0x326f;\\n      local_1a7 = 0x68676968;\\n      local_1a1 = 0;\\n      AchievementTracker::SetFlag((AchievementTracker *)&AchievementTracker::Tracker,&local_1a8);\\n      if ((local_1a8 & 1) != 0) {\\n        operator_delete(local_198);\\n      }\\n    }\\n  }\\n  this[0x1188] = (WorldManager)0x0;\\n  local_388 = (void *)0x0;\\n  local_398._1_8_ = 0x6c617473797263;\\n  local_398[0] = 0xe;\\n  local_398._9_7_ = 0;\\n  iVar10 = ShipObject::HasEquipment(*(ShipObject **)(*(long *)this + 0x10),local_398);\\n  if ((local_398[0] & 1) != 0) {\\n    operator_delete(local_388);\\n  }\\n  if (iVar10 != 0) {\\n    local_368 = (void *)0x0;\\n    local_378._7_9_ = SUB169((undefined1  [16])0x0,7);\\n    local_378._0_7_ = 0x6e657775720a;\\n    cVar7 = AchievementTracker::GetFlag\\n                      ((AchievementTracker *)&AchievementTracker::Tracker,local_378);\\n    if ((local_378[0] & 1) != 0) {\\n      operator_delete(local_368);\\n    }\\n    if (cVar7 != '\\\\0') {\\n      this[0x1188] = (WorldManager)0x1;\\n    }\\n  }\\n  this_00 = (SpaceManager *)(this + 0x10);\\n  SpaceManager::OnLoop(this_00);\\n  (**(code **)(**(long **)this + 0x10))();\\n  CrewMemberFactory::OnLoop((CrewMemberFactory *)&CrewMemberFactory::Factory);\\n  CrewMemberFactory::OnLoop((CrewMemberFactory *)&CrewMemberFactory::Factory);\\n  StarMap::SetBossStage(this_01,*(int *)(*(long *)(this + 8) + 0x1ec));\\n  pWVar25 = this + 0x4c0;\\n  this_03 = *(ShipManager **)(*(long *)this + 0x10);\\n  if (*(long *)(this + 0x4c8) == *(long *)(this + 0x4c0)) {\\n    ShipManager::SetBoostFTL(this_03,false);\\nLAB_1001e6057:\\n    cVar7 = SpaceManager::DangerousEnvironment(this_00);\\n    if (((cVar7 == '\\\\0') && (*(int *)(*(ShipManager **)(*(long *)this + 0x10) + 0xa9c) == 0)) &&\\n       (cVar7 = ShipManager::ContainsMindControlledEnemy(*(ShipManager **)(*(long *)this + 0x10)),\\n       cVar7 == '\\\\0')) {\\n      ShipManager::SetSafe(*(ShipManager **)(*(long *)this + 0x10));\\n    }\\n    if (*(int *)(*(long *)(this + 0x11d8) + 0x74c) != 1) {\\n      *(undefined1 *)(*(long *)(this + 0x11d8) + 0x420) = 0;\\n    }\\n    ShipManager::SetBoostFTL(*(ShipManager **)(*(long *)this + 0x10),true);\\n    lVar21 = *(long *)(this + 0x11d0);\\n    cVar7 = SpaceManager::DangerousEnvironment(this_00);\\n    uVar9 = 1;\\n    if ((cVar7 == '\\\\0') && (*(int *)(*(ShipManager **)(*(long *)this + 0x10) + 0xa9c) == 0)) {\\n      uVar9 = ShipManager::ContainsMindControlledEnemy(*(ShipManager **)(*(long *)this + 0x10));\\n    }\\n    *(undefined1 *)(lVar21 + 0x4faa) = uVar9;\\n    ShipManager::ClearStatus(*(ShipManager **)(*(long *)this + 0x10),2);\\n    ShipManager::ClearStatus(*(ShipManager **)(*(long *)this + 0x10),6);\\n    ShipManager::ClearStatus(*(ShipManager **)(*(long *)this + 0x10),1);\\n  }\\n  else {\\n    local_180 = this + 0x1738;\\n    local_100 = 0;\\n    local_38 = 0;\\n    local_188 = 0;\\n    local_190 = 0;\\n    local_f8 = this_01;\\n    do {\\n      uVar20 = local_190;\\n      pSVar12 = (ShipSystem *)ShipManager::GetSystem(this_03,1);\\n      iVar10 = ShipSystem::GetPowerCap(pSVar12);\\n      if (iVar10 == 0) {\\nLAB_1001e4a80:\\n        iVar10 = ShipManager::CountCrew\\n                           (*(ShipManager **)(*(long *)(*(long *)pWVar25 + uVar20 * 8) + 0x10),true)\\n        ;\\n        bVar8 = iVar10 == 0;\\n      }\\n      else {\\n        pSVar12 = (ShipSystem *)ShipManager::GetSystem(*(ShipManager **)(*(long *)this + 0x10),6);\\n        iVar10 = ShipSystem::GetPowerCap(pSVar12);\\n        if ((iVar10 == 0) || (*(int *)(*(long *)(*(long *)this + 0x10) + 0x690) < 1))\\n        goto LAB_1001e4a80;\\n        bVar8 = false;\\n      }\\n      ShipAI::SetStalemate((ShipAI *)(*(long *)(*(long *)(this + 0x4c0) + uVar20 * 8) + 0x30),bVar8)\\n      ;\\n      (**(code **)(**(long **)(*(long *)(this + 0x4c0) + uVar20 * 8) + 0x10))();\\n      local_88 = (undefined1  [16])0x0;\\n      local_78 = (void *)0x0;\\n      cVar7 = (**(code **)(**(long **)(*(long *)this + 0x10) + 0x80))();\\n      local_40 = uVar20;\\n      if (cVar7 == '\\\\0') {\\n        lVar21 = *(long *)this;\\n        this_02 = (ShipAI *)(*(long *)(*(long *)(this + 0x4c0) + uVar20 * 8) + 0x30);\\n        bVar8 = (bool)ShipAI::RequiredEvac(this_02);\\n        iVar10 = CrewAI::ReadyForEvac((CrewAI *)(lVar21 + 0x40),bVar8);\\n        ShipAI::SetEvacRequest(this_02,iVar10);\\n        lVar21 = *(long *)this;\\n        lVar26 = *(long *)(*(long *)(this + 0x4c0) + local_40 * 8);\\n        bVar8 = (bool)ShipAI::RequiredEvac((ShipAI *)(lVar21 + 0x30));\\n        uVar23 = local_40;\\n        iVar10 = CrewAI::ReadyForEvac((CrewAI *)(lVar26 + 0x40),bVar8);\\n        ShipAI::SetEvacRequest((ShipAI *)(lVar21 + 0x30),iVar10);\\n        cVar7 = (**(code **)(**(long **)(*(long *)(this + 0x4c0) + uVar23 * 8) + 0x20))();\\n        uVar20 = *(ulong *)(this + 0x4c0);\\n        lVar21 = *(long *)(uVar20 + uVar23 * 8);\\n        if (cVar7 == '\\\\0') {\\n          cVar7 = ShipAI::Surrender((ShipAI *)(lVar21 + 0x30));\\n          if ((cVar7 == '\\\\0') ||\\n             (cVar7 = (**(code **)(**(long **)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10) +\\n                                  0x80))(), cVar7 != '\\\\0')) {\\n            cVar7 = ShipAI::GetStalemate\\n                              ((ShipAI *)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x30));\\n            if ((cVar7 == '\\\\0') ||\\n               (cVar7 = (**(code **)(**(long **)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10) +\\n                                    0x80))(), cVar7 != '\\\\0')) {\\n              cVar7 = ShipAI::Escape((ShipAI *)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x30));\\n              if (cVar7 != '\\\\0') {\\n                pLVar13 = (LocationEvent *)\\n                          EventGenerator::GetBaseEvent\\n                                    ((EventGenerator *)&EventGenerator::Generator,\\n                                     (string *)(this + 0x1608),*(int *)(this + 0xa20),false,\\n                                     *(int *)(this + 0x16dc));\\n                std::string::operator=((string *)local_88,(string *)(this + 0x1608));\\n                if (pLVar13 != (LocationEvent *)0x0) goto LAB_1001e5e30;\\n                ShipAI::CancelEscape((ShipAI *)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x30));\\n                goto LAB_1001e4aec;\\n              }\\n              cVar7 = CompleteShip::DeadCrew(*(CompleteShip **)(*(long *)pWVar25 + uVar23 * 8));\\n              if ((((cVar7 != '\\\\0') &&\\n                   (cVar7 = (**(code **)(**(long **)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10\\n                                                    ) + 0x88))(), cVar7 == '\\\\0')) &&\\n                  (plVar2 = *(long **)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10),\\n                  *(char *)((long)plVar2 + 0x1c) != '\\\\0')) &&\\n                 (cVar7 = (**(code **)(*plVar2 + 0x80))(), cVar7 == '\\\\0')) {\\n                local_60 = (LocationEvent *)\\n                           EventGenerator::GetBaseEvent\\n                                     ((EventGenerator *)&EventGenerator::Generator,\\n                                      (string *)(this + 0x1638),*(int *)(this + 0xa20),false,\\n                                      *(int *)(this + 0x16dc));\\n                std::string::operator=((string *)local_88,(string *)(this + 0x1638));\\n                iVar10 = ShipManager::CountCrew(*(ShipManager **)(*(long *)this + 0x10),false);\\n                iVar11 = ShipManager::CountCrew\\n                                   (*(ShipManager **)\\n                                     (*(long *)(*(long *)(this + 0x4c0) + uVar23 * 8) + 0x10),true);\\n                if ((iVar10 < 1) && (iVar11 == 1)) {\\n                  local_358 = 0x26;\\n                  uStack_34f = 0x565255535f5349;\\n                  uStack_348 = 0x49;\\n                  uStack_357 = 0x544e414d5f484341;\\n                  uStack_345 = 0x52;\\n                  uStack_347 = 0x4f56;\\n                  uStack_344 = 0;\\n                  AchievementTracker::SetAchievement\\n                            ((AchievementTracker *)&AchievementTracker::Tracker,&local_358,0,1);\\n                  if ((local_358 & 1) != 0) {\\n                    operator_delete((void *)CONCAT44(uStack_344,\\n                                                     CONCAT13(uStack_345,\\n                                                              CONCAT21(uStack_347,uStack_348))));\\n                  }\\n                }\\n                ScoreKeeper::AddDefeatedShips((ScoreKeeper *)&ScoreKeeper::Keeper);\\n                local_328 = (void *)0x0;\\n                local_338._1_8_ = 0x6572635f64616564;\\n                local_338[0] = 0x12;\\n                local_338[9] = 0x77;\\n                local_338._10_6_ = 0;\\n                AchievementTracker::SetFlag\\n                          ((AchievementTracker *)&AchievementTracker::Tracker,local_338);\\n                if ((local_338[0] & 1) != 0) {\\n                  operator_delete(local_328);\\n                }\\n                local_148 = (void *)0x0;\\n                local_158._1_8_ = 0x6572635f64616564;\\n                local_158[0] = 0x12;\\n                local_158[9] = 0x77;\\n                local_158._10_6_ = 0;\\n                uVar14 = AchievementTracker::GetFlagValue\\n                                   ((AchievementTracker *)&AchievementTracker::Tracker);\\n                if ((int)uVar14 < 0x14) {\\n                  local_38 = CONCAT71((int7)((ulong)uVar14 >> 8),1);\\n                  pLVar13 = local_60;\\n                  if ((local_158[0] & 1) != 0) {\\n                    operator_delete(local_148);\\n                    pLVar13 = local_60;\\n                  }\\n                }\\n                else {\\n                  iVar10 = *(int *)(this + 0xa20);\\n                  if ((local_158[0] & 1) != 0) {\\n                    operator_delete(local_148);\\n                    uVar14 = extraout_RAX;\\n                  }\\n                  local_38 = CONCAT71((int7)((ulong)uVar14 >> 8),1);\\n                  pLVar13 = local_60;\\n                  if (iVar10 < 6) {\\n                    uStack_302 = 0;\\n                    local_318 = 0x28;\\n                    uStack_30f = 0x574552435f5349;\\n                    uStack_308 = 0x5f;\\n                    uStack_317 = 0x544e414d5f484341;\\n                    uStack_307 = 0x44414544;\\n                    uStack_303 = 0;\\n                    AchievementTracker::SetAchievement\\n                              ((AchievementTracker *)&AchievementTracker::Tracker,&local_318,0,1);\\n                    pLVar13 = local_60;\\n                    if ((local_318 & 1) != 0) {\\n                      operator_delete((void *)CONCAT26(uStack_302,\\n                                                       CONCAT15(uStack_303,\\n                                                                CONCAT41(uStack_307,uStack_308))));\\n                      pLVar13 = local_60;\\n                    }\\n                  }\\n                }\\n                goto joined_r0x0001001e5b7f;\\n              }\\n              cVar7 = ShipAI::Destroyed((ShipAI *)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x30))\\n              ;\\n              if (cVar7 == '\\\\0') goto LAB_1001e4aec;\\n              iVar10 = ShipManager::CountCrew\\n                                 (*(ShipManager **)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10)\\n                                  ,true);\\n              if (0 < iVar10) {\\n                local_2e8 = (void *)0x0;\\n                uVar20 = 0x6572635f74736f6c;\\n                local_2f8._1_8_ = 0x6572635f74736f6c;\\n                local_2f8[0] = 0x12;\\n                local_2f8[9] = 0x77;\\n                local_2f8._10_6_ = 0;\\n                AchievementTracker::SetFlag((AchievementTracker *)&AchievementTracker::Tracker);\\n                if ((local_2f8[0] & 1) != 0) {\\n                  operator_delete(local_2e8);\\n                }\\n              }\\n              cVar7 = ShipAI::Escaped((ShipAI *)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x30));\\n              if (cVar7 == '\\\\0') {\\n                ShipManager::KillEveryone\\n                          (*(ShipManager **)(*(long *)(*(long *)(this + 0x4c0) + uVar23 * 8) + 0x10)\\n                           ,false);\\n                ShipManager::GetWeaponList();\\n                lVar21 = CONCAT71(uStack_57,local_58);\\n                lVar26 = CONCAT71(uStack_4f,sStack_50);\\n                uVar23 = (ulong)local_60 >> 0x20;\\n                local_60 = (LocationEvent *)(uVar23 << 0x20);\\n                uVar24 = local_38 >> 0x20;\\n                local_38 = uVar24 << 0x20;\\n                local_90 = 0;\\n                if (lVar26 != lVar21) {\\n                  local_90 = 0;\\n                  local_38 = uVar24 << 0x20;\\n                  local_60 = (LocationEvent *)(uVar23 << 0x20);\\n                  uVar23 = 0;\\n                  uVar24 = 1;\\n                  do {\\n                    lVar3 = *(long *)(lVar21 + uVar23 * 8);\\n                    iVar10 = *(int *)(lVar3 + 0x740);\\n                    uVar19 = (int)CONCAT71((int7)(uVar20 >> 8),1);\\n                    if (iVar10 < 2) {\\n                      uVar19 = (undefined4)local_38;\\n                    }\\n                    local_38 = CONCAT44(local_38._4_4_,uVar19);\\n                    if ((0 < iVar10) &&\\n                       (lVar3 = *(long *)(lVar3 + 0x20), *(int *)(lVar3 + 0xd0) != 1)) {\\n                      uVar14 = std::string::compare((char *)(lVar3 + 8));\\n                      if ((int)uVar14 != 0) {\\n                        local_90 = (undefined4)CONCAT71((int7)((ulong)uVar14 >> 8),1);\\n                      }\\n                      lVar21 = CONCAT71(uStack_57,local_58);\\n                      lVar26 = CONCAT71(uStack_4f,sStack_50);\\n                    }\\n                    local_60 = (LocationEvent *)CONCAT44(local_60._4_4_,(int)local_60 + iVar10);\\n                    uVar20 = lVar26 - lVar21 >> 3;\\n                    bVar8 = uVar24 < uVar20;\\n                    uVar23 = uVar24;\\n                    uVar24 = (ulong)((int)uVar24 + 1);\\n                  } while (bVar8);\\n                }\\n                ShipManager::GetArtilleryWeapons();\\n                iVar10 = 0;\\n                if (stack0xffffffffffffff20 - local_e8._0_8_ != 0) {\\n                  uVar20 = 0;\\n                  uVar22 = 1;\\n                  iVar10 = 0;\\n                  do {\\n                    iVar10 = iVar10 + *(int *)(*(long *)(local_e8._0_8_ + uVar20 * 8) + 0x740);\\n                    uVar20 = (ulong)uVar22;\\n                    uVar22 = uVar22 + 1;\\n                  } while (uVar20 < (ulong)(stack0xffffffffffffff20 - local_e8._0_8_ >> 3));\\n                }\\n                ShipManager::GetDroneList();\\n                local_104 = iVar10;\\n                local_f0 = pWVar25;\\n                if (local_c8._8_8_ == local_c8._0_8_) {\\n                  local_94 = 0;\\n                }\\n                else {\\n                  local_94 = 0;\\n                  uVar20 = 0;\\n                  uVar23 = 1;\\n                  do {\\n                    std::string::string(&local_b0,\\n                                        (string *)\\n                                        (*(long *)(*(long *)(local_c8._0_8_ + uVar20 * 8) + 0x20) +\\n                                        0xd8));\\n                    if ((*(char *)(*(long *)(local_c8._0_8_ + uVar20 * 8) + 0x30) != '\\\\0') &&\\n                       ((uVar14 = std::string::compare((char *)&local_b0), (int)uVar14 == 0 ||\\n                        (uVar14 = std::string::compare((char *)&local_b0), (int)uVar14 == 0)))) {\\n                      local_94 = (uint)CONCAT71((int7)((ulong)uVar14 >> 8),1);\\n                    }\\n                    if (((byte)local_b0 & 1) != 0) {\\n                      operator_delete(puStack_a0);\\n                    }\\n                    bVar8 = uVar23 < (ulong)((long)(local_c8._8_8_ - local_c8._0_8_) >> 3);\\n                    uVar20 = uVar23;\\n                    uVar23 = (ulong)((int)uVar23 + 1);\\n                  } while (bVar8);\\n                }\\n                ShipManager::GetWeaponList();\\n                if ((void *)CONCAT71(uStack_57,local_58) != (void *)0x0) {\\n                  sStack_50 = local_58;\\n                  uStack_4f = uStack_57;\\n                  operator_delete((void *)CONCAT71(uStack_57,local_58));\\n                }\\n                local_58 = local_b0;\\n                uStack_57 = uStack_af;\\n                sStack_50 = SUB81(local_a8,0);\\n                uStack_4f = (undefined7)(local_a8 >> 8);\\n                uStack_48 = SUB81(puStack_a0,0);\\n                uStack_47 = (undefined2)((ulong)puStack_a0 >> 8);\\n                uStack_45 = (undefined1)((ulong)puStack_a0 >> 0x18);\\n                uStack_44 = (undefined4)((ulong)puStack_a0 >> 0x20);\\n                iVar10 = 0;\\n                lVar21 = local_a8 - CONCAT71(uStack_af,local_b0);\\n                if (lVar21 != 0) {\\n                  uVar20 = 0;\\n                  uVar22 = 1;\\n                  iVar10 = 0;\\n                  do {\\n                    iVar10 = iVar10 + *(int *)(*(long *)(CONCAT71(uStack_af,local_b0) + uVar20 * 8)\\n                                              + 0x740);\\n                    uVar20 = (ulong)uVar22;\\n                    uVar22 = uVar22 + 1;\\n                  } while (uVar20 < (ulong)(lVar21 >> 3));\\n                }\\n                ShipManager::GetDroneList();\\n                if ((void *)local_c8._0_8_ != (void *)0x0) {\\n                  local_c8._8_8_ = local_c8._0_8_;\\n                  operator_delete((void *)local_c8._0_8_);\\n                }\\n                local_c8._0_8_ = CONCAT71(uStack_af,local_b0);\\n                local_c8._8_8_ = local_a8;\\n                local_b8 = puStack_a0;\\n                if (local_a8 == local_c8._0_8_) {\\n                  local_8c = 0;\\n                }\\n                else {\\n                  uVar22 = 1;\\n                  uVar23 = 0;\\n                  local_8c = 0;\\n                  uVar20 = local_c8._0_8_;\\n                  do {\\n                    std::string::string(&local_b0,\\n                                        (string *)\\n                                        (*(long *)(*(long *)(uVar20 + uVar23 * 8) + 0x20) + 0xd8));\\n                    iVar11 = std::string::compare((char *)&local_b0);\\n                    if (iVar11 == 0) {\\n                      lVar21 = *(long *)(*(long *)(local_c8._0_8_ + uVar23 * 8) + 0x20);\\n                      if (*(int *)(lVar21 + 0xf4) != 3) {\\n                        local_8c = (uint)CONCAT71((int7)((ulong)lVar21 >> 8),1);\\n                      }\\n                    }\\n                    if (((byte)local_b0 & 1) != 0) {\\n                      operator_delete(puStack_a0);\\n                    }\\n                    uVar23 = (ulong)uVar22;\\n                    uVar22 = uVar22 + 1;\\n                    uVar20 = local_c8._0_8_;\\n                  } while (uVar23 < (ulong)((long)(local_c8._8_8_ - local_c8._0_8_) >> 3));\\n                }\\n                uVar20 = local_40;\\n                uVar22 = local_94;\\n                iVar11 = local_104;\\n                if (((local_38 & 1) == 0) && (iVar10 < 1)) {\\n                  uStack_2c6 = 0;\\n                  local_2d8 = 0x20;\\n                  uStack_2cf = 0x54494e47494552;\\n                  uStack_2c8 = 0x45;\\n                  uStack_2d7 = 0x505f4e4f50414557;\\n                  uStack_2c7 = 0;\\n                  iVar10 = ShipObject::HasEquipment\\n                                     (*(ShipObject **)(*(long *)this + 0x10),&local_2d8);\\n                  if ((local_2d8 & 1) != 0) {\\n                    operator_delete((void *)CONCAT62(uStack_2c6,CONCAT11(uStack_2c7,uStack_2c8)));\\n                  }\\n                  if (iVar11 < 2 && iVar10 != 0) {\\n                    local_3d0 = (void *)0x0;\\n                    local_3e0 = 0x1c;\\n                    uStack_3d7 = 0x59454c4c4f56;\\n                    local_3df = 0x4e4f5f484341;\\n                    uStack_3d9 = 0x5f45;\\n                    local_3d1 = 0;\\n                    AchievementTracker::SetAchievement\\n                              ((AchievementTracker *)&AchievementTracker::Tracker,&local_3e0,0);\\n                    if ((local_3e0 & 1) != 0) {\\n                      operator_delete(local_3d0);\\n                    }\\n                  }\\n                }\\n                iVar10 = (int)local_60;\\n                if ((((int)local_60 == 0) && (0 < iVar11)) && ((uVar22 & 1) == 0)) {\\n                  uStack_2a6 = 0;\\n                  local_2b8 = 0x20;\\n                  uStack_2af = 0x434e4549544150;\\n                  uStack_2a8 = 0x45;\\n                  uStack_2b7 = 0x5f4445465f484341;\\n                  uStack_2a7 = 0;\\n                  AchievementTracker::SetAchievement\\n                            ((AchievementTracker *)&AchievementTracker::Tracker,&local_2b8,0);\\n                  if ((local_2b8 & 1) == 0) goto LAB_1001e54c4;\\n                  operator_delete((void *)CONCAT62(uStack_2a6,CONCAT11(uStack_2a7,uStack_2a8)));\\n                  pWVar25 = local_f0;\\n                  if (iVar11 == 0) goto LAB_1001e54d4;\\n                }\\n                else {\\nLAB_1001e54c4:\\n                  pWVar25 = local_f0;\\n                  if (iVar11 == 0 && iVar10 == 0) {\\nLAB_1001e54d4:\\n                    pWVar25 = local_f0;\\n                    local_298._1_8_ = 0x594c4e4f5f484341;\\n                    local_298[0] = 0x1e;\\n                    local_298._9_7_ = 0x53454e4f52445f;\\n                    local_288 = (void *)0x0;\\n                    AchievementTracker::SetAchievement\\n                              ((AchievementTracker *)&AchievementTracker::Tracker,local_298,0);\\n                    if ((local_298[0] & 1) != 0) {\\n                      operator_delete(local_288);\\n                    }\\n                  }\\n                }\\n                cVar7 = ShipManager::CheckCloakAchievement(*(ShipManager **)(*(long *)this + 0x10));\\n                if (cVar7 != '\\\\0') {\\n                  local_278 = 0x26;\\n                  uStack_26f = 0x5345445f48544c;\\n                  uStack_268 = 0x54;\\n                  uStack_277 = 0x414554535f484341;\\n                  uStack_265 = 0x59;\\n                  uStack_267 = 0x4f52;\\n                  uStack_264 = 0;\\n                  AchievementTracker::SetAchievement\\n                            ((AchievementTracker *)&AchievementTracker::Tracker,&local_278,0);\\n                  if ((local_278 & 1) != 0) {\\n                    operator_delete((void *)CONCAT44(uStack_264,\\n                                                     CONCAT13(uStack_265,\\n                                                              CONCAT21(uStack_267,uStack_268))));\\n                  }\\n                }\\n                (**(code **)(**(long **)(*(long *)this + 0x10) + 0x70))();\\n                if (0 < extraout_EDX) {\\n                  uStack_244 = 0;\\n                  local_258 = 0x24;\\n                  uStack_24f = 0x454948535f5947;\\n                  uStack_248 = 0x4c;\\n                  uStack_257 = 0x52454e455f484341;\\n                  uStack_247 = 0x5344;\\n                  uStack_245 = 0;\\n                  AchievementTracker::SetAchievement\\n                            ((AchievementTracker *)&AchievementTracker::Tracker,&local_258,0);\\n                  if ((local_258 & 1) != 0) {\\n                    operator_delete((void *)CONCAT44(uStack_244,\\n                                                     CONCAT13(uStack_245,\\n                                                              CONCAT21(uStack_247,uStack_248))));\\n                  }\\n                }\\n                if (((((byte)uVar22 | (byte)local_90) & 1) == 0) && ((local_8c & 1) != 0)) {\\n                  uStack_225 = 0;\\n                  local_238 = 0x22;\\n                  uStack_22f = 0x4c495353494d5f;\\n                  uStack_228 = 0x45;\\n                  uStack_237 = 0x4b434f525f484341;\\n                  uStack_227 = 0x53;\\n                  uStack_226 = 0;\\n                  AchievementTracker::SetAchievement\\n                            ((AchievementTracker *)&AchievementTracker::Tracker,&local_238,0);\\n                  if ((local_238 & 1) != 0) {\\n                    operator_delete((void *)CONCAT53(uStack_225,\\n                                                     CONCAT12(uStack_226,\\n                                                              CONCAT11(uStack_227,uStack_228))));\\n                  }\\n                }\\n                std::string::string(&local_b0,\\n                                    (string *)\\n                                    (*(long *)(*(long *)(*(long *)pWVar25 + uVar20 * 8) + 0x10) +\\n                                    0x888));\\n                puVar27 = puStack_a0;\\n                uVar20 = local_a8;\\n                if (((byte)local_b0 & 1) == 0) {\\n                  puVar27 = &uStack_af;\\n                  uVar20 = (ulong)((byte)local_b0 >> 1);\\n                }\\n                if (9 < (long)uVar20) {\\n                  plVar2 = (long *)((long)puVar27 + uVar20);\\n                  puVar16 = puVar27;\\n                  uVar23 = uVar20;\\n                  do {\\n                    puVar5 = puVar27;\\n                    uVar24 = uVar20;\\n                    if ((uVar23 - 9 == 0) ||\\n                       (plVar15 = _memchr(puVar16,0x52,uVar23 - 9), plVar15 == (long *)0x0)) break;\\n                    if ((*plVar15 != 0x4f43535f4b434f52) ||\\n                       (bVar8 = false, (short)plVar15[1] != 0x5455)) {\\n                      bVar8 = true;\\n                    }\\n                    if (!bVar8) {\\n                      if ((plVar15 != plVar2) && ((long)plVar15 - (long)puVar27 != -1))\\n                      goto LAB_1001e5c23;\\n                      break;\\n                    }\\n                    puVar16 = (undefined7 *)((long)plVar15 + 1);\\n                    uVar23 = (long)plVar2 - (long)puVar16;\\n                  } while (9 < (long)uVar23);\\n                  do {\\n                    puVar16 = puVar27;\\n                    if ((((long)uVar24 < 0xc) || (uVar24 - 0xb == 0)) ||\\n                       (plVar15 = _memchr(puVar5,0x52,uVar24 - 0xb), plVar15 == (long *)0x0))\\n                    goto joined_r0x0001001e5ba0;\\n                    if ((*plVar15 != 0x5353415f4b434f52) ||\\n                       (bVar8 = false, (int)plVar15[1] != 0x544c5541)) {\\n                      bVar8 = true;\\n                    }\\n                    if (!bVar8) {\\n                      if ((plVar15 != plVar2) && ((long)plVar15 - (long)puVar27 != -1))\\n                      goto LAB_1001e5c23;\\n                      goto joined_r0x0001001e5ba0;\\n                    }\\n                    puVar5 = (undefined7 *)((long)plVar15 + 1);\\n                    uVar24 = (long)plVar2 - ((long)plVar15 + 1);\\n                  } while( true );\\n                }\\nLAB_1001e5d6b:\\n                pLVar13 = (LocationEvent *)\\n                          EventGenerator::GetBaseEvent\\n                                    ((EventGenerator *)&EventGenerator::Generator,\\n                                     (string *)(this + 0x1620),*(int *)(this + 0xa20),false,\\n                                     *(int *)(this + 0x16dc));\\n                std::string::operator=((string *)local_88,(string *)(this + 0x1620));\\n                if (((byte)local_b0 & 1) != 0) {\\n                  operator_delete(puStack_a0);\\n                }\\n                uVar23 = local_40;\\n                if ((void *)local_c8._0_8_ != (void *)0x0) {\\n                  local_c8._8_8_ = local_c8._0_8_;\\n                  operator_delete((void *)local_c8._0_8_);\\n                }\\n                pWVar25 = local_f0;\\n                if ((void *)local_e8._0_8_ != (void *)0x0) {\\n                  stack0xffffffffffffff20 = local_e8._0_8_;\\n                  operator_delete((void *)local_e8._0_8_);\\n                }\\n                if ((void *)CONCAT71(uStack_57,local_58) != (void *)0x0) {\\n                  sStack_50 = local_58;\\n                  uStack_4f = uStack_57;\\n                  operator_delete((void *)CONCAT71(uStack_57,local_58));\\n                }\\n              }\\n              else {\\n                pLVar13 = (LocationEvent *)\\n                          EventGenerator::GetBaseEvent\\n                                    ((EventGenerator *)&EventGenerator::Generator,\\n                                     (string *)(this + 0x1650),*(int *)(this + 0xa20),false,\\n                                     *(int *)(this + 0x16dc));\\n                ShipManager::KillEveryone\\n                          (*(ShipManager **)(*(long *)(*(long *)(this + 0x4c0) + uVar23 * 8) + 0x10)\\n                           ,true);\\n                uVar14 = std::string::operator=((string *)local_88,(string *)(this + 0x1650));\\n                local_188 = CONCAT71((int7)((ulong)uVar14 >> 8),1);\\n              }\\n              CommandGui::ClearLocation(*(CommandGui **)(this + 0x11d0));\\n              uVar14 = ScoreKeeper::AddDefeatedShips((ScoreKeeper *)&ScoreKeeper::Keeper);\\n              local_38 = CONCAT71((int7)((ulong)uVar14 >> 8),1);\\n            }\\n            else {\\n              local_58 = (string)0x26;\\n              uStack_4f = 0x45525255535f45;\\n              uStack_48 = 0x4e;\\n              uStack_57 = 0x414d454c415453;\\n              sStack_50 = (string)0x54;\\n              uStack_45 = 0x52;\\n              uStack_47 = 0x4544;\\n              uStack_44 = 0;\\n              pLVar13 = (LocationEvent *)\\n                        EventGenerator::GetBaseEvent\\n                                  ((EventGenerator *)&EventGenerator::Generator,&local_58,0,false,-1\\n                                  );\\n              if (((byte)local_58 & 1) != 0) {\\n                operator_delete((void *)CONCAT44(uStack_44,\\n                                                 CONCAT13(uStack_45,CONCAT21(uStack_47,uStack_48))))\\n                ;\\n              }\\n              std::string::assign(local_88);\\n            }\\n          }\\n          else {\\n            pLVar13 = (LocationEvent *)\\n                      EventGenerator::GetBaseEvent\\n                                ((EventGenerator *)&EventGenerator::Generator,\\n                                 (string *)(this + 0x15f0),*(int *)(this + 0xa20),false,\\n                                 *(int *)(this + 0x16dc));\\n            std::string::operator=((string *)local_88,(string *)(this + 0x15f0));\\n          }\\njoined_r0x0001001e5b7f:\\n          if (pLVar13 == (LocationEvent *)0x0) goto LAB_1001e4aec;\\n        }\\n        else {\\n          if (*(char *)(*(long *)(lVar21 + 0x10) + 0x1c) == '\\\\0') {\\n            pLVar13 = (LocationEvent *)0x0;\\n          }\\n          else {\\n            pLVar13 = (LocationEvent *)BossShip::GetSubEvent(*(BossShip **)(this + 8));\\n          }\\n          if (((*(int *)(*(long *)(this + 8) + 0x1ec) == 3) &&\\n              (cVar7 = (**(code **)(**(long **)(*(long *)(this + 8) + 0x10) + 0x88))(),\\n              cVar7 != '\\\\0')) &&\\n             ((*(char *)(*(long *)(*(long *)(this + 8) + 0x10) + 0x695) == '\\\\0' ||\\n              (cVar7 = Ship::DestroyedDone((Ship *)(*(long *)(*(long *)(this + 8) + 0x10) + 0x118)),\\n              cVar7 == '\\\\0')))) {\\n            CommandGui::SetBossDead(*(CommandGui **)(this + 0x11d0),true);\\n          }\\n          cVar7 = StarMap::CheckGameOver(local_f8);\\n          if (cVar7 != '\\\\0') {\\n            pLVar13 = (LocationEvent *)0x0;\\n          }\\n          if (pLVar13 == (LocationEvent *)0x0) goto LAB_1001e4aec;\\n          if (pLVar13[0x20] == (LocationEvent)0x0) {\\n            CommandGui::ClearLocation(*(CommandGui **)(this + 0x11d0));\\n            cVar7 = BossShip::Defeated(*(BossShip **)(this + 8));\\n            if (cVar7 == '\\\\0') {\\n              uVar14 = StarMap::ForceBossJump(local_f8);\\n            }\\n            else {\\n              StarMap::ClearBoss(local_f8);\\n              uVar14 = CommandGui::Victory(*(CommandGui **)(this + 0x11d0));\\n            }\\n            local_38 = CONCAT71((int7)((ulong)uVar14 >> 8),1);\\n          }\\n        }\\nLAB_1001e5e30:\\n        bVar8 = pLVar13 == (LocationEvent *)0x0;\\nLAB_1001e5e37:\\n        if (*(char *)(*(long *)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10) + 0x1c) != '\\\\0') {\\n          uVar20 = (ulong)((byte)local_88[0] >> 1);\\n          if (((byte)local_88[0] & 1) != 0) {\\n            uVar20 = local_88._8_8_;\\n          }\\n          if (uVar20 != 0) {\\n            std::string::operator=((string *)local_180,(string *)local_88);\\n            *(undefined4 *)(this + 0x1798) = 0xffffffff;\\n            *(undefined8 *)(this + 0x1728) = *(undefined8 *)(this + 0x1720);\\n          }\\n          UpdateLocation(this,pLVar13);\\n        }\\n      }\\n      else {\\nLAB_1001e4aec:\\n        cVar7 = TutorialManager::Running((TutorialManager *)&TutorialManager::Tutorial);\\n        bVar8 = true;\\n        uVar23 = local_40;\\n        if ((cVar7 != '\\\\0') &&\\n           (pLVar13 = (LocationEvent *)\\n                      TutorialManager::GetEvent((TutorialManager *)&TutorialManager::Tutorial),\\n           uVar23 = local_40, pLVar13 != (LocationEvent *)0x0)) {\\n          bVar8 = false;\\n          goto LAB_1001e5e37;\\n        }\\n      }\\n      lVar21 = *(long *)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10);\\n      if (*(char *)(lVar21 + 0x1c) != '\\\\0') {\\n        local_100 = CONCAT71((int7)((ulong)lVar21 >> 8),1);\\n      }\\n      if (((local_38 & 1) == 0) && ((local_100 & 1) != 0)) {\\nLAB_1001e5fd0:\\n        lVar21 = *(long *)(this + 0x11d8);\\n        iVar10 = *(int *)(lVar21 + 0x74c);\\n      }\\n      else {\\n        if (((local_188 & 1) == 0) &&\\n           (((local_100 & 1) != 0 &&\\n            (iVar10 = ShipManager::CountCrew(*(ShipManager **)(*(long *)this + 0x10),false),\\n            iVar10 < 1)))) {\\n          local_1f8._1_8_ = 0x41564e495f484341;\\n          local_1f8[0] = 0x1e;\\n          local_1f8._9_7_ = 0x504948535f4544;\\n          local_1e8 = (void *)0x0;\\n          AchievementTracker::SetAchievement\\n                    ((AchievementTracker *)&AchievementTracker::Tracker,local_1f8,0,1);\\n          if ((local_1f8[0] & 1) != 0) {\\n            operator_delete(local_1e8);\\n          }\\n        }\\n        ShipManager::SetTarget(*(ShipManager **)(*(long *)this + 0x10),(ShipManager *)0x0);\\n        *(undefined1 *)(*(long *)(*(long *)(*(long *)(this + 0x4c0) + uVar23 * 8) + 0x10) + 0x1c) =\\n             0;\\n        lVar21 = *(long *)(this + 0x11d8);\\n        if (*(int *)(lVar21 + 0x74c) != 1) {\\n          *(undefined1 *)(lVar21 + 0x420) = 0;\\n          *(undefined1 *)(lVar21 + 0x20) = 0;\\n        }\\n        if ((((!bVar8) ||\\n             (iVar10 = ShipManager::CountCrew(*(ShipManager **)(*(long *)this + 0x10),false),\\n             0 < iVar10)) ||\\n            (iVar10 = ShipManager::CountCrew\\n                                (*(ShipManager **)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10),\\n                                 true), iVar10 < 1)) ||\\n           (iVar10 = ShipManager::GetSystemHealth(*(ShipManager **)(*(long *)this + 0x10),9),\\n           iVar10 != 0)) goto LAB_1001e5fd0;\\n        ShipManager::GetCrewList();\\n        lVar21 = CONCAT71(uStack_57,local_58);\\n        if (CONCAT71(uStack_4f,sStack_50) != lVar21) {\\n          uVar20 = 0;\\n          uVar23 = 1;\\n          do {\\n            cVar7 = (**(code **)(**(long **)(lVar21 + uVar20 * 8) + 0x110))();\\n            if (((cVar7 == '\\\\0') &&\\n                (plVar2 = *(long **)(CONCAT71(uStack_57,local_58) + uVar20 * 8), (int)plVar2[1] == 0\\n                )) && (cVar7 = (**(code **)(*plVar2 + 0x60))(), cVar7 == '\\\\0')) {\\n              CrewMember::EmptySlot(*(CrewMember **)(CONCAT71(uStack_57,local_58) + uVar20 * 8));\\n              pCVar28 = *(CompleteShip **)this;\\n              pCVar18 = *(CrewMember **)(CONCAT71(uStack_57,local_58) + uVar20 * 8);\\n              iVar10 = ShipManager::GetSystemRoom(*(ShipManager **)(pCVar28 + 0x10),6);\\n              CompleteShip::AddCrewMember(pCVar28,pCVar18,iVar10);\\n            }\\n            lVar21 = CONCAT71(uStack_57,local_58);\\n            bVar8 = uVar23 < (ulong)(CONCAT71(uStack_4f,sStack_50) - lVar21 >> 3);\\n            uVar20 = uVar23;\\n            uVar23 = (ulong)((int)uVar23 + 1);\\n          } while (bVar8);\\n        }\\n        local_d8 = (void *)0x0;\\n        local_e8._1_8_ = 0x5554535f57455243;\\n        local_e8[0] = (string)0x14;\\n        uStack_df = 0x4b43;\\n        uStack_dd = 0;\\n        pLVar13 = (LocationEvent *)\\n                  EventGenerator::GetBaseEvent\\n                            ((EventGenerator *)&EventGenerator::Generator,(string *)local_e8,\\n                             *(int *)(this + 0xa20),false,-1);\\n        if (((byte)local_e8[0] & 1) != 0) {\\n          operator_delete(local_d8);\\n        }\\n        std::string::assign((char *)local_180);\\n        *(undefined8 *)(this + 0x1728) = *(undefined8 *)(this + 0x1720);\\n        *(undefined4 *)(this + 0x1798) = 0xffffffff;\\n        CreateChoiceBox(this,pLVar13);\\n        *(LocationEvent **)(this + 0x11e0) = pLVar13;\\n        if ((void *)CONCAT71(uStack_57,local_58) != (void *)0x0) {\\n          sStack_50 = local_58;\\n          uStack_4f = uStack_57;\\n          operator_delete((void *)CONCAT71(uStack_57,local_58));\\n        }\\n        lVar21 = *(long *)(this + 0x11d8);\\n        iVar10 = *(int *)(lVar21 + 0x74c);\\n        uVar23 = local_40;\\n      }\\n      if (iVar10 != 1) {\\n        *(undefined1 *)(lVar21 + 0x420) =\\n             *(undefined1 *)(*(long *)(*(long *)(*(long *)pWVar25 + uVar23 * 8) + 0x10) + 0x1c);\\n      }\\n      if (((byte)local_88[0] & 1) != 0) {\\n        operator_delete(local_78);\\n      }\\n      local_190 = (ulong)((int)local_190 + 1);\\n      this_03 = *(ShipManager **)(*(long *)this + 0x10);\\n    } while (local_190 < (ulong)(*(long *)(this + 0x4c8) - *(long *)(this + 0x4c0) >> 3));\\n    ShipManager::SetBoostFTL(this_03,false);\\n    if ((local_100 & 1) == 0) goto LAB_1001e6057;\\n    lVar21 = *(long *)(this + 0x11d0);\\n    cVar7 = SpaceManager::DangerousEnvironment(this_00);\\n    if ((cVar7 == '\\\\0') && (*(int *)(*(ShipManager **)(*(long *)this + 0x10) + 0xa9c) == 0)) {\\n      ShipManager::ContainsMindControlledEnemy(*(ShipManager **)(*(long *)this + 0x10));\\n    }\\n    *(undefined1 *)(lVar21 + 0x4faa) = 1;\\n  }\\n  CheckLoadEvent(this);\\n  CheckMusic(this);\\n  iVar10 = *(int *)(this + 6000);\\n  iVar11 = CrewMemberFactory::GetPlayerCrewCount((CrewMemberFactory *)&CrewMemberFactory::Factory);\\n  if ((iVar10 == iVar11) &&\\n     (*(int *)(this + 0x1778) == *(int *)(*(long *)(*(long *)this + 0x10) + 0x188))) {\\n    local_1c8 = (void *)0x0;\\n    local_1d8._1_8_ = 0x635f64656c6c696b;\\n    local_1d8[0] = 0x16;\\n    local_1d8._9_4_ = 0x776572;\\n    local_1d8._13_3_ = 0;\\n    iVar11 = AchievementTracker::GetFlagValue\\n                       ((AchievementTracker *)&AchievementTracker::Tracker,local_1d8);\\n    iVar10 = *(int *)(this + 0x1774);\\n    if ((local_1d8[0] & 1) != 0) {\\n      operator_delete(local_1c8);\\n    }\\n    if (4 < iVar11 - iVar10) {\\n      uStack_122 = 0;\\n      local_138 = 0x28;\\n      uStack_12f = 0x55414c535f5349;\\n      uStack_128 = 0x47;\\n      uStack_137 = 0x544e414d5f484341;\\n      uStack_127 = 0x52455448;\\n      uStack_123 = 0;\\n      AchievementTracker::SetAchievement\\n                ((AchievementTracker *)&AchievementTracker::Tracker,&local_138,0,1);\\n      if ((local_138 & 1) != 0) {\\n        operator_delete((void *)CONCAT26(uStack_122,\\n                                         CONCAT15(uStack_123,CONCAT41(uStack_127,uStack_128))));\\n      }\\n    }\\n  }\\n  iVar10 = EventSystem::PollEvent((EventSystem *)&EventSystem::EventManager,0xd);\\n  if ((((iVar10 != 0) && (cVar7 = CommandGui::CanSave(), cVar7 != '\\\\0')) &&\\n      (cVar7 = TutorialManager::Running((TutorialManager *)&TutorialManager::Tutorial),\\n      cVar7 == '\\\\0')) &&\\n     (cVar7 = CommandGui::IsGameOver(*(CommandGui **)(this + 0x11d0)), cVar7 == '\\\\0')) {\\n    SaveGame(this);\\n  }\\n  cVar7 = (**(code **)(**(long **)(*(long *)this + 0x10) + 0x80))();\\n  if (cVar7 != '\\\\0') {\\n    *(undefined8 *)(this + 0x1728) = *(undefined8 *)(this + 0x1720);\\n    *(undefined4 *)(this + 0x1798) = 0xffffffff;\\n    local_88 = (undefined1  [16])0x0;\\n    local_78 = (undefined8 *)0x0;\\n    local_70 = 1;\\n    pWVar1 = this + 0x1750;\\n    if (((byte)this[0x1750] & 1) == 0) {\\n      *(undefined2 *)pWVar1 = 0;\\n    }\\n    else {\\n      **(undefined1 **)(this + 0x1760) = 0;\\n      *(undefined8 *)(this + 0x1758) = 0;\\n    }\\n    std::string::reserve((ulong)pWVar1);\\n    *(undefined8 **)(this + 0x1760) = local_78;\\n    *(undefined8 *)(this + 0x1758) = local_88._8_8_;\\n    *(undefined8 *)pWVar1 = local_88._0_8_;\\n    this[0x1768] = (WorldManager)0x1;\\n  }\\n  local_88 = (undefined1  [16])0x0;\\n  local_78 = (undefined8 *)0x0;\\n  if (*(long **)(this + 0x4c0) == *(long **)(this + 0x4c8)) {\\n    uVar14 = 0;\\n  }\\n  else {\\n    uVar14 = *(undefined8 *)(*(long *)(**(long **)(this + 0x4c0) + 0x10) + 0x68);\\n  }\\n  puVar17 = operator_new(8);\\n  local_78 = puVar17 + 1;\\n  *puVar17 = uVar14;\\n  uVar14 = *(undefined8 *)(*(long *)(*(long *)this + 0x10) + 0x68);\\n  local_88._0_8_ = puVar17;\\n  local_88._8_8_ = local_78;\\n  local_88._0_8_ = operator_new(0x10);\\n  *(undefined8 *)(local_88._0_8_ + 8) = uVar14;\\n  *(undefined8 *)local_88._0_8_ = *puVar17;\\n  local_78 = (undefined8 *)(local_88._0_8_ + 0x10);\\n  local_88._8_8_ = local_78;\\n  operator_delete(puVar17);\\n  if (*(undefined8 **)(this + 0x4c0) != *(undefined8 **)(this + 0x4c8)) {\\n    if (*(CloneSystem **)local_88._0_8_ != (CloneSystem *)0x0) {\\n      pCVar28 = (CompleteShip *)**(undefined8 **)(this + 0x4c0);\\n      pCVar18 = (CrewMember *)CloneSystem::CloneReady(*(CloneSystem **)local_88._0_8_);\\n      iVar10 = ShipManager::GetSystemRoom(*(ShipManager **)(**(long **)pWVar25 + 0x10),0xd);\\n      CompleteShip::AddCrewMember(pCVar28,pCVar18,iVar10);\\n    }\\n  }\\n  if (*(CloneSystem **)(local_88._0_8_ + 8) == (CloneSystem *)0x0) {\\n    if ((*(undefined8 **)(this + 0x4c0) == *(undefined8 **)(this + 0x4c8)) ||\\n       (*(CloneSystem **)(local_88._0_8_ + 8) == (CloneSystem *)0x0)) goto LAB_1001e648a;\\n    pCVar28 = (CompleteShip *)**(undefined8 **)(this + 0x4c0);\\n    pCVar18 = (CrewMember *)CloneSystem::CloneReady(*(CloneSystem **)(local_88._0_8_ + 8));\\n    lVar21 = **(long **)pWVar25;\\n  }\\n  else {\\n    pCVar28 = *(CompleteShip **)this;\\n    pCVar18 = (CrewMember *)CloneSystem::CloneReady(*(CloneSystem **)(local_88._0_8_ + 8));\\n    lVar21 = *(long *)this;\\n  }\\n  iVar10 = ShipManager::GetSystemRoom(*(ShipManager **)(lVar21 + 0x10),0xd);\\n  CompleteShip::AddCrewMember(pCVar28,pCVar18,iVar10);\\nLAB_1001e648a:\\n  CrewMemberFactory::OnLoop((CrewMemberFactory *)&CrewMemberFactory::Factory);\\n  if ((void *)local_88._0_8_ != (void *)0x0) {\\n    local_88._8_8_ = local_88._0_8_;\\n    operator_delete((void *)local_88._0_8_);\\n  }\\n  return;\\njoined_r0x0001001e5ba0:\\n  if (((long)uVar20 < 10) ||\\n     ((uVar20 - 9 == 0 || (plVar15 = _memchr(puVar16,0x52,uVar20 - 9), plVar15 == (long *)0x0))))\\n  goto LAB_1001e5d6b;\\n  if ((*plVar15 != 0x4749465f4b434f52) || (bVar8 = false, (short)plVar15[1] != 0x5448)) {\\n    bVar8 = true;\\n  }\\n  if (!bVar8) {\\n    if ((plVar15 != plVar2) && ((long)plVar15 - (long)puVar27 != -1)) {\\nLAB_1001e5c23:\\n      local_3b8 = (void *)0x0;\\n      local_3c8 = 0x1c;\\n      uStack_3bf = 0x6b636f725f64;\\n      local_3c7 = 0x6f7274736564;\\n      uStack_3c1 = 0x6579;\\n      local_3b9 = 0;\\n      AchievementTracker::SetFlag((AchievementTracker *)&AchievementTracker::Tracker,&local_3c8);\\n      if ((local_3c8 & 1) != 0) {\\n        operator_delete(local_3b8);\\n      }\\n      local_3a0 = (void *)0x0;\\n      local_3b0 = 0x1c;\\n      uStack_3a7 = 0x6b636f725f64;\\n      local_3af = 0x6f7274736564;\\n      uStack_3a9 = 0x6579;\\n      local_3a1 = 0;\\n      iVar10 = AchievementTracker::GetFlagValue\\n                         ((AchievementTracker *)&AchievementTracker::Tracker,&local_3b0);\\n      if ((local_3b0 & 1) != 0) {\\n        operator_delete(local_3a0);\\n      }\\n      if (9 < iVar10) {\\n        uStack_205 = 0;\\n        local_218 = 0x22;\\n        uStack_20f = 0x414c435f4c4154;\\n        uStack_208 = 0x53;\\n        uStack_217 = 0x535952435f484341;\\n        uStack_207 = 0x48;\\n        uStack_206 = 0;\\n        AchievementTracker::SetAchievement\\n                  ((AchievementTracker *)&AchievementTracker::Tracker,&local_218,0);\\n        if ((local_218 & 1) != 0) {\\n          operator_delete((void *)CONCAT53(uStack_205,\\n                                           CONCAT12(uStack_206,CONCAT11(uStack_207,uStack_208))));\\n        }\\n      }\\n    }\\n    goto LAB_1001e5d6b;\\n  }\\n  uVar20 = (long)plVar2 - ((long)plVar15 + 1);\\n  puVar16 = (undefined7 *)((long)plVar15 + 1);\\n  goto joined_r0x0001001e5ba0;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_fK60AZnyF2kPVmjI7aPax9Uy",
+          "type": "function",
+          "function": {
+            "name": "get_xrefs_to",
+            "arguments": "{\"address\":\"0x10019f4e0\",\"reason\":\"Find callers of EventGenerator::GetBaseEvent (wrapper around GetEvent) to identify contexts.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_fK60AZnyF2kPVmjI7aPax9Uy",
+      "content": "[{\"from_address\": \"0x10036822b\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x100001ee0\", \"from_function\": \"GetEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100002233\", \"from_function\": \"GetSubEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100002320\", \"from_function\": \"GetSubEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000023ca\", \"from_function\": \"GetSubEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd06f\", \"from_function\": \"TurnIntoFleetLocation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd111\", \"from_function\": \"TurnIntoFleetLocation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd2b1\", \"from_function\": \"SetupNoFuel\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd45f\", \"from_function\": \"SetupNoFuel\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001dadec\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001db035\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001db096\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cb57e\", \"from_function\": \"LoadGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cc125\", \"from_function\": \"GenerateMap\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cc587\", \"from_function\": \"GenerateMap\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001ccbf0\", \"from_function\": \"GenerateMap\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001ccc7d\", \"from_function\": \"GenerateMap\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001c8dd2\", \"from_function\": \"AddQuest\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001ce7ab\", \"from_function\": \"GenerateEvents\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cebcf\", \"from_function\": \"GenerateEvents\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cecbf\", \"from_function\": \"GenerateEvents\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cf817\", \"from_function\": \"GenerateNebulas\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cf9fd\", \"from_function\": \"GenerateNebulas\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd982\", \"from_function\": \"NewGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001cd9e3\", \"from_function\": \"NewGame\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001df285\", \"from_function\": \"ModifyResources\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001df3d9\", \"from_function\": \"ModifyResources\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001df4b2\", \"from_function\": \"ModifyResources\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001dfb5e\", \"from_function\": \"ModifyResources\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001dfee2\", \"from_function\": \"ModifyResources\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e1d0b\", \"from_function\": \"CheckLoadEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e4c95\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e4e9d\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e4eff\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e4f7b\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e588f\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e5d8c\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e4996\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100047d01\", \"from_function\": \"GetEvent\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e30c9\", \"from_function\": \"TestBlueprints\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_rZ4sWJ6PhL1j8E2jFnZP4boN",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\":\"0x100002233\",\"reason\":\"Decompile BossShip::GetSubEvent which calls EventGenerator::GetBaseEvent; related boss event handling.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_rZ4sWJ6PhL1j8E2jFnZP4boN",
+      "content": "{\"function\": \"GetSubEvent\", \"address\": \"0x1000021d0\", \"size\": 552, \"section\": \"__text\", \"pseudocode\": \"\\n/* WARNING: Removing unreachable block (ram,0x0001000022c1) */\\n/* BossShip::GetSubEvent() */\\n\\nlong __thiscall BossShip::GetSubEvent(BossShip *this)\\n\\n{\\n  char cVar1;\\n  undefined1 uVar2;\\n  int iVar3;\\n  long lVar4;\\n  string local_38;\\n  undefined6 uStack_37;\\n  undefined1 uStack_31;\\n  undefined1 uStack_30;\\n  undefined4 uStack_2f;\\n  undefined1 uStack_2b;\\n  undefined1 uStack_2a;\\n  undefined1 uStack_29;\\n  void *local_28;\\n  \\n  cVar1 = CompleteShip::DeadCrew((CompleteShip *)this);\\n  lVar4 = *(long *)(this + 0x10);\\n  if (cVar1 == '\\\\0') {\\n    if ((*(char *)(lVar4 + 0x695) == '\\\\0') ||\\n       (cVar1 = Ship::DestroyedDone((Ship *)(lVar4 + 0x118)), cVar1 == '\\\\0')) {\\n      return 0;\\n    }\\n    iVar3 = ShipManager::CountCrew(*(ShipManager **)(this + 0x10),true);\\n    if (0 < iVar3) {\\n      AchievementTracker::SetFlag((AchievementTracker *)&AchievementTracker::Tracker);\\n    }\\n    ShipManager::KillEveryone(*(ShipManager **)(this + 0x10),false);\\n    if (this[0x15a] == (BossShip)0x0) {\\n      if (*(int *)(this + 0x1ec) == 3) {\\n        local_38 = (string)0x1c;\\n        uStack_2f = 0x594f5254;\\n        uStack_2b = 0x45;\\n        uStack_2a = 0x44;\\n        uStack_37 = 0x445f53534f42;\\n        uStack_31 = 0x45;\\n        uStack_30 = 0x53;\\n      }\\n      else {\\n        uStack_2a = 0;\\n        local_38 = (string)0x18;\\n        uStack_37 = 0x455f53534f42;\\n        uStack_31 = 0x53;\\n        uStack_30 = 0x43;\\n        uStack_2f = 0x44455041;\\n        uStack_2b = 0;\\n      }\\n      uStack_29 = 0;\\n      local_28 = (void *)0x0;\\n      lVar4 = EventGenerator::GetBaseEvent\\n                        ((EventGenerator *)&EventGenerator::Generator,&local_38,0,false,-1);\\n      if (((byte)local_38 & 1) != 0) {\\n        operator_delete(local_28);\\n      }\\n    }\\n    else {\\n      local_28 = (void *)0x0;\\n      local_38 = (string)0x1c;\\n      uStack_2f = 0x414d454c;\\n      uStack_2b = 0x54;\\n      uStack_2a = 0x45;\\n      uStack_37 = 0x535f53534f42;\\n      uStack_31 = 0x54;\\n      uStack_30 = 0x41;\\n      uStack_29 = 0;\\n      lVar4 = EventGenerator::GetBaseEvent\\n                        ((EventGenerator *)&EventGenerator::Generator,&local_38,0,false,-1);\\n      if (((byte)local_38 & 1) != 0) {\\n        operator_delete(local_28);\\n      }\\n      *(undefined4 *)(this + 0x224) = *(undefined4 *)(this + 0x1ec);\\n    }\\n    uVar2 = 0;\\n  }\\n  else {\\n    *(undefined1 *)(lVar4 + 0x6f5) = 1;\\n    local_28 = (void *)0x0;\\n    local_38 = (string)0x1c;\\n    uStack_2f = 0x54414d4f;\\n    uStack_2b = 0x45;\\n    uStack_2a = 0x44;\\n    uStack_37 = 0x415f53534f42;\\n    uStack_31 = 0x55;\\n    uStack_30 = 0x54;\\n    uStack_29 = 0;\\n    lVar4 = EventGenerator::GetBaseEvent\\n                      ((EventGenerator *)&EventGenerator::Generator,&local_38,0,false,-1);\\n    if (((byte)local_38 & 1) != 0) {\\n      operator_delete(local_28);\\n    }\\n    uVar2 = 1;\\n  }\\n  *(undefined1 *)(lVar4 + 0x20) = uVar2;\\n  *(undefined1 *)(lVar4 + 0x420) = uVar2;\\n  return lVar4;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "user",
+      "content": "Note: Only 2 iterations remaining. Please wrap up your analysis and call conclude_analysis soon."
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_0xJOw0sJs9HrS02wadbSH0Sg",
+          "type": "function",
+          "function": {
+            "name": "conclude_analysis",
+            "arguments": "{\"get_event_addr\":\"0x10019f540\",\"get_event_signature\":\"LocationEvent* __thiscall EventGenerator::GetEvent(const std::string& eventName, int worldLevelOrSector, bool param3)\",\"get_event_purpose\":\"Looks up an event name in EventGenerator's internal maps; if known, repeatedly calls CreateEvent(...) until it returns a non-null LocationEvent*. If the name is unknown/nonexistent, logs an error and returns null.\",\"callers\":[{\"name\":\"EventGenerator::GetBaseEvent\",\"address\":\"0x10019f4e0\",\"context\":\"Wrapper that optionally seeds RNG (param_4), sets a flag at this+0x214, then calls GetEvent(eventName,param_2,param_3). Used widely to fetch events with deterministic seeds.\"},{\"name\":\"TutorialManager::GetEvent\",\"address\":\"0x100047ca0\",\"context\":\"When tutorial is running and a one-shot flag at this+0x238 is set, constructs string \\\"TUTORIAL_MISSILE\\\" and calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1).\"},{\"name\":\"BossShip::GetEvent\",\"address\":\"0x100001e70\",\"context\":\"Builds a boss event name by inserting an int-to-string into a base string, then calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); marks returned event as boss-related and pushes a StatusEffect.\"},{\"name\":\"BossShip::GetSubEvent\",\"address\":\"0x1000021d0\",\"context\":\"Chooses among boss subevent names (e.g., BOSS_* variants) based on boss stage/death state and calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1).\"},{\"name\":\"WorldManager::OnLoop\",\"address\":\"0x1001e4470\",\"context\":\"Calls TutorialManager::GetEvent() to inject tutorial events during combat resolution; also calls EventGenerator::GetBaseEvent for many combat outcome events (escape, dead crew, destroyed, etc.).\"},{\"name\":\"WorldManager::LoadGame\",\"address\":\"0x1001da810\",\"context\":\"After loading, if a flag indicates boss encounter, calls BossShip::GetEvent() and then CheckStatusEffects on the event's status effect vector.\"}],\"function_prologue_bytes\":\"55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 28 41 89 ce 89 55 d4 49 89 f7 49 89 fc 49 8d bc\",\"related_functions\":\"EventGenerator::GetBaseEvent @0x10019f4e0 (seeds RNG, sets flag this+0x214, calls GetEvent); BossShip::GetEvent @0x100001e70; BossShip::GetSubEvent @0x1000021d0; TutorialManager::GetEvent @0x100047ca0; WorldManager::OnLoop @0x1001e4470; WorldManager::LoadGame @0x1001da810\",\"key_functions\":[{\"name\":\"EventGenerator::GetEvent\",\"address\":\"0x10019f540\",\"role\":\"Core event lookup/instantiation by name\",\"pseudocode_summary\":\"Finds eventName in two unordered_maps at this+0x90 (string->EventTemplate*) and this+0x68 (string->vector<string>?), logs error if missing; otherwise loops: copy name to temp string; call CreateEvent(this,temp,param_2,param_3) until non-null; returns created event pointer.\"},{\"name\":\"EventGenerator::GetBaseEvent\",\"address\":\"0x10019f4e0\",\"role\":\"Wrapper around GetEvent with optional RNG seeding\",\"pseudocode_summary\":\"If seed != -1, seeds RNG via _srandom32 or _srand depending on Globals::RNG; sets *(uint16*)(this+0x214)=1; calls GetEvent(this,name,param_2,param_3).\"},{\"name\":\"BossShip::GetEvent\",\"address\":\"0x100001e70\",\"role\":\"Creates boss event and annotates it\",\"pseudocode_summary\":\"Builds boss event name using to_string<int> and string::insert; calls EventGenerator::GetBaseEvent(&Generator,name,0,false,-1); sets event flags at +0x20 and +0x74c; pushes a StatusEffect into vector at +0x790.\"},{\"name\":\"BossShip::GetSubEvent\",\"address\":\"0x1000021d0\",\"role\":\"Boss subevent selection\",\"pseudocode_summary\":\"If boss dead crew vs destroyed, selects among BOSS_* event names (e.g., BOSS_AUTO_DEFEATED, BOSS_ESCAPED, BOSS_DESTROYED, BOSS_LAST_STAND) and calls EventGenerator::GetBaseEvent; sets event flags at +0x20 and +0x420.\"},{\"name\":\"TutorialManager::GetEvent\",\"address\":\"0x100047ca0\",\"role\":\"Tutorial event injection\",\"pseudocode_summary\":\"If one-shot flag at this+0x238 set, clears it and requests base event \\\"TUTORIAL_MISSILE\\\" via EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); else returns 0.\"},{\"name\":\"WorldManager::OnLoop\",\"address\":\"0x1001e4470\",\"role\":\"Main loop; triggers events based on combat outcomes and tutorial\",\"pseudocode_summary\":\"During combat resolution, generates outcome events via EventGenerator::GetBaseEvent using stored string fields (this+0x15f0/0x1608/0x1620/0x1638/0x1650 etc.); if no event and tutorial running, calls TutorialManager::GetEvent and updates location with returned event.\"},{\"name\":\"WorldManager::LoadGame\",\"address\":\"0x1001da810\",\"role\":\"Load save; may trigger boss event\",\"pseudocode_summary\":\"After loading boss state, if boss encounter flag set, clears environment, calls BossShip::GetEvent twice and then CheckStatusEffects on event's status effects vector.\"}]}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_0xJOw0sJs9HrS02wadbSH0Sg",
+      "content": "{\"status\": \"analysis_complete\"}"
+    }
+  ]
+}

@@ -1,0 +1,769 @@
+{
+  "goal_name": "augment_dispatch",
+  "model": "gpt-5.2",
+  "max_iterations": 25,
+  "total_duration_s": 96.89,
+  "num_iterations": 4,
+  "num_tool_calls": 15,
+  "entries": [
+    {
+      "iteration": 0,
+      "time": 8.1,
+      "type": "seed",
+      "duration_s": 8.1,
+      "data": {
+        "seed_strings_found": 20,
+        "seed_message_len": 6054
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 13.74,
+      "type": "llm_call",
+      "duration_s": 5.64,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 7,
+        "tool_calls": [
+          {
+            "id": "call_7OJMtIfvl5899v8yNqr1M1Jn",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1000a2240",
+              "reason": "Primary ShipInfo::HasAugmentation implementation; should show how augment name strings are matched."
+            }
+          },
+          {
+            "id": "call_mrkMYYEF0Gka51Vig3LMqw0R",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1000a2520",
+              "reason": "ShipInfo::GetAugmentationValue; should reveal how augment values are stored/returned for a given name."
+            }
+          },
+          {
+            "id": "call_c7N2fElGdt6e03nQesxxX8Lh",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1000a2740",
+              "reason": "ShipObject::HasAugmentation wrapper/forwarder; helps identify where actual data lives (ShipInfo vs ShipObject)."
+            }
+          },
+          {
+            "id": "call_KjV0MuekrdVR7n5I6GQwrjK1",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1000a2870",
+              "reason": "ShipObject::GetAugmentationValue wrapper/forwarder; confirm call chain and calling convention."
+            }
+          },
+          {
+            "id": "call_ezmR4cZjJv5Lzzf7ty9kSXdp",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x100092310",
+              "reason": "ShipManager::CheckCrystalAugment likely checks specific augment names; good example of scattered checks."
+            }
+          },
+          {
+            "id": "call_J9joDCrUEgjqojbsIYrIt1wH",
+            "name": "get_bytes",
+            "args": {
+              "address": "0x1000a2240",
+              "length": 32,
+              "reason": "Need HasAugmentation prologue bytes for trampoline patching."
+            }
+          },
+          {
+            "id": "call_Vo1TPZidFXAidUb4ePyHxHfJ",
+            "name": "get_bytes",
+            "args": {
+              "address": "0x1000a2520",
+              "length": 32,
+              "reason": "Need GetAugmentationValue prologue bytes for trampoline patching."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 18.12,
+      "type": "tool_exec",
+      "duration_s": 4.38,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1000a2240",
+          "reason": "Primary ShipInfo::HasAugmentation implementation; should show how augment name strings are matched."
+        },
+        "result_preview": "{\"function\": \"HasAugmentation\", \"address\": \"0x1000a2240\", \"size\": 177, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipInfo::HasAugmentation(std::string) */\\n\\nundefined4 __thiscall ShipInfo::HasAugmentation(ShipInfo *this,string *param_2)\\n\\n{\\n  undefined4 uVar1;\\n  ShipInfo *pSVar2;\\n  __tree_node_base **pp_Var3;\\n  __tree_node_base *p_Var4;\\n  __tree_node_base *p_Var5;\\n  __tree_end_node *local_30;\\n  \\n  pSVar2 = (ShipInfo *)\\n           std::\\n           __tree<std::__value_type<std::string,int>,std::__map_value_compare<std::string,std::__value_type<std::string,int>,std::less<std::string>,true>,std::allocator<std::__value_type<std::string,int>>>\\n           ::find<std::string>((__tree<std::__value_type<std::string,int>,std::__map_value_compare<std::string,std::__value_type<std::string,int>,std::less<std::string>,true>,std::allocator<std::__value_type<std::string,int>>>\\n                                *)this,param_2);\\n  if (pSVar2 == this + 8) {\\n    uVar1 = 0;\\n  }\\n  else {\\n    pp_Var3 = std::\\n              __tree<std::__value_type<std::string,int>,std::__map_value_compare<std::string,std::__value_type<std::string,int>,std::less<std::string>,true>,std::allocator<std::__value_type<std::string,int>>>\\n              ::__find_equal<std::string>\\n                        ((__tree<std::__value_type<std::string,int>,std::__map_value_compare<std::string,std::__value_type<std::string,int>,std::less<std::string>,true>,std::allocator<std::__value_type<std::string,int>>>\\n                          *)this,&local_30,param_2);\\n    p_Var4 = *pp_Var3;\\n    if (p_Var4 == (__tree_node_base *)0x0) {\\n      p_Var4 = operator_new(0x40);\\n      std::string::string((string *)(p_Var4 + 0x20),param_2);\\n      *(undefined4 *)(p_Var4 + 0x38) = 0;\\n      *(undefined8 *)(p_Var4 + 8) = 0;\\n      *(undefined8 *)p_Var4 = 0;\\n      *(__tree_end_node **)(p_Var4 + 0x10) = local_30;\\n      *pp_Var3 = p_Var4;\\n      p_Var5 = p_Var4;\\n      if (**(long **)this != 0) {\\n        *(long *)this = **(...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 21.95,
+      "type": "tool_exec",
+      "duration_s": 3.83,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1000a2520",
+          "reason": "ShipInfo::GetAugmentationValue; should reveal how augment values are stored/returned for a given name."
+        },
+        "result_preview": "{\"function\": \"GetAugmentationValue\", \"address\": \"0x1000a2520\", \"size\": 196, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipInfo::GetAugmentationValue(std::string) */\\n\\nfloat __thiscall ShipInfo::GetAugmentationValue(ShipInfo *this,string *param_2)\\n\\n{\\n  int iVar1;\\n  string local_70 [16];\\n  void *local_60;\\n  string local_58 [16];\\n  void *local_48;\\n  string local_40 [16];\\n  void *local_30;\\n  float local_24;\\n  \\n  std::string::string(local_70,param_2);\\n  iVar1 = HasAugmentation(this,local_70);\\n  if (((byte)local_70[0] & 1) != 0) {\\n    operator_delete(local_60);\\n  }\\n  if (iVar1 == 0) {\\n    local_24 = 0.0;\\n  }\\n  else {\\n    std::string::string(local_58,param_2);\\n    local_24 = (float)BlueprintManager::GetAugmentValue\\n                                ((BlueprintManager *)&BlueprintManager::Blueprints,local_58);\\n    if (((byte)local_58[0] & 1) != 0) {\\n      operator_delete(local_48);\\n    }\\n    std::string::string(local_40,param_2);\\n    iVar1 = HasAugmentation(this,local_40);\\n    local_24 = local_24 * (float)iVar1;\\n    if (((byte)local_40[0] & 1) != 0) {\\n      operator_delete(local_30);\\n    }\\n  }\\n  return local_24;\\n}\\n\\n\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 25.9,
+      "type": "tool_exec",
+      "duration_s": 3.95,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1000a2740",
+          "reason": "ShipObject::HasAugmentation wrapper/forwarder; helps identify where actual data lives (ShipInfo vs ShipObject)."
+        },
+        "result_preview": "{\"function\": \"HasAugmentation\", \"address\": \"0x1000a2740\", \"size\": 82, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipObject::HasAugmentation(std::string) */\\n\\nundefined4 __thiscall ShipObject::HasAugmentation(ShipObject *this,string *param_2)\\n\\n{\\n  undefined4 uVar1;\\n  ShipInfo *pSVar2;\\n  string local_30 [16];\\n  void *local_20;\\n  \\n  pSVar2 = (ShipInfo *)((ulong)(*(int *)(this + 8) == 0) * 0x38 + shipInfoList);\\n  std::string::string(local_30,param_2);\\n  uVar1 = ShipInfo::HasAugmentation(pSVar2,local_30);\\n  if (((byte)local_30[0] & 1) != 0) {\\n    operator_delete(local_20);\\n  }\\n  return uVar1;\\n}\\n\\n\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 30.06,
+      "type": "tool_exec",
+      "duration_s": 4.16,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1000a2870",
+          "reason": "ShipObject::GetAugmentationValue wrapper/forwarder; confirm call chain and calling convention."
+        },
+        "result_preview": "{\"function\": \"GetAugmentationValue\", \"address\": \"0x1000a2870\", \"size\": 88, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipObject::GetAugmentationValue(std::string) */\\n\\nulong __thiscall ShipObject::GetAugmentationValue(ShipObject *this,string *param_2)\\n\\n{\\n  ShipInfo *pSVar1;\\n  ulong uVar2;\\n  string local_38 [16];\\n  void *local_28;\\n  uint local_1c;\\n  \\n  pSVar1 = (ShipInfo *)((ulong)(*(int *)(this + 8) == 0) * 0x38 + shipInfoList);\\n  std::string::string(local_38,param_2);\\n  uVar2 = ShipInfo::GetAugmentationValue(pSVar1,local_38);\\n  local_1c = (uint)uVar2;\\n  if (((byte)local_38[0] & 1) != 0) {\\n    operator_delete(local_28);\\n    uVar2 = (ulong)local_1c;\\n  }\\n  return uVar2;\\n}\\n\\n\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 34.42,
+      "type": "tool_exec",
+      "duration_s": 4.35,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x100092310",
+          "reason": "ShipManager::CheckCrystalAugment likely checks specific augment names; good example of scattered checks."
+        },
+        "result_preview": "{\"function\": \"CheckCrystalAugment\", \"address\": \"0x100092310\", \"size\": 901, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipManager::CheckCrystalAugment(Pointf) */\\n\\nvoid __thiscall ShipManager::CheckCrystalAugment(void *param_1,ShipManager *this)\\n\\n{\\n  ulong uVar1;\\n  undefined4 uVar2;\\n  undefined8 *puVar3;\\n  int iVar4;\\n  undefined4 uVar5;\\n  Projectile *this_00;\\n  WeaponBlueprint *pWVar6;\\n  long lVar7;\\n  void *pvVar8;\\n  long lVar9;\\n  ulong uVar10;\\n  Missile *pMVar11;\\n  size_t sVar12;\\n  float fVar13;\\n  float fVar14;\\n  string local_c0 [16];\\n  void *local_b0;\\n  Missile *local_a8;\\n  byte local_90 [16];\\n  void *local_80;\\n  byte local_78 [16];\\n  void *local_68;\\n  byte local_60 [16];\\n  void *local_50;\\n  long local_48;\\n  float local_34;\\n  \\n  local_50 = (void *)0x0;\\n  local_60[0] = 0x1c;\\n  local_60[9] = 0x53;\\n  local_60[10] = 0x48;\\n  local_60[0xb] = 0x41;\\n  local_60[0xc] = 0x52;\\n  local_60[0xd] = 0x44;\\n  local_60[0xe] = 0x53;\\n  local_60[1] = 0x43;\\n  local_60[2] = 0x52;\\n  local_60[3] = 0x59;\\n  local_60[4] = 0x53;\\n  local_60[5] = 0x54;\\n  local_60[6] = 0x41;\\n  local_60[7] = 0x4c;\\n  local_60[8] = 0x5f;\\n  local_60[0xf] = 0;\\n  local_a8 = param_1;\\n  iVar4 = ShipObject::HasAugmentation((ShipObject *)this,local_60);\\n  if (iVar4 == 0) {\\n    pMVar11 = local_50;\\n    if ((local_60[0] & 1) == 0) {\\n      return;\\n    }\\n    goto LAB_1000923a7;\\n  }\\n  lVar7 = *(long *)(this + 0x680);\\n  if ((local_60[0] & 1) != 0) {\\n    operator_delete(local_50);\\n  }\\n  if (lVar7 == 0) {\\n    return;\\n  }\\n  if (Globals::RNG == '\\\\0') {\\n    iVar4 = _random32();\\n  }\\n  else {\\n    iVar4 = _rand();\\n  }\\n  local_48 = CONCAT44(local_48._4_4_,(float)(iVar4 % 100));\\n  local_80 = (void *)0x0;\\n  local_90[0] = 0x1c;\\n  local_90[9] = 0x53;\\n  local_90[10] = 0x48;\\n  local_90[0xb] = 0x41;\\n  local_90[0xc] = 0x52;\\n  local_90[0xd] = 0x44;\\n  local_90[0xe] = 0x53;\\n  local_90[1] = 0x43;\\n  local_90[2] = 0x52;\\n  local_90[3] = 0x59;\\n  local_90[4] = 0x53;\\n  local_9...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 38.29,
+      "type": "tool_exec",
+      "duration_s": 3.87,
+      "data": {
+        "tool": "get_bytes",
+        "args": {
+          "address": "0x1000a2240",
+          "length": 32,
+          "reason": "Need HasAugmentation prologue bytes for trampoline patching."
+        },
+        "result_preview": "{\"address\": \"0x1000a2240\", \"length\": 32, \"hex\": \"554889e5415741564154534883ec104989f74989fee8f617f7ff498d4e084839\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 1,
+      "time": 42.21,
+      "type": "tool_exec",
+      "duration_s": 3.92,
+      "data": {
+        "tool": "get_bytes",
+        "args": {
+          "address": "0x1000a2520",
+          "length": 32,
+          "reason": "Need GetAugmentationValue prologue bytes for trampoline patching."
+        },
+        "result_preview": "{\"address\": \"0x1000a2520\", \"length\": 32, \"hex\": \"554889e541574156534883ec584989f74989fe488d5d984889dfe8490b21004c\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 45.98,
+      "type": "llm_call",
+      "duration_s": 3.77,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 4,
+        "tool_calls": [
+          {
+            "id": "call_N2QP0zBMHcFlmFj1GYio4Zk9",
+            "name": "get_xrefs_to",
+            "args": {
+              "address": "0x1000a2740",
+              "reason": "Find call sites of ShipObject::HasAugmentation to see scattered augment checks across systems."
+            }
+          },
+          {
+            "id": "call_WgPt4sCiETI19WDlBuXXb8nJ",
+            "name": "get_xrefs_to",
+            "args": {
+              "address": "0x1000a2870",
+              "reason": "Find call sites of ShipObject::GetAugmentationValue to see where augment values affect gameplay."
+            }
+          },
+          {
+            "id": "call_DDBIkOUiHfN2QaLoVtBHEets",
+            "name": "get_xrefs_to",
+            "args": {
+              "address": "0x1000a2240",
+              "reason": "Find call sites of ShipInfo::HasAugmentation (may be used in non-ShipObject contexts like UI or save/load)."
+            }
+          },
+          {
+            "id": "call_T293fdwWRbusCXMQjntd9cun",
+            "name": "get_xrefs_to",
+            "args": {
+              "address": "0x1000a2520",
+              "reason": "Find call sites of ShipInfo::GetAugmentationValue."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 49.94,
+      "type": "tool_exec",
+      "duration_s": 3.95,
+      "data": {
+        "tool": "get_xrefs_to",
+        "args": {
+          "address": "0x1000a2740",
+          "reason": "Find call sites of ShipObject::HasAugmentation to see scattered augment checks across systems."
+        },
+        "result_preview": "[{\"from_address\": \"0x100367535\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1001fa9cb\", \"from_function\": \"GetHealingSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001fa7a5\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10017d875\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000899ee\", \"from_function\": \"ModifyScrapCount\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008fa8a\", \"from_function\": \"DamageSystem\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001df348\", \"from_function\": \"ModifyResources\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000992cc\", \"from_function\": \"RemoveItem\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008ec09\", \"from_function\": \"PulsarDamage\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e96c1\", \"from_function\": \"FiredWeapon\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001fa6d2\", \"from_function\": \"OnRender\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100053992\", \"from_function\": \"GetMoveSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100053a5e\", \"from_function\": \"GetMoveSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100056599\", \"from_function\": \"OnUpdate\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008ead5\", \"from_function\": \"ResistDamage\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001f1321\", \"from_function\": \"Collision\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10009235e\", \"from_function\": \"CheckCrystalAugment\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10011f11a\", \"from_function\": \"CanHold\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10011f1b6\", \"from_function\": \"MouseMove\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001d14c3\", \"from_function\": \"OnTouch\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001d2ccc\", \"from_fu...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 53.87,
+      "type": "tool_exec",
+      "duration_s": 3.93,
+      "data": {
+        "tool": "get_xrefs_to",
+        "args": {
+          "address": "0x1000a2870",
+          "reason": "Find call sites of ShipObject::GetAugmentationValue to see where augment values affect gameplay."
+        },
+        "result_preview": "[{\"from_address\": \"0x100367539\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1001faa2e\", \"from_function\": \"GetHealingSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008709b\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001fa8ac\", \"from_function\": \"GetEngineSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100008c7e\", \"from_function\": \"InitiateTeleport\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e8f77\", \"from_function\": \"SetTurnedOn\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008991c\", \"from_function\": \"ModifyScrapCount\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100089981\", \"from_function\": \"ModifyScrapCount\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008facf\", \"from_function\": \"DamageSystem\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008ec5c\", \"from_function\": \"PulsarDamage\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000539e6\", \"from_function\": \"GetMoveSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100053abe\", \"from_function\": \"GetMoveSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100055fe3\", \"from_function\": \"UpdateHealth\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100026721\", \"from_function\": \"Update\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008eb04\", \"from_function\": \"ResistDamage\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001f1385\", \"from_function\": \"Collision\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100092408\", \"from_function\": \"CheckCrystalAugment\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001f2486\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 57.82,
+      "type": "tool_exec",
+      "duration_s": 3.95,
+      "data": {
+        "tool": "get_xrefs_to",
+        "args": {
+          "address": "0x1000a2240",
+          "reason": "Find call sites of ShipInfo::HasAugmentation (may be used in non-ShipObject contexts like UI or save/load)."
+        },
+        "result_preview": "[{\"from_address\": \"0x100367528\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1000a2771\", \"from_function\": \"HasAugmentation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000a2545\", \"from_function\": \"GetAugmentationValue\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000a25a6\", \"from_function\": \"GetAugmentationValue\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000a2327\", \"from_function\": \"RemoveAugmentation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 2,
+      "time": 61.72,
+      "type": "tool_exec",
+      "duration_s": 3.9,
+      "data": {
+        "tool": "get_xrefs_to",
+        "args": {
+          "address": "0x1000a2520",
+          "reason": "Find call sites of ShipInfo::GetAugmentationValue."
+        },
+        "result_preview": "[{\"from_address\": \"0x10036752e\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1000a28a1\", \"from_function\": \"GetAugmentationValue\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 3,
+      "time": 65.03,
+      "type": "llm_call",
+      "duration_s": 3.31,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 4,
+        "tool_calls": [
+          {
+            "id": "call_jo9eBEYVNNaf2PNuyMvY8OSp",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1000899ee",
+              "reason": "ModifyScrapCount likely uses SCRAP_COLLECTOR augment; demonstrates mapping from name to effect via HasAugmentation/GetAugmentationValue."
+            }
+          },
+          {
+            "id": "call_sNkfh4yzHyxMiKEgVcsBLTku",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x10008fa8a",
+              "reason": "DamageSystem callsite of HasAugmentation; may check for system repair/damage augments."
+            }
+          },
+          {
+            "id": "call_SS2pVzgmdyFj94QELoALkr2P",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1001df348",
+              "reason": "ModifyResources callsite; may apply augment multipliers."
+            }
+          },
+          {
+            "id": "call_i6JP8WDeeOeMqYSkjrZ3w4yv",
+            "name": "decompile_function",
+            "args": {
+              "address": "0x1001fa8ac",
+              "reason": "GetEngineSpeed uses GetAugmentationValue; likely checks engine-related augment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 3,
+      "time": 69.01,
+      "type": "tool_exec",
+      "duration_s": 3.98,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1000899ee",
+          "reason": "ModifyScrapCount likely uses SCRAP_COLLECTOR augment; demonstrates mapping from name to effect via HasAugmentation/GetAugmentationValue."
+        },
+        "result_preview": "{\"function\": \"ModifyScrapCount\", \"address\": \"0x1000898c0\", \"size\": 405, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipManager::ModifyScrapCount(int, bool) */\\n\\nvoid __thiscall ShipManager::ModifyScrapCount(ShipManager *this,int param_1,bool param_2)\\n\\n{\\n  char cVar1;\\n  int iVar2;\\n  undefined4 uVar3;\\n  float fVar4;\\n  byte local_88 [16];\\n  void *local_78;\\n  byte local_68 [16];\\n  void *local_58;\\n  byte local_48 [16];\\n  void *local_38;\\n  float local_24;\\n  \\n  if ((0 < param_1) && (param_2)) {\\n    local_88[0] = 0x1e;\\n    local_88[9] = 0x4c;\\n    local_88[10] = 0x4c;\\n    local_88[0xb] = 0x45;\\n    local_88[0xc] = 0x43;\\n    local_88[0xd] = 0x54;\\n    local_88[0xe] = 0x4f;\\n    local_88[0xf] = 0x52;\\n    local_88[1] = 0x53;\\n    local_88[2] = 0x43;\\n    local_88[3] = 0x52;\\n    local_88[4] = 0x41;\\n    local_88[5] = 0x50;\\n    local_88[6] = 0x5f;\\n    local_88[7] = 0x43;\\n    local_88[8] = 0x4f;\\n    local_78 = (void *)0x0;\\n    local_24 = (float)ShipObject::GetAugmentationValue((ShipObject *)this,local_88);\\n    if ((local_88[0] & 1) != 0) {\\n      operator_delete(local_78);\\n    }\\n    if ((int)*(undefined8 *)(this + 0x188) != (int)((ulong)*(undefined8 *)(this + 0x188) >> 0x20)) {\\n      local_68[0xc] = 0;\\n      local_68[0xd] = 0;\\n      local_68[0xe] = 0;\\n      local_68[0xf] = 0;\\n      local_58 = (void *)0x0;\\n      local_68[0] = 0x14;\\n      local_68[1] = 0x52;\\n      local_68[2] = 0x45;\\n      local_68[3] = 0x50;\\n      local_68[4] = 0x41;\\n      local_68[5] = 0x49;\\n      local_68[6] = 0x52;\\n      local_68[7] = 0x5f;\\n      local_68[8] = 0x41;\\n      local_68[9] = 0x52;\\n      local_68[10] = 0x4d;\\n      local_68[0xb] = 0;\\n      fVar4 = (float)ShipObject::GetAugmentationValue((ShipObject *)this,local_68);\\n      local_24 = local_24 - fVar4;\\n      if ((local_68[0] & 1) != 0) {\\n        operator_delete(local_58);\\n      }\\n    }\\n    local_24 = local_24 * (float)param_1 + (float)param_1;\\n    local_48[0xc] = 0;\\n    local_48[0xd] = 0;\\n    local_4...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 3,
+      "time": 73.33,
+      "type": "tool_exec",
+      "duration_s": 4.32,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x10008fa8a",
+          "reason": "DamageSystem callsite of HasAugmentation; may check for system repair/damage augments."
+        },
+        "result_preview": "{\"function\": \"DamageSystem\", \"address\": \"0x10008fa20\", \"size\": 1569, \"section\": \"__text\", \"pseudocode\": \"// Decompilation failed: \\nLow-level Error: Overriding symbol with different type size\\n// Function: DamageSystem at 10008fa20\"}",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 3,
+      "time": 78.07,
+      "type": "tool_exec",
+      "duration_s": 4.74,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1001df348",
+          "reason": "ModifyResources callsite; may apply augment multipliers."
+        },
+        "result_preview": "{\"function\": \"ModifyResources\", \"address\": \"0x1001df070\", \"size\": 4661, \"section\": \"__text\", \"pseudocode\": \"\\n/* WorldManager::ModifyResources(LocationEvent*) */\\n\\nstring * __thiscall WorldManager::ModifyResources(WorldManager *this,LocationEvent *param_1)\\n\\n{\\n  void *pvVar1;\\n  AugmentBlueprint AVar2;\\n  undefined8 uVar3;\\n  ShipObject *pSVar4;\\n  CompleteShip *pCVar5;\\n  int iVar6;\\n  char cVar7;\\n  string *this_00;\\n  CrewMember *pCVar8;\\n  void *pvVar9;\\n  ulong uVar10;\\n  uint uVar11;\\n  void *pvVar12;\\n  int iVar13;\\n  ShipManager *pSVar14;\\n  long lVar15;\\n  ulong uVar16;\\n  undefined4 *puVar17;\\n  size_t sVar18;\\n  long lVar19;\\n  CrewBlueprint local_a98 [384];\\n  CrewBlueprint local_918 [384];\\n  CrewBlueprint local_798 [384];\\n  CrewBlueprint local_618 [384];\\n  string local_498 [16];\\n  void *local_488;\\n  string local_480 [16];\\n  void *local_470;\\n  string local_468;\\n  undefined4 uStack_467;\\n  undefined1 uStack_463;\\n  undefined1 uStack_462;\\n  undefined1 uStack_461;\\n  undefined1 uStack_460;\\n  undefined2 uStack_45f;\\n  undefined1 uStack_45d;\\n  undefined1 uStack_45c;\\n  undefined1 uStack_45b;\\n  undefined2 uStack_45a;\\n  void *local_458;\\n  undefined8 local_2e0;\\n  int local_2d8;\\n  undefined2 local_2d4;\\n  undefined2 uStack_2d2;\\n  int iStack_2d0;\\n  char cStack_2cc;\\n  char cStack_2cb;\\n  string local_2c8 [16];\\n  void *local_2b8;\\n  string local_2b0;\\n  string local_2a8 [16];\\n  void *local_298;\\n  WeaponBlueprint *local_290;\\n  DroneBlueprint *local_288;\\n  AugmentBlueprint *local_280;\\n  CrewBlueprint local_278 [384];\\n  undefined8 local_f8;\\n  undefined8 local_f0;\\n  undefined8 local_e8;\\n  undefined8 local_e0;\\n  undefined4 local_d8;\\n  string local_d0 [8];\\n  ulong local_c8;\\n  void *local_c0;\\n  string local_b8 [16];\\n  void *local_a8;\\n  string *local_a0;\\n  byte local_98;\\n  undefined7 uStack_97;\\n  undefined1 uStack_90;\\n  undefined1 uStack_8f;\\n  undefined6 uStack_8e;\\n  void *local_88;\\n  byte local_78;\\n  undefined7 uStack_77;\\n  u...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 3,
+      "time": 81.97,
+      "type": "tool_exec",
+      "duration_s": 3.9,
+      "data": {
+        "tool": "decompile_function",
+        "args": {
+          "address": "0x1001fa8ac",
+          "reason": "GetEngineSpeed uses GetAugmentationValue; likely checks engine-related augment."
+        },
+        "result_preview": "{\"function\": \"GetEngineSpeed\", \"address\": \"0x1001fa800\", \"size\": 330, \"section\": \"__text\", \"pseudocode\": \"\\n/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */\\n/* EngineSystem::GetEngineSpeed() */\\n\\nfloat __thiscall EngineSystem::GetEngineSpeed(EngineSystem *this)\\n\\n{\\n  int iVar1;\\n  float fVar2;\\n  byte local_38 [16];\\n  void *local_28;\\n  float local_18;\\n  float local_14;\\n  \\n  iVar1 = -1;\\n  if (((0 < *(int *)(this + 0x58)) && (this[0x5c] != (EngineSystem)0x0)) &&\\n     (*(int *)(this + 0x188) == *(int *)(this + 0x184))) {\\n    iVar1 = (byte)this[0x245] - 1;\\n  }\\n  local_18 = *(float *)(&DAT_1002b7cc0 + (ulong)(this[0x264] == (EngineSystem)0x0) * 4);\\n  local_14 = (float)(iVar1 + *(int *)(this + 0x60) + *(int *)(this + 0x204) + *(int *)(this + 0x23c)\\n                    ) * _DAT_1002b7cb0 + _DAT_1002b7cb4;\\n  local_38[0xd] = 0;\\n  local_38[0xe] = 0;\\n  local_38[0xf] = 0;\\n  local_28 = (void *)0x0;\\n  local_38[0] = 0x16;\\n  local_38[1] = 0x46;\\n  local_38[2] = 0x54;\\n  local_38[3] = 0x4c;\\n  local_38[4] = 0x5f;\\n  local_38[5] = 0x42;\\n  local_38[6] = 0x4f;\\n  local_38[7] = 0x4f;\\n  local_38[8] = 0x53;\\n  local_38[9] = 0x54;\\n  local_38[10] = 0x45;\\n  local_38[0xb] = 0x52;\\n  local_38[0xc] = 0;\\n  fVar2 = (float)ShipObject::GetAugmentationValue((ShipObject *)(this + 0x10),local_38);\\n  local_14 = (fVar2 + DAT_1002b43a4) * local_14;\\n  if ((local_38[0] & 1) != 0) {\\n    operator_delete(local_28);\\n  }\\n  local_14 = local_14 * local_18;\\n  if ((0 < *(int *)(this + 0x58)) && (this[0x5c] != (EngineSystem)0x0)) {\\n    iVar1 = 0;\\n    if (*(int *)(this + 0x188) == *(int *)(this + 0x184)) {\\n      iVar1 = *(int *)(this + 0x58);\\n    }\\n    if (iVar1 == 3) {\\n      local_14 = local_14 * DAT_1002b4958;\\n    }\\n    else if (iVar1 == 2) {\\n      local_14 = local_14 * _DAT_1002b7cb8;\\n    }\\n    else if (iVar1 == 1) {\\n      local_14 = local_14 * _DAT_1002b7cbc;\\n    }\\n  }\\n  if (DAT_1002b4960 <= local_14) {\\n    local_14 = DAT_1002b49...(truncated)",
+        "result_is_error": false
+      }
+    },
+    {
+      "iteration": 4,
+      "time": 96.89,
+      "type": "llm_call",
+      "duration_s": 14.92,
+      "data": {
+        "model": "gpt-5.2",
+        "has_content": false,
+        "content_preview": "",
+        "num_tool_calls": 1,
+        "tool_calls": [
+          {
+            "id": "call_JzsZHAdffpzj6YogGYuog3bs",
+            "name": "conclude_analysis",
+            "args": {
+              "dispatch_pattern": "scattered_checks",
+              "primary_function_addr": "0x1000a2740",
+              "secondary_function_addr": "0x1000a2870",
+              "string_comparison_method": "Augment presence stored in ShipInfo as std::map<std::string,int>; lookup via libc++ std::__tree::find/__find_equal using std::less<std::string> (lexicographic compare). No strcmp; comparisons happen inside std::string operator< used by map comparator.",
+              "calling_convention": "x86_64 macOS: decompiler labels __thiscall, but actually System V AMD64 ABI. this in RDI; std::string passed by pointer in RSI (caller often constructs a temporary std::string on stack and passes its address). Return: HasAugmentation returns int (count). GetAugmentationValue returns float in XMM0 (ShipInfo) but ShipObject wrapper shows it as ulong due to decompiler type confusion; treat as float.",
+              "function_prologue_bytes": "HasAugmentation(ShipInfo) 0x1000a2240: 55 48 89 e5 41 57 41 56 41 54 53 48 83 ec 10 49 89 f7 49 89 fe e8 f6 17 f7 ff ...; GetAugmentationValue(ShipInfo) 0x1000a2520: 55 48 89 e5 41 57 41 56 53 48 83 ec 58 49 89 f7 49 89 fe 48 8d 5d 98 48 89 df e8 49 0b 21 00 ...",
+              "recommended_patch_strategy": "Trampoline/detour ShipObject::HasAugmentation (0x1000a2740) and ShipObject::GetAugmentationValue (0x1000a2870) for global augment behavior overrides, since most gameplay code calls through ShipObject. Alternatively hook ShipInfo::HasAugmentation (0x1000a2240) to intercept map lookups/insertions. Be aware ShipInfo::HasAugmentation has side effect: inserts missing key with value 0 (due to __find_equal + node allocation), so hooks should preserve this behavior if game relies on it.",
+              "key_functions": [
+                {
+                  "name": "ShipInfo::HasAugmentation(std::string)",
+                  "address": "0x1000a2240",
+                  "role": "Core augment presence/count lookup in ShipInfo; uses std::map<string,int>",
+                  "pseudocode_summary": "Calls std::__tree::find; if not found returns 0. If found, uses __find_equal and returns node->value (int). If key not present, allocates/inserts new node with value 0 (side effect)."
+                },
+                {
+                  "name": "ShipInfo::GetAugmentationValue(std::string)",
+                  "address": "0x1000a2520",
+                  "role": "Core augment value computation",
+                  "pseudocode_summary": "If HasAugmentation(name)==0 return 0. Else value = BlueprintManager::GetAugmentValue(name); then multiplies by HasAugmentation(name) (count/stacking) and returns float."
+                },
+                {
+                  "name": "ShipObject::HasAugmentation(std::string)",
+                  "address": "0x1000a2740",
+                  "role": "Wrapper selecting correct ShipInfo (player/enemy) then forwarding",
+                  "pseudocode_summary": "Selects ShipInfo from global shipInfoList based on *(int*)(this+8)==0; constructs temp std::string; calls ShipInfo::HasAugmentation."
+                },
+                {
+                  "name": "ShipObject::GetAugmentationValue(std::string)",
+                  "address": "0x1000a2870",
+                  "role": "Wrapper forwarding to ShipInfo::GetAugmentationValue",
+                  "pseudocode_summary": "Same ShipInfo selection; constructs temp std::string; calls ShipInfo::GetAugmentationValue and returns it (float)."
+                },
+                {
+                  "name": "ShipManager::CheckCrystalAugment(Pointf)",
+                  "address": "0x100092310",
+                  "role": "Example of scattered augment check affecting gameplay",
+                  "pseudocode_summary": "Builds string \"CRYSTAL_SHARDS\" and checks ShipObject::HasAugmentation; if present, uses ShipObject::GetAugmentationValue(\"CRYSTAL_SHARDS\") as chance multiplier to spawn crystal shard projectile."
+                },
+                {
+                  "name": "ShipManager::ModifyScrapCount(int,bool)",
+                  "address": "0x1000898c0",
+                  "role": "Example of augment affecting scrap gain",
+                  "pseudocode_summary": "If gaining scrap: bonus = GetAugmentationValue(\"SCRAP_COLLECTOR\"); subtract REPAIR_ARM value in some condition; param_1 = param_1 + param_1*bonus; also checks HasAugmentation(\"REPAIR_ARM\") to apply hull damage side effect."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "iteration": 4,
+      "time": 96.89,
+      "type": "conclude",
+      "duration_s": 0.0,
+      "data": {
+        "conclusion_args": {
+          "dispatch_pattern": "scattered_checks",
+          "primary_function_addr": "0x1000a2740",
+          "secondary_function_addr": "0x1000a2870",
+          "string_comparison_method": "Augment presence stored in ShipInfo as std::map<std::string,int>; lookup via libc++ std::__tree::find/__find_equal using std::less<std::string> (lexicographic compare). No strcmp; comparisons happen inside std::string operator< used by map comparator.",
+          "calling_convention": "x86_64 macOS: decompiler labels __thiscall, but actually System V AMD64 ABI. this in RDI; std::string passed by pointer in RSI (caller often constructs a temporary std::string on stack and passes its address). Return: HasAugmentation returns int (count). GetAugmentationValue returns float in XMM0 (ShipInfo) but ShipObject wrapper shows it as ulong due to decompiler type confusion; treat as float.",
+          "function_prologue_bytes": "HasAugmentation(ShipInfo) 0x1000a2240: 55 48 89 e5 41 57 41 56 41 54 53 48 83 ec 10 49 89 f7 49 89 fe e8 f6 17 f7 ff ...; GetAugmentationValue(ShipInfo) 0x1000a2520: 55 48 89 e5 41 57 41 56 53 48 83 ec 58 49 89 f7 49 89 fe 48 8d 5d 98 48 89 df e8 49 0b 21 00 ...",
+          "recommended_patch_strategy": "Trampoline/detour ShipObject::HasAugmentation (0x1000a2740) and ShipObject::GetAugmentationValue (0x1000a2870) for global augment behavior overrides, since most gameplay code calls through ShipObject. Alternatively hook ShipInfo::HasAugmentation (0x1000a2240) to intercept map lookups/insertions. Be aware ShipInfo::HasAugmentation has side effect: inserts missing key with value 0 (due to __find_equal + node allocation), so hooks should preserve this behavior if game relies on it.",
+          "key_functions": [
+            {
+              "name": "ShipInfo::HasAugmentation(std::string)",
+              "address": "0x1000a2240",
+              "role": "Core augment presence/count lookup in ShipInfo; uses std::map<string,int>",
+              "pseudocode_summary": "Calls std::__tree::find; if not found returns 0. If found, uses __find_equal and returns node->value (int). If key not present, allocates/inserts new node with value 0 (side effect)."
+            },
+            {
+              "name": "ShipInfo::GetAugmentationValue(std::string)",
+              "address": "0x1000a2520",
+              "role": "Core augment value computation",
+              "pseudocode_summary": "If HasAugmentation(name)==0 return 0. Else value = BlueprintManager::GetAugmentValue(name); then multiplies by HasAugmentation(name) (count/stacking) and returns float."
+            },
+            {
+              "name": "ShipObject::HasAugmentation(std::string)",
+              "address": "0x1000a2740",
+              "role": "Wrapper selecting correct ShipInfo (player/enemy) then forwarding",
+              "pseudocode_summary": "Selects ShipInfo from global shipInfoList based on *(int*)(this+8)==0; constructs temp std::string; calls ShipInfo::HasAugmentation."
+            },
+            {
+              "name": "ShipObject::GetAugmentationValue(std::string)",
+              "address": "0x1000a2870",
+              "role": "Wrapper forwarding to ShipInfo::GetAugmentationValue",
+              "pseudocode_summary": "Same ShipInfo selection; constructs temp std::string; calls ShipInfo::GetAugmentationValue and returns it (float)."
+            },
+            {
+              "name": "ShipManager::CheckCrystalAugment(Pointf)",
+              "address": "0x100092310",
+              "role": "Example of scattered augment check affecting gameplay",
+              "pseudocode_summary": "Builds string \"CRYSTAL_SHARDS\" and checks ShipObject::HasAugmentation; if present, uses ShipObject::GetAugmentationValue(\"CRYSTAL_SHARDS\") as chance multiplier to spawn crystal shard projectile."
+            },
+            {
+              "name": "ShipManager::ModifyScrapCount(int,bool)",
+              "address": "0x1000898c0",
+              "role": "Example of augment affecting scrap gain",
+              "pseudocode_summary": "If gaining scrap: bonus = GetAugmentationValue(\"SCRAP_COLLECTOR\"); subtract REPAIR_ARM value in some condition; param_1 = param_1 + param_1*bonus; also checks HasAugmentation(\"REPAIR_ARM\") to apply hull damage side effect."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "final_messages": [
+    {
+      "role": "system",
+      "content": "You are a reverse engineer analyzing the FTL: Faster Than Light game binary (macOS, x86_64).\n\nYour goal: Find how the game maps augment name strings (like \"SCRAP_COLLECTOR\") to gameplay effects.\n\nContext from Hyperspace (an existing Windows FTL modding framework):\n- HasAugmentation(std::string) \u2014 checks if ship has a named augment, returns bool\n- GetAugmentationValue(std::string) \u2014 returns the float value for a named augment\n- These are C++ methods, likely on a ShipManager or ShipObject class\n- The checks are likely SCATTERED: each game system calls HasAugmentation(\"SPECIFIC_NAME\")\n  for the augments it cares about. There is probably no single dispatch table.\n\nIMPORTANT TIPS:\n- Use list_functions to find CODE addresses (e.g. list_functions(\"HasAug\"), list_functions(\"Augment\")).\n  This is much more reliable than following string xrefs which often lead to RTTI data.\n- If decompile returns an error about \"non-executable section\", the address is data, not code.\n\nStrategy:\n1. Use list_functions to find augment-related functions (HasAugmentation, GetAugmentationValue, ShipManager)\n2. Decompile them and understand how string arguments are compared\n3. Verify by checking that multiple different augment strings flow through the same function\n4. Get the function prologue bytes (first 16+ bytes) \u2014 needed for trampoline patching\n5. Identify the calling convention (how the std::string argument is passed)\n\nCall conclude_analysis when you are confident in your findings."
+    },
+    {
+      "role": "user",
+      "content": "Here are augment-related functions found in the FTL binary:\n\n[\n  {\n    \"name\": \"CheckCrystalAugment\",\n    \"address\": \"0x100092310\",\n    \"size\": 901,\n    \"signature\": \"undefined __thiscall CheckCrystalAugment(ShipManager * this, Pointf param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"HasAugmentation\",\n    \"address\": \"0x1000a2240\",\n    \"size\": 177,\n    \"signature\": \"undefined __thiscall HasAugmentation(ShipInfo * this, string param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"RemoveAugmentation\",\n    \"address\": \"0x1000a2300\",\n    \"size\": 254,\n    \"signature\": \"undefined __thiscall RemoveAugmentation(ShipInfo * this, string param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"AddAugmentation\",\n    \"address\": \"0x1000a2400\",\n    \"size\": 274,\n    \"signature\": \"undefined __thiscall AddAugmentation(ShipInfo * this, string param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"GetAugmentationValue\",\n    \"address\": \"0x1000a2520\",\n    \"size\": 196,\n    \"signature\": \"undefined __thiscall GetAugmentationValue(ShipInfo * this, string param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"GetAugmentationList\",\n    \"address\": \"0x1000a25f0\",\n    \"size\": 216,\n    \"signature\": \"undefined __stdcall GetAugmentationList(void)\",\n    \"calling_convention\": \"__stdcall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 0\n  },\n  {\n    \"name\": \"GetAugmentationCount\",\n    \"address\": \"0x1000a26d0\",\n    \"size\": 9,\n    \"signature\": \"undefined __thiscall GetAugmentationCount(ShipInfo * this)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 1\n  },\n  {\n    \"name\": \"HasAugmentation\",\n    \"address\": \"0x1000a2740\",\n    \"size\": 82,\n    \"signature\": \"undefined __thiscall HasAugmentation(ShipObject * this, string param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"AddAugmentation\",\n    \"address\": \"0x1000a27a0\",\n    \"size\": 82,\n    \"signature\": \"undefined __thiscall AddAugmentation(ShipObject * this, string param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"RemoveAugmentation\",\n    \"address\": \"0x1000a2800\",\n    \"size\": 78,\n    \"signature\": \"undefined __thiscall RemoveAugmentation(ShipObject * this, string param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"GetAugmentationCount\",\n    \"address\": \"0x1000a2850\",\n    \"size\": 30,\n    \"signature\": \"undefined __thiscall GetAugmentationCount(ShipObject * this)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 1\n  },\n  {\n    \"name\": \"GetAugmentationValue\",\n    \"address\": \"0x1000a2870\",\n    \"size\": 88,\n    \"signature\": \"undefined __thiscall GetAugmentationValue(ShipObject * this, string param_1)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 2\n  },\n  {\n    \"name\": \"AddAugmentation\",\n    \"address\": \"0x1000a28d0\",\n    \"size\": 584,\n    \"signature\": \"undefined __thiscall AddAugmentation(ShipObject * this, string param_1, int param_2)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 3\n  },\n  {\n    \"name\": \"GetAugmentationList\",\n    \"address\": \"0x1000a2b30\",\n    \"size\": 248,\n    \"signature\": \"undefined __stdcall GetAugmentationList(void)\",\n    \"calling_convention\": \"__stdcall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 0\n  },\n  {\n    \"name\": \"AddAugment\",\n    \"address\": \"0x1000bba50\",\n    \"size\": 22,\n    \"signature\": \"undefined __thiscall AddAugment(CommandGui * this, AugmentBlueprint * param_1, bool param_2)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 3\n  },\n  {\n    \"name\": \"DraggingAugment\",\n    \"address\": \"0x1000d39d0\",\n    \"size\": 76,\n    \"signature\": \"undefined __thiscall DraggingAugment(Equipment * this)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 1\n  },\n  {\n    \"name\": \"AddAugment\",\n    \"address\": \"0x1000d42f0\",\n    \"size\": 316,\n    \"signature\": \"undefined __stdcall AddAugment(AugmentBlueprint * param_1, bool param_2, bool param_3)\",\n    \"calling_convention\": \"__stdcall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 3\n  },\n  {\n    \"name\": \"CanHoldAugment\",\n    \"address\": \"0x1000d6e30\",\n    \"size\": 8,\n    \"signature\": \"undefined __stdcall CanHoldAugment(void)\",\n    \"calling_convention\": \"__stdcall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 0\n  },\n  {\n    \"name\": \"AugmentEquipBox\",\n    \"address\": \"0x1000d9c70\",\n    \"size\": 94,\n    \"signature\": \"undefined __thiscall AugmentEquipBox(AugmentEquipBox * this, Point param_1, ShipManager * param_2, int param_3)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 4\n  },\n  {\n    \"name\": \"AugmentEquipBox\",\n    \"address\": \"0x1000d9cd0\",\n    \"size\": 94,\n    \"signature\": \"undefined __thiscall AugmentEquipBox(AugmentEquipBox * this, Point param_1, ShipManager * param_2, int param_3)\",\n    \"calling_convention\": \"__thiscall\",\n    \"is_thunk\": false,\n    \"is_external\": false,\n    \"param_count\": 4\n  }\n]\n\nThese are actual CODE entry points. Start by decompiling the most relevant ones \u2014 look for HasAugmentation, GetAugmentationValue, or any ShipManager methods that deal with augments."
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_7OJMtIfvl5899v8yNqr1M1Jn",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x1000a2240\", \"reason\": \"Primary ShipInfo::HasAugmentation implementation; should show how augment name strings are matched.\"}"
+          }
+        },
+        {
+          "id": "call_mrkMYYEF0Gka51Vig3LMqw0R",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x1000a2520\", \"reason\": \"ShipInfo::GetAugmentationValue; should reveal how augment values are stored/returned for a given name.\"}"
+          }
+        },
+        {
+          "id": "call_c7N2fElGdt6e03nQesxxX8Lh",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x1000a2740\", \"reason\": \"ShipObject::HasAugmentation wrapper/forwarder; helps identify where actual data lives (ShipInfo vs ShipObject).\"}"
+          }
+        },
+        {
+          "id": "call_KjV0MuekrdVR7n5I6GQwrjK1",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x1000a2870\", \"reason\": \"ShipObject::GetAugmentationValue wrapper/forwarder; confirm call chain and calling convention.\"}"
+          }
+        },
+        {
+          "id": "call_ezmR4cZjJv5Lzzf7ty9kSXdp",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x100092310\", \"reason\": \"ShipManager::CheckCrystalAugment likely checks specific augment names; good example of scattered checks.\"}"
+          }
+        },
+        {
+          "id": "call_J9joDCrUEgjqojbsIYrIt1wH",
+          "type": "function",
+          "function": {
+            "name": "get_bytes",
+            "arguments": "{\"address\": \"0x1000a2240\", \"length\": 32, \"reason\": \"Need HasAugmentation prologue bytes for trampoline patching.\"}"
+          }
+        },
+        {
+          "id": "call_Vo1TPZidFXAidUb4ePyHxHfJ",
+          "type": "function",
+          "function": {
+            "name": "get_bytes",
+            "arguments": "{\"address\": \"0x1000a2520\", \"length\": 32, \"reason\": \"Need GetAugmentationValue prologue bytes for trampoline patching.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_7OJMtIfvl5899v8yNqr1M1Jn",
+      "content": "{\"function\": \"HasAugmentation\", \"address\": \"0x1000a2240\", \"size\": 177, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipInfo::HasAugmentation(std::string) */\\n\\nundefined4 __thiscall ShipInfo::HasAugmentation(ShipInfo *this,string *param_2)\\n\\n{\\n  undefined4 uVar1;\\n  ShipInfo *pSVar2;\\n  __tree_node_base **pp_Var3;\\n  __tree_node_base *p_Var4;\\n  __tree_node_base *p_Var5;\\n  __tree_end_node *local_30;\\n  \\n  pSVar2 = (ShipInfo *)\\n           std::\\n           __tree<std::__value_type<std::string,int>,std::__map_value_compare<std::string,std::__value_type<std::string,int>,std::less<std::string>,true>,std::allocator<std::__value_type<std::string,int>>>\\n           ::find<std::string>((__tree<std::__value_type<std::string,int>,std::__map_value_compare<std::string,std::__value_type<std::string,int>,std::less<std::string>,true>,std::allocator<std::__value_type<std::string,int>>>\\n                                *)this,param_2);\\n  if (pSVar2 == this + 8) {\\n    uVar1 = 0;\\n  }\\n  else {\\n    pp_Var3 = std::\\n              __tree<std::__value_type<std::string,int>,std::__map_value_compare<std::string,std::__value_type<std::string,int>,std::less<std::string>,true>,std::allocator<std::__value_type<std::string,int>>>\\n              ::__find_equal<std::string>\\n                        ((__tree<std::__value_type<std::string,int>,std::__map_value_compare<std::string,std::__value_type<std::string,int>,std::less<std::string>,true>,std::allocator<std::__value_type<std::string,int>>>\\n                          *)this,&local_30,param_2);\\n    p_Var4 = *pp_Var3;\\n    if (p_Var4 == (__tree_node_base *)0x0) {\\n      p_Var4 = operator_new(0x40);\\n      std::string::string((string *)(p_Var4 + 0x20),param_2);\\n      *(undefined4 *)(p_Var4 + 0x38) = 0;\\n      *(undefined8 *)(p_Var4 + 8) = 0;\\n      *(undefined8 *)p_Var4 = 0;\\n      *(__tree_end_node **)(p_Var4 + 0x10) = local_30;\\n      *pp_Var3 = p_Var4;\\n      p_Var5 = p_Var4;\\n      if (**(long **)this != 0) {\\n        *(long *)this = **(long **)this;\\n        p_Var5 = *pp_Var3;\\n      }\\n      std::__tree_balance_after_insert<std::__tree_node_base<void*>*>\\n                (*(__tree_node_base **)(this + 8),p_Var5);\\n      *(long *)(this + 0x10) = *(long *)(this + 0x10) + 1;\\n    }\\n    uVar1 = *(undefined4 *)(p_Var4 + 0x38);\\n  }\\n  return uVar1;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_mrkMYYEF0Gka51Vig3LMqw0R",
+      "content": "{\"function\": \"GetAugmentationValue\", \"address\": \"0x1000a2520\", \"size\": 196, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipInfo::GetAugmentationValue(std::string) */\\n\\nfloat __thiscall ShipInfo::GetAugmentationValue(ShipInfo *this,string *param_2)\\n\\n{\\n  int iVar1;\\n  string local_70 [16];\\n  void *local_60;\\n  string local_58 [16];\\n  void *local_48;\\n  string local_40 [16];\\n  void *local_30;\\n  float local_24;\\n  \\n  std::string::string(local_70,param_2);\\n  iVar1 = HasAugmentation(this,local_70);\\n  if (((byte)local_70[0] & 1) != 0) {\\n    operator_delete(local_60);\\n  }\\n  if (iVar1 == 0) {\\n    local_24 = 0.0;\\n  }\\n  else {\\n    std::string::string(local_58,param_2);\\n    local_24 = (float)BlueprintManager::GetAugmentValue\\n                                ((BlueprintManager *)&BlueprintManager::Blueprints,local_58);\\n    if (((byte)local_58[0] & 1) != 0) {\\n      operator_delete(local_48);\\n    }\\n    std::string::string(local_40,param_2);\\n    iVar1 = HasAugmentation(this,local_40);\\n    local_24 = local_24 * (float)iVar1;\\n    if (((byte)local_40[0] & 1) != 0) {\\n      operator_delete(local_30);\\n    }\\n  }\\n  return local_24;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_c7N2fElGdt6e03nQesxxX8Lh",
+      "content": "{\"function\": \"HasAugmentation\", \"address\": \"0x1000a2740\", \"size\": 82, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipObject::HasAugmentation(std::string) */\\n\\nundefined4 __thiscall ShipObject::HasAugmentation(ShipObject *this,string *param_2)\\n\\n{\\n  undefined4 uVar1;\\n  ShipInfo *pSVar2;\\n  string local_30 [16];\\n  void *local_20;\\n  \\n  pSVar2 = (ShipInfo *)((ulong)(*(int *)(this + 8) == 0) * 0x38 + shipInfoList);\\n  std::string::string(local_30,param_2);\\n  uVar1 = ShipInfo::HasAugmentation(pSVar2,local_30);\\n  if (((byte)local_30[0] & 1) != 0) {\\n    operator_delete(local_20);\\n  }\\n  return uVar1;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_KjV0MuekrdVR7n5I6GQwrjK1",
+      "content": "{\"function\": \"GetAugmentationValue\", \"address\": \"0x1000a2870\", \"size\": 88, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipObject::GetAugmentationValue(std::string) */\\n\\nulong __thiscall ShipObject::GetAugmentationValue(ShipObject *this,string *param_2)\\n\\n{\\n  ShipInfo *pSVar1;\\n  ulong uVar2;\\n  string local_38 [16];\\n  void *local_28;\\n  uint local_1c;\\n  \\n  pSVar1 = (ShipInfo *)((ulong)(*(int *)(this + 8) == 0) * 0x38 + shipInfoList);\\n  std::string::string(local_38,param_2);\\n  uVar2 = ShipInfo::GetAugmentationValue(pSVar1,local_38);\\n  local_1c = (uint)uVar2;\\n  if (((byte)local_38[0] & 1) != 0) {\\n    operator_delete(local_28);\\n    uVar2 = (ulong)local_1c;\\n  }\\n  return uVar2;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_ezmR4cZjJv5Lzzf7ty9kSXdp",
+      "content": "{\"function\": \"CheckCrystalAugment\", \"address\": \"0x100092310\", \"size\": 901, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipManager::CheckCrystalAugment(Pointf) */\\n\\nvoid __thiscall ShipManager::CheckCrystalAugment(void *param_1,ShipManager *this)\\n\\n{\\n  ulong uVar1;\\n  undefined4 uVar2;\\n  undefined8 *puVar3;\\n  int iVar4;\\n  undefined4 uVar5;\\n  Projectile *this_00;\\n  WeaponBlueprint *pWVar6;\\n  long lVar7;\\n  void *pvVar8;\\n  long lVar9;\\n  ulong uVar10;\\n  Missile *pMVar11;\\n  size_t sVar12;\\n  float fVar13;\\n  float fVar14;\\n  string local_c0 [16];\\n  void *local_b0;\\n  Missile *local_a8;\\n  byte local_90 [16];\\n  void *local_80;\\n  byte local_78 [16];\\n  void *local_68;\\n  byte local_60 [16];\\n  void *local_50;\\n  long local_48;\\n  float local_34;\\n  \\n  local_50 = (void *)0x0;\\n  local_60[0] = 0x1c;\\n  local_60[9] = 0x53;\\n  local_60[10] = 0x48;\\n  local_60[0xb] = 0x41;\\n  local_60[0xc] = 0x52;\\n  local_60[0xd] = 0x44;\\n  local_60[0xe] = 0x53;\\n  local_60[1] = 0x43;\\n  local_60[2] = 0x52;\\n  local_60[3] = 0x59;\\n  local_60[4] = 0x53;\\n  local_60[5] = 0x54;\\n  local_60[6] = 0x41;\\n  local_60[7] = 0x4c;\\n  local_60[8] = 0x5f;\\n  local_60[0xf] = 0;\\n  local_a8 = param_1;\\n  iVar4 = ShipObject::HasAugmentation((ShipObject *)this,local_60);\\n  if (iVar4 == 0) {\\n    pMVar11 = local_50;\\n    if ((local_60[0] & 1) == 0) {\\n      return;\\n    }\\n    goto LAB_1000923a7;\\n  }\\n  lVar7 = *(long *)(this + 0x680);\\n  if ((local_60[0] & 1) != 0) {\\n    operator_delete(local_50);\\n  }\\n  if (lVar7 == 0) {\\n    return;\\n  }\\n  if (Globals::RNG == '\\\\0') {\\n    iVar4 = _random32();\\n  }\\n  else {\\n    iVar4 = _rand();\\n  }\\n  local_48 = CONCAT44(local_48._4_4_,(float)(iVar4 % 100));\\n  local_80 = (void *)0x0;\\n  local_90[0] = 0x1c;\\n  local_90[9] = 0x53;\\n  local_90[10] = 0x48;\\n  local_90[0xb] = 0x41;\\n  local_90[0xc] = 0x52;\\n  local_90[0xd] = 0x44;\\n  local_90[0xe] = 0x53;\\n  local_90[1] = 0x43;\\n  local_90[2] = 0x52;\\n  local_90[3] = 0x59;\\n  local_90[4] = 0x53;\\n  local_90[5] = 0x54;\\n  local_90[6] = 0x41;\\n  local_90[7] = 0x4c;\\n  local_90[8] = 0x5f;\\n  local_90[0xf] = 0;\\n  fVar13 = (float)ShipObject::GetAugmentationValue((ShipObject *)this,local_90);\\n  fVar14 = fVar13 * DAT_1002b4aa0;\\n  if ((local_90[0] & 1) != 0) {\\n    local_34 = fVar13 * DAT_1002b4aa0;\\n    operator_delete(local_80);\\n    fVar14 = local_34;\\n  }\\n  if (fVar14 <= (float)local_48) {\\n    return;\\n  }\\n  this_00 = operator_new(0x2f8);\\n  uVar2 = *(undefined4 *)(this + 8);\\n  uVar5 = (**(code **)(**(long **)(this + 0x680) + 0x90))();\\n  local_48 = (**(code **)(**(long **)(this + 0x680) + 0x60))(*(long **)(this + 0x680),0);\\n  if (Globals::RNG == '\\\\0') {\\n    iVar4 = _random32();\\n  }\\n  else {\\n    iVar4 = _rand();\\n  }\\n  Missile::Missile(local_a8._0_4_,(float)local_48,(float)(iVar4 % 0x168),this_00,uVar2,uVar5);\\n  local_78[0xb] = 0;\\n  local_78[0xc] = 0;\\n  local_78[0xd] = 0;\\n  local_78[0xe] = 0;\\n  local_78[0xf] = 0;\\n  local_68 = (void *)0x0;\\n  local_78[0] = 0x12;\\n  local_78[1] = 0x43;\\n  local_78[2] = 0x52;\\n  local_78[3] = 0x59;\\n  local_78[4] = 0x53;\\n  local_78[5] = 0x54;\\n  local_78[6] = 0x41;\\n  local_78[7] = 0x4c;\\n  local_78[8] = 0x5f;\\n  local_78[9] = 0x31;\\n  local_78[10] = 0;\\n  pWVar6 = (WeaponBlueprint *)\\n           BlueprintManager::GetWeaponBlueprint\\n                     ((BlueprintManager *)&BlueprintManager::Blueprints,local_78);\\n  if ((local_78[0] & 1) != 0) {\\n    operator_delete(local_68);\\n  }\\n  Projectile::Initialize(this_00,pWVar6);\\n  *(undefined4 *)(this_00 + 0x40) = 1;\\n  this_00[0x6d] = (Projectile)0x1;\\n  *(undefined4 *)(this_00 + 0x38) = 0xffffffff;\\n  EffectsBlueprint::GetLaunchSound();\\n  SoundControl::PlaySoundMix((SoundControl *)&SoundControl::Sounds,local_c0,DAT_1002b41f4,false);\\n  if (((byte)local_c0[0] & 1) != 0) {\\n    operator_delete(local_b0);\\n  }\\n  puVar3 = *(undefined8 **)(this + 0xb58);\\n  if (puVar3 != *(undefined8 **)(this + 0xb60)) {\\n    *puVar3 = this_00;\\n    *(long *)(this + 0xb58) = *(long *)(this + 0xb58) + 8;\\n    return;\\n  }\\n  pMVar11 = *(Missile **)(this + 0xb50);\\n  sVar12 = (long)puVar3 - (long)pMVar11;\\n  lVar7 = (long)sVar12 >> 3;\\n  uVar1 = lVar7 + 1;\\n  if (uVar1 >> 0x3d != 0) {\\n                    /* WARNING: Subroutine does not return */\\n    std::__vector_base_common<true>::__throw_length_error();\\n  }\\n  lVar9 = (long)*(undefined8 **)(this + 0xb60) - (long)pMVar11;\\n  if ((ulong)(lVar9 >> 3) < 0xfffffffffffffff) {\\n    uVar10 = lVar9 >> 2;\\n    if (uVar10 < uVar1) {\\n      uVar10 = uVar1;\\n    }\\n    if (uVar10 != 0) {\\n      if (0x1fffffffffffffff < uVar10) {\\n        local_a8 = pMVar11;\\n        local_48 = lVar7;\\n                    /* WARNING: Subroutine does not return */\\n        _abort();\\n      }\\n      goto LAB_10009261d;\\n    }\\n    uVar10 = 0;\\n    pvVar8 = (void *)0x0;\\n  }\\n  else {\\n    uVar10 = 0x1fffffffffffffff;\\nLAB_10009261d:\\n    local_a8 = pMVar11;\\n    local_48 = lVar7;\\n    pvVar8 = operator_new(uVar10 * 8);\\n    lVar7 = local_48;\\n    pMVar11 = local_a8;\\n  }\\n  *(Projectile **)((long)pvVar8 + lVar7 * 8) = this_00;\\n  if (0 < (long)sVar12) {\\n    _memcpy(pvVar8,pMVar11,sVar12);\\n  }\\n  *(void **)(this + 0xb50) = pvVar8;\\n  *(long *)(this + 0xb58) = (long)pvVar8 + lVar7 * 8 + 8;\\n  *(void **)(this + 0xb60) = (void *)((long)pvVar8 + uVar10 * 8);\\n  if (pMVar11 == (void *)0x0) {\\n    return;\\n  }\\nLAB_1000923a7:\\n  operator_delete(pMVar11);\\n  return;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_J9joDCrUEgjqojbsIYrIt1wH",
+      "content": "{\"address\": \"0x1000a2240\", \"length\": 32, \"hex\": \"554889e5415741564154534883ec104989f74989fee8f617f7ff498d4e084839\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_Vo1TPZidFXAidUb4ePyHxHfJ",
+      "content": "{\"address\": \"0x1000a2520\", \"length\": 32, \"hex\": \"554889e541574156534883ec584989f74989fe488d5d984889dfe8490b21004c\"}"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_N2QP0zBMHcFlmFj1GYio4Zk9",
+          "type": "function",
+          "function": {
+            "name": "get_xrefs_to",
+            "arguments": "{\"address\": \"0x1000a2740\", \"reason\": \"Find call sites of ShipObject::HasAugmentation to see scattered augment checks across systems.\"}"
+          }
+        },
+        {
+          "id": "call_WgPt4sCiETI19WDlBuXXb8nJ",
+          "type": "function",
+          "function": {
+            "name": "get_xrefs_to",
+            "arguments": "{\"address\": \"0x1000a2870\", \"reason\": \"Find call sites of ShipObject::GetAugmentationValue to see where augment values affect gameplay.\"}"
+          }
+        },
+        {
+          "id": "call_DDBIkOUiHfN2QaLoVtBHEets",
+          "type": "function",
+          "function": {
+            "name": "get_xrefs_to",
+            "arguments": "{\"address\": \"0x1000a2240\", \"reason\": \"Find call sites of ShipInfo::HasAugmentation (may be used in non-ShipObject contexts like UI or save/load).\"}"
+          }
+        },
+        {
+          "id": "call_T293fdwWRbusCXMQjntd9cun",
+          "type": "function",
+          "function": {
+            "name": "get_xrefs_to",
+            "arguments": "{\"address\": \"0x1000a2520\", \"reason\": \"Find call sites of ShipInfo::GetAugmentationValue.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_N2QP0zBMHcFlmFj1GYio4Zk9",
+      "content": "[{\"from_address\": \"0x100367535\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1001fa9cb\", \"from_function\": \"GetHealingSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001fa7a5\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10017d875\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000899ee\", \"from_function\": \"ModifyScrapCount\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008fa8a\", \"from_function\": \"DamageSystem\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001df348\", \"from_function\": \"ModifyResources\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000992cc\", \"from_function\": \"RemoveItem\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008ec09\", \"from_function\": \"PulsarDamage\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e96c1\", \"from_function\": \"FiredWeapon\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001fa6d2\", \"from_function\": \"OnRender\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100053992\", \"from_function\": \"GetMoveSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100053a5e\", \"from_function\": \"GetMoveSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100056599\", \"from_function\": \"OnUpdate\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008ead5\", \"from_function\": \"ResistDamage\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001f1321\", \"from_function\": \"Collision\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10009235e\", \"from_function\": \"CheckCrystalAugment\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10011f11a\", \"from_function\": \"CanHold\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10011f1b6\", \"from_function\": \"MouseMove\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001d14c3\", \"from_function\": \"OnTouch\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001d2ccc\", \"from_function\": \"MouseMove\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001d3a8e\", \"from_function\": \"GetLocationText\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001d656a\", \"from_function\": \"OnRender\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001d63ca\", \"from_function\": \"OnRender\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001eb55f\", \"from_function\": \"CheckRecall\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001fe0bd\", \"from_function\": \"Jump\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_WgPt4sCiETI19WDlBuXXb8nJ",
+      "content": "[{\"from_address\": \"0x100367539\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1001faa2e\", \"from_function\": \"GetHealingSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008709b\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001fa8ac\", \"from_function\": \"GetEngineSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100008c7e\", \"from_function\": \"InitiateTeleport\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001e8f77\", \"from_function\": \"SetTurnedOn\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008991c\", \"from_function\": \"ModifyScrapCount\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100089981\", \"from_function\": \"ModifyScrapCount\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008facf\", \"from_function\": \"DamageSystem\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008ec5c\", \"from_function\": \"PulsarDamage\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000539e6\", \"from_function\": \"GetMoveSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100053abe\", \"from_function\": \"GetMoveSpeed\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100055fe3\", \"from_function\": \"UpdateHealth\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100026721\", \"from_function\": \"Update\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x10008eb04\", \"from_function\": \"ResistDamage\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001f1385\", \"from_function\": \"Collision\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x100092408\", \"from_function\": \"CheckCrystalAugment\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1001f2486\", \"from_function\": \"OnLoop\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_DDBIkOUiHfN2QaLoVtBHEets",
+      "content": "[{\"from_address\": \"0x100367528\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1000a2771\", \"from_function\": \"HasAugmentation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000a2545\", \"from_function\": \"GetAugmentationValue\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000a25a6\", \"from_function\": \"GetAugmentationValue\", \"ref_type\": \"UNCONDITIONAL_CALL\"}, {\"from_address\": \"0x1000a2327\", \"from_function\": \"RemoveAugmentation\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_T293fdwWRbusCXMQjntd9cun",
+      "content": "[{\"from_address\": \"0x10036752e\", \"from_function\": \"unknown\", \"ref_type\": \"DATA\"}, {\"from_address\": \"0x1000a28a1\", \"from_function\": \"GetAugmentationValue\", \"ref_type\": \"UNCONDITIONAL_CALL\"}]"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_jo9eBEYVNNaf2PNuyMvY8OSp",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x1000899ee\", \"reason\": \"ModifyScrapCount likely uses SCRAP_COLLECTOR augment; demonstrates mapping from name to effect via HasAugmentation/GetAugmentationValue.\"}"
+          }
+        },
+        {
+          "id": "call_sNkfh4yzHyxMiKEgVcsBLTku",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x10008fa8a\", \"reason\": \"DamageSystem callsite of HasAugmentation; may check for system repair/damage augments.\"}"
+          }
+        },
+        {
+          "id": "call_SS2pVzgmdyFj94QELoALkr2P",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x1001df348\", \"reason\": \"ModifyResources callsite; may apply augment multipliers.\"}"
+          }
+        },
+        {
+          "id": "call_i6JP8WDeeOeMqYSkjrZ3w4yv",
+          "type": "function",
+          "function": {
+            "name": "decompile_function",
+            "arguments": "{\"address\": \"0x1001fa8ac\", \"reason\": \"GetEngineSpeed uses GetAugmentationValue; likely checks engine-related augment.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_jo9eBEYVNNaf2PNuyMvY8OSp",
+      "content": "{\"function\": \"ModifyScrapCount\", \"address\": \"0x1000898c0\", \"size\": 405, \"section\": \"__text\", \"pseudocode\": \"\\n/* ShipManager::ModifyScrapCount(int, bool) */\\n\\nvoid __thiscall ShipManager::ModifyScrapCount(ShipManager *this,int param_1,bool param_2)\\n\\n{\\n  char cVar1;\\n  int iVar2;\\n  undefined4 uVar3;\\n  float fVar4;\\n  byte local_88 [16];\\n  void *local_78;\\n  byte local_68 [16];\\n  void *local_58;\\n  byte local_48 [16];\\n  void *local_38;\\n  float local_24;\\n  \\n  if ((0 < param_1) && (param_2)) {\\n    local_88[0] = 0x1e;\\n    local_88[9] = 0x4c;\\n    local_88[10] = 0x4c;\\n    local_88[0xb] = 0x45;\\n    local_88[0xc] = 0x43;\\n    local_88[0xd] = 0x54;\\n    local_88[0xe] = 0x4f;\\n    local_88[0xf] = 0x52;\\n    local_88[1] = 0x53;\\n    local_88[2] = 0x43;\\n    local_88[3] = 0x52;\\n    local_88[4] = 0x41;\\n    local_88[5] = 0x50;\\n    local_88[6] = 0x5f;\\n    local_88[7] = 0x43;\\n    local_88[8] = 0x4f;\\n    local_78 = (void *)0x0;\\n    local_24 = (float)ShipObject::GetAugmentationValue((ShipObject *)this,local_88);\\n    if ((local_88[0] & 1) != 0) {\\n      operator_delete(local_78);\\n    }\\n    if ((int)*(undefined8 *)(this + 0x188) != (int)((ulong)*(undefined8 *)(this + 0x188) >> 0x20)) {\\n      local_68[0xc] = 0;\\n      local_68[0xd] = 0;\\n      local_68[0xe] = 0;\\n      local_68[0xf] = 0;\\n      local_58 = (void *)0x0;\\n      local_68[0] = 0x14;\\n      local_68[1] = 0x52;\\n      local_68[2] = 0x45;\\n      local_68[3] = 0x50;\\n      local_68[4] = 0x41;\\n      local_68[5] = 0x49;\\n      local_68[6] = 0x52;\\n      local_68[7] = 0x5f;\\n      local_68[8] = 0x41;\\n      local_68[9] = 0x52;\\n      local_68[10] = 0x4d;\\n      local_68[0xb] = 0;\\n      fVar4 = (float)ShipObject::GetAugmentationValue((ShipObject *)this,local_68);\\n      local_24 = local_24 - fVar4;\\n      if ((local_68[0] & 1) != 0) {\\n        operator_delete(local_58);\\n      }\\n    }\\n    local_24 = local_24 * (float)param_1 + (float)param_1;\\n    local_48[0xc] = 0;\\n    local_48[0xd] = 0;\\n    local_48[0xe] = 0;\\n    local_48[0xf] = 0;\\n    local_38 = (void *)0x0;\\n    local_48[0] = 0x14;\\n    local_48[1] = 0x52;\\n    local_48[2] = 0x45;\\n    local_48[3] = 0x50;\\n    local_48[4] = 0x41;\\n    local_48[5] = 0x49;\\n    local_48[6] = 0x52;\\n    local_48[7] = 0x5f;\\n    local_48[8] = 0x41;\\n    local_48[9] = 0x52;\\n    local_48[10] = 0x4d;\\n    local_48[0xb] = 0;\\n    iVar2 = ShipObject::HasAugmentation((ShipObject *)this,local_48);\\n    if ((local_48[0] & 1) != 0) {\\n      operator_delete(local_38);\\n    }\\n    param_1 = (int)local_24;\\n    if (iVar2 != 0) {\\n      cVar1 = (**(code **)(*(long *)this + 0x80))(this);\\n      if (cVar1 == '\\\\0') {\\n        uVar3 = Ship::DamageHull((Ship *)(this + 0x118),-2);\\n        *(undefined4 *)(this + 0x698) = uVar3;\\n      }\\n    }\\n  }\\n  iVar2 = param_1 + *(int *)(this + 0x6f0);\\n  if (iVar2 < 0) {\\n    iVar2 = 0;\\n  }\\n  *(int *)(this + 0x6f0) = iVar2;\\n  return;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_sNkfh4yzHyxMiKEgVcsBLTku",
+      "content": "{\"function\": \"DamageSystem\", \"address\": \"0x10008fa20\", \"size\": 1569, \"section\": \"__text\", \"pseudocode\": \"// Decompilation failed: \\nLow-level Error: Overriding symbol with different type size\\n// Function: DamageSystem at 10008fa20\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_SS2pVzgmdyFj94QELoALkr2P",
+      "content": "{\"function\": \"ModifyResources\", \"address\": \"0x1001df070\", \"size\": 4661, \"section\": \"__text\", \"pseudocode\": \"\\n/* WorldManager::ModifyResources(LocationEvent*) */\\n\\nstring * __thiscall WorldManager::ModifyResources(WorldManager *this,LocationEvent *param_1)\\n\\n{\\n  void *pvVar1;\\n  AugmentBlueprint AVar2;\\n  undefined8 uVar3;\\n  ShipObject *pSVar4;\\n  CompleteShip *pCVar5;\\n  int iVar6;\\n  char cVar7;\\n  string *this_00;\\n  CrewMember *pCVar8;\\n  void *pvVar9;\\n  ulong uVar10;\\n  uint uVar11;\\n  void *pvVar12;\\n  int iVar13;\\n  ShipManager *pSVar14;\\n  long lVar15;\\n  ulong uVar16;\\n  undefined4 *puVar17;\\n  size_t sVar18;\\n  long lVar19;\\n  CrewBlueprint local_a98 [384];\\n  CrewBlueprint local_918 [384];\\n  CrewBlueprint local_798 [384];\\n  CrewBlueprint local_618 [384];\\n  string local_498 [16];\\n  void *local_488;\\n  string local_480 [16];\\n  void *local_470;\\n  string local_468;\\n  undefined4 uStack_467;\\n  undefined1 uStack_463;\\n  undefined1 uStack_462;\\n  undefined1 uStack_461;\\n  undefined1 uStack_460;\\n  undefined2 uStack_45f;\\n  undefined1 uStack_45d;\\n  undefined1 uStack_45c;\\n  undefined1 uStack_45b;\\n  undefined2 uStack_45a;\\n  void *local_458;\\n  undefined8 local_2e0;\\n  int local_2d8;\\n  undefined2 local_2d4;\\n  undefined2 uStack_2d2;\\n  int iStack_2d0;\\n  char cStack_2cc;\\n  char cStack_2cb;\\n  string local_2c8 [16];\\n  void *local_2b8;\\n  string local_2b0;\\n  string local_2a8 [16];\\n  void *local_298;\\n  WeaponBlueprint *local_290;\\n  DroneBlueprint *local_288;\\n  AugmentBlueprint *local_280;\\n  CrewBlueprint local_278 [384];\\n  undefined8 local_f8;\\n  undefined8 local_f0;\\n  undefined8 local_e8;\\n  undefined8 local_e0;\\n  undefined4 local_d8;\\n  string local_d0 [8];\\n  ulong local_c8;\\n  void *local_c0;\\n  string local_b8 [16];\\n  void *local_a8;\\n  string *local_a0;\\n  byte local_98;\\n  undefined7 uStack_97;\\n  undefined1 uStack_90;\\n  undefined1 uStack_8f;\\n  undefined6 uStack_8e;\\n  void *local_88;\\n  byte local_78;\\n  undefined7 uStack_77;\\n  undefined1 uStack_70;\\n  undefined1 uStack_6f;\\n  undefined1 uStack_6e;\\n  undefined5 uStack_6d;\\n  void *local_68;\\n  WorldManager *local_60;\\n  LocationEvent *local_58;\\n  void *local_50;\\n  WorldManager *local_48;\\n  LocationEvent *local_40;\\n  string *local_38;\\n  \\n  uVar3 = *(undefined8 *)(param_1 + 0x526);\\n  iStack_2d0 = (int)((ulong)uVar3 >> 0x10);\\n  cStack_2cc = (char)((ulong)uVar3 >> 0x30);\\n  cStack_2cb = (char)((ulong)uVar3 >> 0x38);\\n  local_2e0 = *(undefined8 *)(param_1 + 0x518);\\n  uVar3 = *(undefined8 *)(param_1 + 0x520);\\n  local_2d8 = (int)uVar3;\\n  local_2d4 = (undefined2)((ulong)uVar3 >> 0x20);\\n  uStack_2d2 = (undefined2)((ulong)uVar3 >> 0x30);\\n  std::string::string(local_2c8,(string *)(param_1 + 0x530));\\n  local_2b0 = *(string *)(param_1 + 0x548);\\n  local_a0 = (string *)(param_1 + 0x550);\\n  std::string::string(local_2a8,local_a0);\\n  local_280 = *(AugmentBlueprint **)(param_1 + 0x578);\\n  local_290 = *(WeaponBlueprint **)(param_1 + 0x568);\\n  local_288 = *(DroneBlueprint **)(param_1 + 0x570);\\n  local_58 = param_1 + 0x580;\\n  CrewBlueprint::CrewBlueprint(local_278,local_58);\\n  local_d8 = *(undefined4 *)(param_1 + 0x720);\\n  local_e0 = *(undefined8 *)(param_1 + 0x718);\\n  local_e8 = *(undefined8 *)(param_1 + 0x710);\\n  local_f8 = *(undefined8 *)(param_1 + 0x700);\\n  local_f0 = *(undefined8 *)(param_1 + 0x708);\\n  std::string::string(local_d0,(string *)(param_1 + 0x728));\\n  pSVar14 = *(ShipManager **)(*(long *)this + 0x10);\\n  iVar13 = *(int *)(pSVar14 + 0x690) + local_2e0._4_4_;\\n  if (*(int *)(pSVar14 + 0x690) + local_2e0._4_4_ < 0) {\\n    iVar13 = 0;\\n  }\\n  *(int *)(pSVar14 + 0x690) = iVar13;\\n  ShipManager::ModifyMissileCount(pSVar14,(int)local_2e0);\\n  ShipManager::ModifyDroneCount(*(ShipManager **)(*(long *)this + 0x10),local_2d8);\\n  ShipManager::ModifyScrapCount\\n            (*(ShipManager **)(*(long *)this + 0x10),CONCAT22(uStack_2d2,local_2d4),true);\\n  if (0 < CONCAT22(uStack_2d2,local_2d4)) {\\n    ScoreKeeper::AddScrapCollected\\n              ((ScoreKeeper *)&ScoreKeeper::Keeper,CONCAT22(uStack_2d2,local_2d4));\\n  }\\n  local_40 = param_1;\\n  if ((local_290 == (WeaponBlueprint *)0x0) || (*(int *)(local_290 + 0xd0) == -1)) {\\nLAB_1001df2f3:\\n    this_00 = (string *)0x0;\\n  }\\n  else {\\n    cVar7 = Equipment::IsCompletelyFull((Equipment *)(*(long *)(this + 0x11d0) + 0x4728),0);\\n    if (cVar7 == '\\\\0') {\\n      CommandGui::AddWeapon(*(CommandGui **)(this + 0x11d0),local_290,true);\\n      goto LAB_1001df2f3;\\n    }\\n    uStack_45c = 0;\\n    uStack_45b = 0;\\n    uStack_45a = 0;\\n    local_458 = (void *)0x0;\\n    local_468 = (string)0x14;\\n    uStack_467 = 0x49555145;\\n    uStack_463 = 0x50;\\n    uStack_462 = 0x5f;\\n    uStack_461 = 0x46;\\n    uStack_460 = 0x55;\\n    uStack_45f = 0x4c4c;\\n    uStack_45d = 0;\\n    this_00 = (string *)\\n              EventGenerator::GetBaseEvent\\n                        ((EventGenerator *)&EventGenerator::Generator,&local_468,0,false,-1);\\n    if (((byte)local_468 & 1) != 0) {\\n      operator_delete(local_458);\\n    }\\n    *(undefined4 *)(this_00 + 0x524) = 0x19;\\n    puVar17 = *(undefined4 **)(this + 0x1728);\\n    if (puVar17 == *(undefined4 **)(this + 0x1730)) {\\n      pvVar12 = *(void **)(this + 0x1720);\\n      sVar18 = (long)puVar17 - (long)pvVar12;\\n      lVar19 = (long)sVar18 >> 2;\\n      uVar10 = lVar19 + 1;\\n      local_48 = this;\\n      if (uVar10 >> 0x3e != 0) goto LAB_1001e02b8;\\n      lVar15 = (long)*(undefined4 **)(this + 0x1730) - (long)pvVar12;\\n      local_38 = this_00;\\n      if ((ulong)(lVar15 >> 2) < 0x1fffffffffffffff) {\\n        uVar16 = lVar15 >> 1;\\n        if (uVar16 < uVar10) {\\n          uVar16 = uVar10;\\n        }\\n        if (uVar16 != 0) {\\n          local_50 = pvVar12;\\n          if (0x3fffffffffffffff < uVar16) goto LAB_1001e00cd;\\n          goto LAB_1001df61e;\\n        }\\n        uVar16 = 0;\\n        pvVar9 = (void *)0x0;\\n      }\\n      else {\\n        uVar16 = 0x3fffffffffffffff;\\nLAB_1001df61e:\\n        local_50 = pvVar12;\\n        pvVar9 = operator_new(uVar16 * 4);\\n        pvVar12 = local_50;\\n      }\\n      *(undefined4 *)((long)pvVar9 + lVar19 * 4) = 0x67;\\n      if (0 < (long)sVar18) {\\n        _memcpy(pvVar9,pvVar12,sVar18);\\n      }\\n      this = local_48;\\n      *(void **)(local_48 + 0x1720) = pvVar9;\\n      *(long *)(local_48 + 0x1728) = (long)pvVar9 + lVar19 * 4 + 4;\\n      *(void **)(local_48 + 0x1730) = (void *)((long)pvVar9 + uVar16 * 4);\\n      param_1 = local_40;\\n      this_00 = local_38;\\n      if (pvVar12 != (void *)0x0) {\\n        operator_delete(pvVar12);\\n        param_1 = local_40;\\n        this_00 = local_38;\\n      }\\n    }\\n    else {\\n      *puVar17 = 0x67;\\n      *(undefined4 **)(this + 0x1728) = puVar17 + 1;\\n      param_1 = local_40;\\n    }\\n  }\\n  if (local_280 != (AugmentBlueprint *)0x0) {\\n    if (((byte)local_280[8] & 1) == 0) {\\n      if ((byte)local_280[8] >> 1 != 0) {\\nLAB_1001df328:\\n        pSVar4 = *(ShipObject **)(*(long *)this + 0x10);\\n        std::string::string(local_b8,(string *)(local_280 + 8));\\n        iVar13 = ShipObject::HasAugmentation(pSVar4,local_b8);\\n        param_1 = local_40;\\n        if (iVar13 == 0) {\\n          if (((byte)local_b8[0] & 1) != 0) {\\n            operator_delete(local_a8);\\n          }\\nLAB_1001df43d:\\n          cVar7 = Equipment::IsCompletelyFull((Equipment *)(*(long *)(this + 0x11d0) + 0x4728),3);\\n          if (cVar7 == '\\\\0') {\\n            CommandGui::AddAugment(*(CommandGui **)(this + 0x11d0),local_280,true);\\n            goto LAB_1001df793;\\n          }\\n          uStack_45c = 0;\\n          uStack_45b = 0;\\n          uStack_45a = 0;\\n          local_458 = (void *)0x0;\\n          local_468 = (string)0x14;\\n          uStack_467 = 0x49555145;\\n          uStack_463 = 0x50;\\n          uStack_462 = 0x5f;\\n          uStack_461 = 0x46;\\n          uStack_460 = 0x55;\\n          uStack_45f = 0x4c4c;\\n          uStack_45d = 0;\\n          this_00 = (string *)\\n                    EventGenerator::GetBaseEvent\\n                              ((EventGenerator *)&EventGenerator::Generator,&local_468,0,false,-1);\\n          if (((byte)local_468 & 1) != 0) {\\n            operator_delete(local_458);\\n          }\\n          *(undefined4 *)(this_00 + 0x524) = 0x19;\\n          puVar17 = *(undefined4 **)(this + 0x1728);\\n          if (puVar17 != *(undefined4 **)(this + 0x1730)) {\\n            *puVar17 = 0x67;\\n            goto LAB_1001df4f8;\\n          }\\n          pvVar12 = *(void **)(this + 0x1720);\\n          sVar18 = (long)puVar17 - (long)pvVar12;\\n          lVar19 = (long)sVar18 >> 2;\\n          uVar10 = lVar19 + 1;\\n          local_48 = this;\\n          if (uVar10 >> 0x3e != 0) goto LAB_1001e02b8;\\n          lVar15 = (long)*(undefined4 **)(this + 0x1730) - (long)pvVar12;\\n          local_38 = this_00;\\n          if ((ulong)(lVar15 >> 2) < 0x1fffffffffffffff) {\\n            uVar16 = lVar15 >> 1;\\n            if (uVar16 < uVar10) {\\n              uVar16 = uVar10;\\n            }\\n            if (uVar16 != 0) {\\n              local_50 = pvVar12;\\n              if (0x3fffffffffffffff < uVar16) goto LAB_1001e00cd;\\n              goto LAB_1001df723;\\n            }\\n            uVar16 = 0;\\n            pvVar9 = (void *)0x0;\\n          }\\n          else {\\n            uVar16 = 0x3fffffffffffffff;\\nLAB_1001df723:\\n            local_50 = pvVar12;\\n            pvVar9 = operator_new(uVar16 * 4);\\n            pvVar12 = local_50;\\n          }\\n          pvVar1 = (void *)((long)pvVar9 + uVar16 * 4);\\n          *(undefined4 *)((long)pvVar9 + lVar19 * 4) = 0x67;\\n          lVar19 = (long)pvVar9 + lVar19 * 4 + 4;\\n        }\\n        else {\\n          AVar2 = local_280[0xd8];\\n          if (((byte)local_b8[0] & 1) != 0) {\\n            operator_delete(local_a8);\\n          }\\n          param_1 = local_40;\\n          if (AVar2 != (AugmentBlueprint)0x0) goto LAB_1001df43d;\\n          uStack_45a = 0;\\n          local_458 = (void *)0x0;\\n          local_468 = (string)0x18;\\n          uStack_467 = 0x4d475541;\\n          uStack_463 = 0x45;\\n          uStack_462 = 0x4e;\\n          uStack_461 = 0x54;\\n          uStack_460 = 0x5f;\\n          uStack_45f = 0x5546;\\n          uStack_45d = 0x4c;\\n          uStack_45c = 0x4c;\\n          uStack_45b = 0;\\n          this_00 = (string *)\\n                    EventGenerator::GetBaseEvent\\n                              ((EventGenerator *)&EventGenerator::Generator,&local_468,0,false,-1);\\n          if (((byte)local_468 & 1) != 0) {\\n            operator_delete(local_458);\\n          }\\n          *(undefined4 *)(this_00 + 0x524) = 0x19;\\n          puVar17 = *(undefined4 **)(this + 0x1728);\\n          if (puVar17 != *(undefined4 **)(this + 0x1730)) {\\n            *puVar17 = 0x65;\\nLAB_1001df4f8:\\n            *(undefined4 **)(this + 0x1728) = puVar17 + 1;\\n            param_1 = local_40;\\n            goto LAB_1001df793;\\n          }\\n          pvVar12 = *(void **)(this + 0x1720);\\n          sVar18 = (long)puVar17 - (long)pvVar12;\\n          lVar19 = (long)sVar18 >> 2;\\n          uVar10 = lVar19 + 1;\\n          local_48 = this;\\n          if (uVar10 >> 0x3e != 0) goto LAB_1001e02b8;\\n          lVar15 = (long)*(undefined4 **)(this + 0x1730) - (long)pvVar12;\\n          local_38 = this_00;\\n          if ((ulong)(lVar15 >> 2) < 0x1fffffffffffffff) {\\n            uVar16 = lVar15 >> 1;\\n            if (uVar16 < uVar10) {\\n              uVar16 = uVar10;\\n            }\\n            if (uVar16 != 0) {\\n              local_50 = pvVar12;\\n              if (0x3fffffffffffffff < uVar16) goto LAB_1001e00cd;\\n              goto LAB_1001e0256;\\n            }\\n            uVar16 = 0;\\n            pvVar9 = (void *)0x0;\\n          }\\n          else {\\n            uVar16 = 0x3fffffffffffffff;\\nLAB_1001e0256:\\n            local_50 = pvVar12;\\n            pvVar9 = operator_new(uVar16 * 4);\\n            pvVar12 = local_50;\\n          }\\n          pvVar1 = (void *)((long)pvVar9 + uVar16 * 4);\\n          *(undefined4 *)((long)pvVar9 + lVar19 * 4) = 0x65;\\n          lVar19 = (long)pvVar9 + lVar19 * 4 + 4;\\n        }\\n        if (0 < (long)sVar18) {\\n          _memcpy(pvVar9,pvVar12,sVar18);\\n        }\\n        this = local_48;\\n        *(void **)(local_48 + 0x1720) = pvVar9;\\n        *(long *)(local_48 + 0x1728) = lVar19;\\n        *(void **)(local_48 + 0x1730) = pvVar1;\\n        this_00 = local_38;\\n        param_1 = local_40;\\n        if (pvVar12 != (void *)0x0) {\\n          operator_delete(pvVar12);\\n          this_00 = local_38;\\n          param_1 = local_40;\\n        }\\n      }\\n    }\\n    else if (*(long *)(local_280 + 0x10) != 0) goto LAB_1001df328;\\n  }\\nLAB_1001df793:\\n  uVar10 = (ulong)((byte)local_d0[0] >> 1);\\n  if (((byte)local_d0[0] & 1) != 0) {\\n    uVar10 = local_c8;\\n  }\\n  if (uVar10 != 0) {\\n    pSVar14 = *(ShipManager **)(*(long *)this + 0x10);\\n    std::string::string(local_498,local_d0);\\n    param_1 = local_40;\\n    ShipManager::RemoveItem(pSVar14,local_498);\\n    if (((byte)local_498[0] & 1) != 0) {\\n      operator_delete(local_488);\\n    }\\n  }\\n  if (0 < (int)local_e0) {\\n    if (local_e0._4_4_ == 0x11) {\\n      pSVar14 = *(ShipManager **)(*(long *)this + 0x10);\\n      uVar11 = 0x11;\\n    }\\n    else {\\n      if ((local_e0._4_4_ | 0x10) == 0x10) {\\n        ShipManager::UpgradeSystem\\n                  (*(ShipManager **)(*(long *)this + 0x10),local_e0._4_4_,(int)local_e0);\\n      }\\n      if ((local_e0._4_4_ == 1) || (uVar11 = local_e0._4_4_, local_e0._4_4_ == 0x10)) {\\n        ShipManager::UpgradeSystem\\n                  (*(ShipManager **)(*(long *)this + 0x10),local_e0._4_4_,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 2)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 3)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 4)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 5)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 6)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 7)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 8)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 9)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 10)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 0xb)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 0xc)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 0xd)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if ((uVar11 == 0x10) || (uVar11 == 0xe)) {\\n        ShipManager::UpgradeSystem(*(ShipManager **)(*(long *)this + 0x10),uVar11,(int)local_e0);\\n        uVar11 = local_e0._4_4_;\\n      }\\n      if (1 < uVar11 - 0xf) goto LAB_1001dfa2c;\\n      pSVar14 = *(ShipManager **)(*(long *)this + 0x10);\\n    }\\n    ShipManager::UpgradeSystem(pSVar14,uVar11,(int)local_e0);\\n  }\\nLAB_1001dfa2c:\\n  if ((int)local_f8 != -1) {\\n    ShipManager::AddSystem(*(ShipManager **)(*(long *)this + 0x10),(int)local_f8);\\n  }\\n  if (iStack_2d0 < 1) {\\n    if ((iStack_2d0 != 0) && (0 < -iStack_2d0)) {\\n      local_60 = this + 0x1720;\\n      pvVar12 = (void *)0x0;\\n      local_48 = this;\\n      do {\\n        local_50 = pvVar12;\\n        if (((byte)param_1[0x588] & 1) == 0) {\\n          if ((byte)param_1[0x588] >> 1 == 0) {\\nLAB_1001dfcfc:\\n            iVar13 = *(int *)(this + 0x1798);\\n            if (iVar13 == -1) {\\n              if (Globals::RNG == '\\\\0') {\\n                iVar13 = _random32();\\n              }\\n              else {\\n                iVar13 = _rand();\\n              }\\n              *(int *)(this + 0x1798) = iVar13;\\n            }\\n            uVar3 = *(undefined8 *)(*(long *)this + 0x10);\\n            local_38 = this_00;\\n            std::string::string(local_480,local_a0);\\n            ShipManager::SelectRandomCrew((CrewBlueprint *)&local_468,uVar3,iVar13);\\n            CrewBlueprint::operator=((CrewBlueprint *)local_58,(CrewBlueprint *)&local_468);\\n            CrewBlueprint::~CrewBlueprint((CrewBlueprint *)&local_468);\\n            this_00 = local_38;\\n            param_1 = local_40;\\n            this = local_48;\\n            if (((byte)local_480[0] & 1) != 0) {\\n              operator_delete(local_470);\\n              this_00 = local_38;\\n              param_1 = local_40;\\n              this = local_48;\\n            }\\n          }\\n        }\\n        else if (*(long *)(param_1 + 0x590) == 0) goto LAB_1001dfcfc;\\n        uStack_8e = 0;\\n        local_88 = (void *)0x0;\\n        local_98 = 0x10;\\n        uStack_97 = 0x6162656e6f6c63;\\n        uStack_90 = 0x79;\\n        uStack_8f = 0;\\n        iVar13 = ShipObject::HasEquipment(*(ShipObject **)(*(long *)this + 0x10),&local_98);\\n        if ((local_98 & 1) != 0) {\\n          operator_delete(local_88);\\n        }\\n        if (iVar13 != 0) {\\n          if (local_2b0 == (string)0x0) {\\n            TextLibrary::GetText(&local_468,(string *)&Globals::Library);\\n            if (((byte)local_468 & 1) != 0) goto LAB_1001dfe7a;\\nLAB_1001dfe35:\\n            if ((byte)local_468 >> 1 != 0) {\\nLAB_1001dfe96:\\n              uStack_461 = 0;\\n              uStack_460 = 0;\\n              uStack_45f = 0;\\n              uStack_45d = 0;\\n              uStack_45c = 0;\\n              uStack_45b = 0;\\n              uStack_45a = 0;\\n              local_458 = (void *)0x0;\\n              local_468 = (string)0xa;\\n              uStack_463 = 0x59;\\n              uStack_467 = 0x4d4d5544;\\n              uStack_462 = 0;\\n              this_00 = (string *)\\n                        EventGenerator::GetBaseEvent\\n                                  ((EventGenerator *)&EventGenerator::Generator,&local_468,0,false,\\n                                   -1);\\n              if (((byte)local_468 & 1) != 0) {\\n                operator_delete(local_458);\\n              }\\n              std::string::operator=(this_00,local_2c8);\\n              this_00[0x18] = local_2b0;\\n              puVar17 = *(undefined4 **)(this + 0x1728);\\n              if (puVar17 == *(undefined4 **)(this + 0x1730)) {\\n                pvVar12 = *(void **)local_60;\\n                sVar18 = (long)puVar17 - (long)pvVar12;\\n                lVar19 = (long)sVar18 >> 2;\\n                uVar10 = lVar19 + 1;\\n                local_38 = this_00;\\n                if (0x3fffffffffffffff < uVar10) {\\n                    /* WARNING: Subroutine does not return */\\n                  std::__vector_base_common<true>::__throw_length_error();\\n                }\\n                lVar15 = (long)*(undefined4 **)(this + 0x1730) - (long)pvVar12;\\n                uVar16 = 0x3fffffffffffffff;\\n                if ((ulong)(lVar15 >> 2) < 0x1fffffffffffffff) {\\n                  uVar16 = lVar15 >> 1;\\n                  if (uVar16 < uVar10) {\\n                    uVar16 = uVar10;\\n                  }\\n                  if (uVar16 != 0) {\\n                    if (uVar16 < 0x4000000000000000) goto LAB_1001dfc60;\\n                    goto LAB_1001e00cd;\\n                  }\\n                  uVar16 = 0;\\n                  pvVar9 = (void *)0x0;\\n                }\\n                else {\\nLAB_1001dfc60:\\n                  pvVar9 = operator_new(uVar16 * 4);\\n                }\\n                *(undefined4 *)((long)pvVar9 + lVar19 * 4) = 0x66;\\n                if (0 < (long)sVar18) {\\n                  _memcpy(pvVar9,pvVar12,sVar18);\\n                }\\n                this = local_48;\\n                *(void **)(local_48 + 0x1720) = pvVar9;\\n                *(long *)(local_48 + 0x1728) = (long)pvVar9 + lVar19 * 4 + 4;\\n                *(void **)(local_48 + 0x1730) = (void *)((long)pvVar9 + uVar16 * 4);\\n                param_1 = local_40;\\n                this_00 = local_38;\\n                if (pvVar12 != (void *)0x0) {\\n                  operator_delete(pvVar12);\\n                  param_1 = local_40;\\n                  this_00 = local_38;\\n                }\\n              }\\n              else {\\n                *puVar17 = 0x66;\\n                *(undefined4 **)(this + 0x1728) = puVar17 + 1;\\n              }\\n            }\\n          }\\n          else {\\n            std::string::string(&local_468,local_2c8);\\n            if (((byte)local_468 & 1) == 0) goto LAB_1001dfe35;\\nLAB_1001dfe7a:\\n            lVar19 = CONCAT26(uStack_45a,\\n                              CONCAT15(uStack_45b,\\n                                       CONCAT14(uStack_45c,\\n                                                CONCAT13(uStack_45d,CONCAT21(uStack_45f,uStack_460))\\n                                               )));\\n            operator_delete(local_458);\\n            if (lVar19 != 0) goto LAB_1001dfe96;\\n          }\\n          if (cStack_2cb != '\\\\0') {\\n            pSVar14 = *(ShipManager **)(*(long *)this + 0x10);\\n            CrewBlueprint::CrewBlueprint(local_918,local_58);\\n            pCVar8 = (CrewMember *)ShipManager::FindCrew(pSVar14,local_918);\\n            CrewBlueprint::~CrewBlueprint(local_918);\\n            iVar13 = ShipManager::GetSystemRoom(*(ShipManager **)(*(long *)this + 0x10),0xd);\\n            CrewMember::Clone(pCVar8);\\n            if (*(int *)(pCVar8 + 0x1ac) == -1) {\\n              CompleteShip::AddCrewMember(*(CompleteShip **)this,pCVar8,iVar13);\\n            }\\n            else {\\n              CrewMember::SetRoom(pCVar8,iVar13);\\n            }\\n            break;\\n          }\\n        }\\n        pSVar14 = *(ShipManager **)(*(long *)this + 0x10);\\n        CrewBlueprint::CrewBlueprint(local_798,local_58);\\n        ShipManager::KillCrew(pSVar14,local_798);\\n        CrewBlueprint::~CrewBlueprint(local_798);\\n        uStack_6d = 0;\\n        local_68 = (void *)0x0;\\n        local_78 = 0x12;\\n        uStack_77 = 0x72635f74736f6c;\\n        uStack_70 = 0x65;\\n        uStack_6f = 0x77;\\n        uStack_6e = 0;\\n        AchievementTracker::SetFlag((AchievementTracker *)&AchievementTracker::Tracker,&local_78);\\n        if ((local_78 & 1) != 0) {\\n          operator_delete(local_68);\\n        }\\n        if (cStack_2cc != '\\\\0') {\\n          pCVar5 = *(CompleteShip **)this;\\n          CrewBlueprint::CrewBlueprint(local_618,local_58);\\n          CompleteShip::AddCrewMember(pCVar5,local_618,1);\\n          CrewBlueprint::~CrewBlueprint(local_618);\\n        }\\n        uVar11 = (int)local_50 + 1;\\n        pvVar12 = (void *)(ulong)uVar11;\\n        iVar13 = -iStack_2d0;\\n        if (0 < iStack_2d0) {\\n          iVar13 = iStack_2d0;\\n        }\\n      } while ((int)uVar11 < iVar13);\\n    }\\n  }\\n  else {\\n    iVar13 = 0;\\n    local_38 = this_00;\\n    do {\\n      ScoreKeeper::AddCrew((ScoreKeeper *)&ScoreKeeper::Keeper);\\n      pCVar5 = *(CompleteShip **)this;\\n      CrewBlueprint::CrewBlueprint(local_a98,local_278);\\n      pCVar8 = (CrewMember *)CompleteShip::AddCrewMember(pCVar5,local_a98,0);\\n      CrewBlueprint::~CrewBlueprint(local_a98);\\n      CrewMember::InitializeSkills(pCVar8);\\n      iVar13 = iVar13 + 1;\\n      iVar6 = -iStack_2d0;\\n      if (0 < iStack_2d0) {\\n        iVar6 = iStack_2d0;\\n      }\\n      this_00 = local_38;\\n    } while (iVar13 < iVar6);\\n  }\\n  if ((local_288 == (DroneBlueprint *)0x0) || (*(int *)(local_288 + 0xd0) == -1))\\n  goto joined_r0x0001001e004f;\\n  cVar7 = Equipment::IsCompletelyFull((Equipment *)(*(long *)(this + 0x11d0) + 0x4728),1);\\n  if (cVar7 == '\\\\0') {\\n    CommandGui::AddDrone(*(CommandGui **)(this + 0x11d0),local_288,true);\\n    goto joined_r0x0001001e004f;\\n  }\\n  uStack_45c = 0;\\n  uStack_45b = 0;\\n  uStack_45a = 0;\\n  local_458 = (void *)0x0;\\n  local_468 = (string)0x14;\\n  uStack_467 = 0x49555145;\\n  uStack_463 = 0x50;\\n  uStack_462 = 0x5f;\\n  uStack_461 = 0x46;\\n  uStack_460 = 0x55;\\n  uStack_45f = 0x4c4c;\\n  uStack_45d = 0;\\n  this_00 = (string *)\\n            EventGenerator::GetBaseEvent\\n                      ((EventGenerator *)&EventGenerator::Generator,&local_468,0,false,-1);\\n  if (((byte)local_468 & 1) != 0) {\\n    operator_delete(local_458);\\n  }\\n  *(undefined4 *)(this_00 + 0x524) = 0x19;\\n  puVar17 = *(undefined4 **)(this + 0x1728);\\n  if (puVar17 != *(undefined4 **)(this + 0x1730)) {\\n    *puVar17 = 0x67;\\n    *(undefined4 **)(this + 0x1728) = puVar17 + 1;\\n    goto joined_r0x0001001e004f;\\n  }\\n  pvVar12 = *(void **)(this + 0x1720);\\n  sVar18 = (long)puVar17 - (long)pvVar12;\\n  lVar19 = (long)sVar18 >> 2;\\n  uVar10 = lVar19 + 1;\\n  local_48 = this;\\n  if (uVar10 >> 0x3e != 0) {\\nLAB_1001e02b8:\\n                    /* WARNING: Subroutine does not return */\\n    std::__vector_base_common<true>::__throw_length_error();\\n  }\\n  lVar15 = (long)*(undefined4 **)(this + 0x1730) - (long)pvVar12;\\n  local_38 = this_00;\\n  if ((ulong)(lVar15 >> 2) < 0x1fffffffffffffff) {\\n    uVar16 = lVar15 >> 1;\\n    if (uVar16 < uVar10) {\\n      uVar16 = uVar10;\\n    }\\n    if (uVar16 != 0) {\\n      if (0x3fffffffffffffff < uVar16) {\\nLAB_1001e00cd:\\n                    /* WARNING: Subroutine does not return */\\n        _abort();\\n      }\\n      goto LAB_1001e01af;\\n    }\\n    uVar16 = 0;\\n    pvVar9 = (void *)0x0;\\n  }\\n  else {\\n    uVar16 = 0x3fffffffffffffff;\\nLAB_1001e01af:\\n    pvVar9 = operator_new(uVar16 * 4);\\n  }\\n  *(undefined4 *)((long)pvVar9 + lVar19 * 4) = 0x67;\\n  if (0 < (long)sVar18) {\\n    _memcpy(pvVar9,pvVar12,sVar18);\\n  }\\n  *(void **)(local_48 + 0x1720) = pvVar9;\\n  *(long *)(local_48 + 0x1728) = (long)pvVar9 + lVar19 * 4 + 4;\\n  *(void **)(local_48 + 0x1730) = (void *)((long)pvVar9 + uVar16 * 4);\\n  this_00 = local_38;\\n  if (pvVar12 != (void *)0x0) {\\n    operator_delete(pvVar12);\\n    this_00 = local_38;\\n  }\\njoined_r0x0001001e004f:\\n  if (((byte)local_d0[0] & 1) != 0) {\\n    operator_delete(local_c0);\\n  }\\n  CrewBlueprint::~CrewBlueprint(local_278);\\n  if (((byte)local_2a8[0] & 1) != 0) {\\n    operator_delete(local_298);\\n  }\\n  if (((byte)local_2c8[0] & 1) != 0) {\\n    operator_delete(local_2b8);\\n  }\\n  return this_00;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_i6JP8WDeeOeMqYSkjrZ3w4yv",
+      "content": "{\"function\": \"GetEngineSpeed\", \"address\": \"0x1001fa800\", \"size\": 330, \"section\": \"__text\", \"pseudocode\": \"\\n/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */\\n/* EngineSystem::GetEngineSpeed() */\\n\\nfloat __thiscall EngineSystem::GetEngineSpeed(EngineSystem *this)\\n\\n{\\n  int iVar1;\\n  float fVar2;\\n  byte local_38 [16];\\n  void *local_28;\\n  float local_18;\\n  float local_14;\\n  \\n  iVar1 = -1;\\n  if (((0 < *(int *)(this + 0x58)) && (this[0x5c] != (EngineSystem)0x0)) &&\\n     (*(int *)(this + 0x188) == *(int *)(this + 0x184))) {\\n    iVar1 = (byte)this[0x245] - 1;\\n  }\\n  local_18 = *(float *)(&DAT_1002b7cc0 + (ulong)(this[0x264] == (EngineSystem)0x0) * 4);\\n  local_14 = (float)(iVar1 + *(int *)(this + 0x60) + *(int *)(this + 0x204) + *(int *)(this + 0x23c)\\n                    ) * _DAT_1002b7cb0 + _DAT_1002b7cb4;\\n  local_38[0xd] = 0;\\n  local_38[0xe] = 0;\\n  local_38[0xf] = 0;\\n  local_28 = (void *)0x0;\\n  local_38[0] = 0x16;\\n  local_38[1] = 0x46;\\n  local_38[2] = 0x54;\\n  local_38[3] = 0x4c;\\n  local_38[4] = 0x5f;\\n  local_38[5] = 0x42;\\n  local_38[6] = 0x4f;\\n  local_38[7] = 0x4f;\\n  local_38[8] = 0x53;\\n  local_38[9] = 0x54;\\n  local_38[10] = 0x45;\\n  local_38[0xb] = 0x52;\\n  local_38[0xc] = 0;\\n  fVar2 = (float)ShipObject::GetAugmentationValue((ShipObject *)(this + 0x10),local_38);\\n  local_14 = (fVar2 + DAT_1002b43a4) * local_14;\\n  if ((local_38[0] & 1) != 0) {\\n    operator_delete(local_28);\\n  }\\n  local_14 = local_14 * local_18;\\n  if ((0 < *(int *)(this + 0x58)) && (this[0x5c] != (EngineSystem)0x0)) {\\n    iVar1 = 0;\\n    if (*(int *)(this + 0x188) == *(int *)(this + 0x184)) {\\n      iVar1 = *(int *)(this + 0x58);\\n    }\\n    if (iVar1 == 3) {\\n      local_14 = local_14 * DAT_1002b4958;\\n    }\\n    else if (iVar1 == 2) {\\n      local_14 = local_14 * _DAT_1002b7cb8;\\n    }\\n    else if (iVar1 == 1) {\\n      local_14 = local_14 * _DAT_1002b7cbc;\\n    }\\n  }\\n  if (DAT_1002b4960 <= local_14) {\\n    local_14 = DAT_1002b4960;\\n  }\\n  fVar2 = (float)CFPS::GetSpeedFactor((CFPS *)&CFPS::FPSControl);\\n  return fVar2 * local_14;\\n}\\n\\n\"}"
+    },
+    {
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_JzsZHAdffpzj6YogGYuog3bs",
+          "type": "function",
+          "function": {
+            "name": "conclude_analysis",
+            "arguments": "{\"dispatch_pattern\":\"scattered_checks\",\"primary_function_addr\":\"0x1000a2740\",\"secondary_function_addr\":\"0x1000a2870\",\"string_comparison_method\":\"Augment presence stored in ShipInfo as std::map<std::string,int>; lookup via libc++ std::__tree::find/__find_equal using std::less<std::string> (lexicographic compare). No strcmp; comparisons happen inside std::string operator< used by map comparator.\",\"calling_convention\":\"x86_64 macOS: decompiler labels __thiscall, but actually System V AMD64 ABI. this in RDI; std::string passed by pointer in RSI (caller often constructs a temporary std::string on stack and passes its address). Return: HasAugmentation returns int (count). GetAugmentationValue returns float in XMM0 (ShipInfo) but ShipObject wrapper shows it as ulong due to decompiler type confusion; treat as float.\",\"function_prologue_bytes\":\"HasAugmentation(ShipInfo) 0x1000a2240: 55 48 89 e5 41 57 41 56 41 54 53 48 83 ec 10 49 89 f7 49 89 fe e8 f6 17 f7 ff ...; GetAugmentationValue(ShipInfo) 0x1000a2520: 55 48 89 e5 41 57 41 56 53 48 83 ec 58 49 89 f7 49 89 fe 48 8d 5d 98 48 89 df e8 49 0b 21 00 ...\",\"recommended_patch_strategy\":\"Trampoline/detour ShipObject::HasAugmentation (0x1000a2740) and ShipObject::GetAugmentationValue (0x1000a2870) for global augment behavior overrides, since most gameplay code calls through ShipObject. Alternatively hook ShipInfo::HasAugmentation (0x1000a2240) to intercept map lookups/insertions. Be aware ShipInfo::HasAugmentation has side effect: inserts missing key with value 0 (due to __find_equal + node allocation), so hooks should preserve this behavior if game relies on it.\",\"key_functions\":[{\"name\":\"ShipInfo::HasAugmentation(std::string)\",\"address\":\"0x1000a2240\",\"role\":\"Core augment presence/count lookup in ShipInfo; uses std::map<string,int>\",\"pseudocode_summary\":\"Calls std::__tree::find; if not found returns 0. If found, uses __find_equal and returns node->value (int). If key not present, allocates/inserts new node with value 0 (side effect).\"},{\"name\":\"ShipInfo::GetAugmentationValue(std::string)\",\"address\":\"0x1000a2520\",\"role\":\"Core augment value computation\",\"pseudocode_summary\":\"If HasAugmentation(name)==0 return 0. Else value = BlueprintManager::GetAugmentValue(name); then multiplies by HasAugmentation(name) (count/stacking) and returns float.\"},{\"name\":\"ShipObject::HasAugmentation(std::string)\",\"address\":\"0x1000a2740\",\"role\":\"Wrapper selecting correct ShipInfo (player/enemy) then forwarding\",\"pseudocode_summary\":\"Selects ShipInfo from global shipInfoList based on *(int*)(this+8)==0; constructs temp std::string; calls ShipInfo::HasAugmentation.\"},{\"name\":\"ShipObject::GetAugmentationValue(std::string)\",\"address\":\"0x1000a2870\",\"role\":\"Wrapper forwarding to ShipInfo::GetAugmentationValue\",\"pseudocode_summary\":\"Same ShipInfo selection; constructs temp std::string; calls ShipInfo::GetAugmentationValue and returns it (float).\"},{\"name\":\"ShipManager::CheckCrystalAugment(Pointf)\",\"address\":\"0x100092310\",\"role\":\"Example of scattered augment check affecting gameplay\",\"pseudocode_summary\":\"Builds string \\\"CRYSTAL_SHARDS\\\" and checks ShipObject::HasAugmentation; if present, uses ShipObject::GetAugmentationValue(\\\"CRYSTAL_SHARDS\\\") as chance multiplier to spawn crystal shard projectile.\"},{\"name\":\"ShipManager::ModifyScrapCount(int,bool)\",\"address\":\"0x1000898c0\",\"role\":\"Example of augment affecting scrap gain\",\"pseudocode_summary\":\"If gaining scrap: bonus = GetAugmentationValue(\\\"SCRAP_COLLECTOR\\\"); subtract REPAIR_ARM value in some condition; param_1 = param_1 + param_1*bonus; also checks HasAugmentation(\\\"REPAIR_ARM\\\") to apply hull damage side effect.\"}]}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_JzsZHAdffpzj6YogGYuog3bs",
+      "content": "{\"status\": \"analysis_complete\"}"
+    }
+  ]
+}

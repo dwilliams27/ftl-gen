@@ -972,6 +972,386 @@ def extract(
         raise typer.Exit(1)
 
 
+@app.command("binary-info")
+def binary_info(
+    binary_path: Annotated[
+        Optional[Path],
+        typer.Option("--binary", "-b", help="Path to FTL binary (auto-detected if omitted)"),
+    ] = None,
+):
+    """Inspect the FTL binary for modding reconnaissance.
+
+    Shows architecture, segments, augment name strings, code caves,
+    code signing status, and linked libraries.
+
+    Examples:
+        ftl-gen binary-info
+        ftl-gen binary-info --binary /path/to/FTL
+    """
+    try:
+        from ftl_gen.binary.recon import BinaryRecon
+    except ImportError:
+        console.print("[red]Binary analysis dependencies not installed.[/]")
+        console.print("Install with: [bold]pip install -e \".[binary]\"[/]")
+        raise typer.Exit(1)
+
+    # Find FTL binary
+    if binary_path is None:
+        settings = get_settings()
+        binary_path = settings.find_ftl_executable()
+        if binary_path is None:
+            console.print("[red]FTL binary not found. Specify with --binary[/]")
+            raise typer.Exit(1)
+
+    if not binary_path.exists():
+        console.print(f"[red]Binary not found: {binary_path}[/]")
+        raise typer.Exit(1)
+
+    console.print(f"[bold]Analyzing:[/] {binary_path}\n")
+
+    try:
+        recon = BinaryRecon(binary_path)
+        info = recon.analyze()
+    except Exception as e:
+        console.print(f"[red]Analysis failed: {e}[/]")
+        raise typer.Exit(1)
+
+    # Overview table
+    overview = Table(title="Binary Overview")
+    overview.add_column("Property", style="cyan")
+    overview.add_column("Value")
+    overview.add_row("Path", str(info.path))
+    overview.add_row("Size", f"{info.file_size / 1024 / 1024:.1f} MB")
+    overview.add_row("Architecture", info.architecture)
+    overview.add_row("PIE", "[green]Yes[/]" if info.pie else "[yellow]No[/]")
+    overview.add_row(
+        "Code Signed",
+        f"[green]Yes[/] ({info.signing_identity})" if info.code_signed else "[yellow]No[/]",
+    )
+    overview.add_row(
+        "Hardened Runtime",
+        "[red]Yes (patching may fail)[/]" if info.hardened_runtime else "[green]No[/]",
+    )
+    console.print(overview)
+
+    # Segments table
+    console.print()
+    seg_table = Table(title="Segments")
+    seg_table.add_column("Name", style="cyan")
+    seg_table.add_column("VA", style="dim")
+    seg_table.add_column("Size", justify="right")
+    seg_table.add_column("Sections")
+    for seg in info.segments:
+        seg_table.add_row(
+            seg.name,
+            f"0x{seg.virtual_address:x}",
+            f"{seg.file_size:,}",
+            ", ".join(seg.sections) if seg.sections else "-",
+        )
+    console.print(seg_table)
+
+    # Augment strings table
+    console.print()
+    aug_table = Table(title=f"Augment Strings ({len(info.augment_strings)} found)")
+    aug_table.add_column("Name", style="cyan")
+    aug_table.add_column("Virtual Address", style="dim")
+    aug_table.add_column("File Offset", style="dim")
+    aug_table.add_column("Section")
+    for s in info.augment_strings:
+        aug_table.add_row(
+            s.value,
+            f"0x{s.virtual_address:x}",
+            f"0x{s.file_offset:x}",
+            s.section,
+        )
+    console.print(aug_table)
+
+    # Code caves table
+    console.print()
+    if info.code_caves:
+        cave_table = Table(title=f"Code Caves ({len(info.code_caves)}, {info.total_cave_space:,} bytes total)")
+        cave_table.add_column("Offset", style="dim")
+        cave_table.add_column("Size", justify="right", style="green")
+        cave_table.add_column("Segment")
+        for cave in info.code_caves[:20]:  # Show top 20
+            cave_table.add_row(
+                f"0x{cave.file_offset:x}",
+                f"{cave.size:,}",
+                cave.segment,
+            )
+        if len(info.code_caves) > 20:
+            cave_table.add_row("...", f"+{len(info.code_caves) - 20} more", "")
+        console.print(cave_table)
+    else:
+        console.print("[yellow]No code caves found (may need segment extension for patching)[/]")
+
+    # Linked libraries
+    console.print()
+    if info.linked_libraries:
+        lib_table = Table(title=f"Linked Libraries ({len(info.linked_libraries)})")
+        lib_table.add_column("Path")
+        for lib in info.linked_libraries:
+            lib_table.add_row(lib)
+        console.print(lib_table)
+
+    # Summary
+    console.print()
+    if info.hardened_runtime:
+        console.print("[red bold]Warning: Hardened runtime detected. Binary patching may require re-signing.[/]")
+    if not info.augment_strings:
+        console.print("[yellow]No augment strings found — binary may be stripped or non-standard.[/]")
+    elif len(info.augment_strings) >= 20:
+        console.print(f"[green]Found {len(info.augment_strings)} augment strings — good target for patching.[/]")
+    if info.total_cave_space > 1024:
+        console.print(f"[green]Code cave space: {info.total_cave_space:,} bytes — sufficient for trampolines.[/]")
+    elif info.total_cave_space > 0:
+        console.print(f"[yellow]Code cave space: {info.total_cave_space:,} bytes — may be tight.[/]")
+
+
+@app.command("ghidra-analyze")
+def ghidra_analyze(
+    binary_path: Annotated[
+        Optional[Path],
+        typer.Option("--binary", "-b", help="Path to FTL binary (auto-detected if omitted)"),
+    ] = None,
+    goal_name: Annotated[str, typer.Option("--goal", "-g", help="Analysis goal (augment_dispatch, event_dispatch, get_event)")] = "augment_dispatch",
+    model: Annotated[str, typer.Option("--model", "-m", help="OpenAI model for analysis")] = "gpt-5.2",
+    output: Annotated[
+        Optional[Path],
+        typer.Option("--output", "-o", help="Output path for analysis JSON"),
+    ] = None,
+    max_iterations: Annotated[int, typer.Option("--max-iter", help="Max analysis iterations")] = 25,
+    validate_findings: Annotated[bool, typer.Option("--validate/--no-validate", help="Validate findings with capstone")] = True,
+):
+    """Run agentic Ghidra analysis on the FTL binary.
+
+    Uses Ghidra headless + OpenAI function calling to autonomously reverse
+    engineer FTL binary internals. Choose a preset goal or use a custom one.
+
+    Saves both analysis results and a full transcript (every LLM call,
+    tool execution, timing) for post-hoc review.
+
+    Preset goals:
+        augment_dispatch  - Find how augment name strings map to effects
+        event_dispatch    - Find how events are loaded and why custom events freeze
+        get_event         - Smoke test: find and characterize the GetEvent function
+
+    Requires: Ghidra installed (GHIDRA_HOME env var), OpenAI API key.
+
+    Examples:
+        ftl-gen ghidra-analyze --goal get_event --max-iter 10
+        ftl-gen ghidra-analyze --goal event_dispatch
+        ftl-gen ghidra-analyze --model gpt-5.2 --max-iter 30
+        ftl-gen ghidra-analyze --binary /path/to/FTL --output analysis.json
+    """
+    settings = get_settings()
+
+    # Check OpenAI API key is in env
+    import os
+    if not os.environ.get("OPENAI_API_KEY") and not settings.openai_api_key:
+        console.print("[red]OPENAI_API_KEY required for Ghidra analysis agent.[/]")
+        console.print("[dim]Set it in .env or environment[/]")
+        raise typer.Exit(1)
+
+    # Resolve goal
+    from ftl_gen.binary.ghidra.agent import PRESET_GOALS
+
+    if goal_name not in PRESET_GOALS:
+        console.print(f"[red]Unknown goal: {goal_name}[/]")
+        console.print(f"[dim]Available goals: {', '.join(PRESET_GOALS.keys())}[/]")
+        raise typer.Exit(1)
+
+    goal = PRESET_GOALS[goal_name]
+
+    # Find Ghidra
+    ghidra_home = settings.find_ghidra()
+    if ghidra_home is None:
+        console.print("[red]Ghidra not found.[/]")
+        console.print("[dim]Install: brew install ghidra[/]")
+        console.print("[dim]Or set GHIDRA_HOME in .env[/]")
+        raise typer.Exit(1)
+
+    # Find FTL binary
+    if binary_path is None:
+        binary_path = settings.find_ftl_executable()
+        if binary_path is None:
+            console.print("[red]FTL binary not found. Specify with --binary[/]")
+            raise typer.Exit(1)
+
+    if not binary_path.exists():
+        console.print(f"[red]Binary not found: {binary_path}[/]")
+        raise typer.Exit(1)
+
+    # Output path
+    specs_dir = Path(__file__).resolve().parent / "binary" / "specs"
+    output_path = output or (specs_dir / f"{goal_name}_analysis.json")
+
+    console.print(Panel(
+        f"[bold]Ghidra Analysis[/]\n"
+        f"Goal: {goal_name}\n"
+        f"Binary: {binary_path}\n"
+        f"Ghidra: {ghidra_home}\n"
+        f"Model: {model}\n"
+        f"Max iterations: {max_iterations}",
+        title="Agentic Binary Analysis",
+    ))
+
+    try:
+        from rich.progress import Progress, SpinnerColumn, TextColumn
+
+        from ftl_gen.binary.ghidra.agent import GhidraAgent
+        from ftl_gen.binary.ghidra.headless import GhidraHeadless
+
+        # Set up Ghidra
+        console.print("\n[bold]Importing binary into Ghidra...[/]")
+        console.print("[dim]This may take 2-5 minutes on first run[/]")
+
+        project_dir = Path.cwd() / ".ghidra_project"
+        ghidra = GhidraHeadless(ghidra_home, project_dir=project_dir)
+        ghidra.import_binary(binary_path)
+        console.print("[green]Binary imported successfully[/]")
+
+        # Set up agent (reads OPENAI_API_KEY from env)
+        agent = GhidraAgent(
+            ghidra=ghidra,
+            model=model,
+            max_iterations=max_iterations,
+        )
+
+        # Run analysis with progress
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Analyzing...", total=None)
+
+            def on_progress(iteration, max_iter, message):
+                progress.update(task, description=f"[{iteration}/{max_iter}] {message}")
+
+            analysis = agent.run(goal, progress_callback=on_progress)
+
+        # Display results
+        console.print("\n[bold green]Analysis complete![/]\n")
+
+        results_table = Table(title=f"Analysis Results: {goal_name}")
+        results_table.add_column("Property", style="cyan")
+        results_table.add_column("Value")
+        results_table.add_row("Goal", analysis.goal_name)
+        results_table.add_row("Iterations Used", str(analysis.iterations_used))
+        # Display all conclusion fields
+        for key, value in analysis.conclusion.items():
+            if key == "key_functions":
+                continue  # Displayed separately below
+            display_val = str(value) if value is not None else "Not found"
+            # Truncate long values
+            if len(display_val) > 120:
+                display_val = display_val[:117] + "..."
+            results_table.add_row(key.replace("_", " ").title(), display_val)
+        console.print(results_table)
+
+        if analysis.key_functions:
+            console.print()
+            func_table = Table(title="Key Functions")
+            func_table.add_column("Name", style="cyan")
+            func_table.add_column("Address", style="dim")
+            func_table.add_column("Role")
+            for f in analysis.key_functions:
+                func_table.add_row(f.name, f.address, f.role)
+            console.print(func_table)
+
+        # Validate findings with capstone
+        if validate_findings and analysis.key_functions:
+            console.print("\n[bold]Validating findings with capstone...[/]")
+            try:
+                from ftl_gen.binary.ghidra.validator import FindingValidator
+                from ftl_gen.binary.recon import BinaryRecon
+
+                recon = BinaryRecon(binary_path)
+                info = recon.analyze()
+                validator = FindingValidator(binary_path)
+                text_seg = next((s for s in info.segments if s.name == "__TEXT"), None)
+
+                if text_seg:
+                    # Validate every key function's address as a valid prologue
+                    for kf in analysis.key_functions:
+                        try:
+                            addr_int = int(kf.address, 16)
+                            file_offset = addr_int - text_seg.virtual_address + text_seg.file_offset
+                            result = validator.validate_function_prologue(file_offset, addr_int)
+                            status = "[green]PASS[/]" if result.passed else "[red]FAIL[/]"
+                            console.print(f"  {status} {kf.name} @ {kf.address}: {result.evidence}")
+                        except (ValueError, IndexError) as e:
+                            console.print(f"  [yellow]SKIP[/] {kf.name} @ {kf.address}: {e}")
+
+                    # Also validate any *_addr conclusion fields not already covered
+                    checked_addrs = {kf.address for kf in analysis.key_functions}
+                    for key, value in analysis.conclusion.items():
+                        if key.endswith("_addr") and isinstance(value, str) and value not in checked_addrs:
+                            try:
+                                addr_int = int(value, 16)
+                                file_offset = addr_int - text_seg.virtual_address + text_seg.file_offset
+                                result = validator.validate_function_prologue(file_offset, addr_int)
+                                status = "[green]PASS[/]" if result.passed else "[red]FAIL[/]"
+                                console.print(f"  {status} {key} ({value}): {result.evidence}")
+                            except (ValueError, IndexError) as e:
+                                console.print(f"  [yellow]SKIP[/] {key} ({value}): {e}")
+
+                    # Validate prologue bytes if provided
+                    prologue_bytes = analysis.get("function_prologue_bytes")
+                    if prologue_bytes:
+                        # Strip spaces from hex string (LLM may format as "55 48 89 e5")
+                        prologue_hex = prologue_bytes.replace(" ", "")
+                        # Use the first _addr field or first key function
+                        first_addr = None
+                        for key, value in analysis.conclusion.items():
+                            if key.endswith("_addr") and isinstance(value, str):
+                                first_addr = value
+                                break
+                        if not first_addr and analysis.key_functions:
+                            first_addr = analysis.key_functions[0].address
+                        if first_addr:
+                            addr_int = int(first_addr, 16)
+                            file_offset = addr_int - text_seg.virtual_address + text_seg.file_offset
+                            result = validator.validate_bytes_at(
+                                file_offset, prologue_hex[:16]
+                            )
+                            status = "[green]PASS[/]" if result.passed else "[red]FAIL[/]"
+                            console.print(f"  {status} {result.finding}: {result.evidence}")
+            except Exception as e:
+                console.print(f"  [yellow]Validation error: {e}[/]")
+
+        # Save results + transcript
+        analysis.save(output_path)
+        console.print(f"\n[bold]Results saved to:[/] {output_path}")
+
+        transcript_path = output_path.with_suffix(".transcript.json")
+        agent.save_transcript(transcript_path)
+        console.print(f"[bold]Transcript saved to:[/] {transcript_path}")
+        if agent.transcript:
+            t = agent.transcript
+            console.print(
+                f"[dim]  {t.total_duration_s:.1f}s total, "
+                f"{len([e for e in t.entries if e.entry_type == 'llm_call'])} LLM calls, "
+                f"{len([e for e in t.entries if e.entry_type == 'tool_exec'])} tool executions[/]"
+            )
+
+    except Exception as e:
+        console.print(f"\n[red]Analysis failed: {e}[/]")
+        # Always save transcript on failure so we can debug
+        transcript_path = output_path.with_suffix(".transcript.json")
+        agent.save_transcript(transcript_path)
+        console.print(f"[bold]Transcript saved to:[/] {transcript_path}")
+        if agent.transcript:
+            t = agent.transcript
+            console.print(
+                f"[dim]  {t.total_duration_s:.1f}s total, "
+                f"{len([e for e in t.entries if e.entry_type == 'llm_call'])} LLM calls, "
+                f"{len([e for e in t.entries if e.entry_type == 'tool_exec'])} tool executions[/]"
+            )
+        raise typer.Exit(1)
+
+
 @app.command("diagnose")
 def diagnose_mod(
     mod_name: Annotated[str, typer.Argument(help="Mod name")],

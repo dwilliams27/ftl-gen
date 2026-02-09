@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     # Paths
     slipstream_path: Path | None = Field(default=None, alias="SLIPSTREAM_PATH")
     output_dir: Path = Field(default=Path("./mods"), alias="OUTPUT_DIR")
+    ghidra_home: Path | None = Field(default=None, alias="GHIDRA_HOME")
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 
@@ -67,6 +68,47 @@ class Settings(BaseSettings):
         for path in search_paths:
             if path.exists():
                 return path
+        return None
+
+    def find_ghidra(self) -> Path | None:
+        """Auto-detect Ghidra installation path.
+
+        Returns the directory containing support/analyzeHeadless.
+        Handles both cask installs (/Applications/ghidra) and
+        formula installs (/opt/homebrew/Cellar/ghidra/<ver>/libexec).
+        """
+        if self.ghidra_home and self.ghidra_home.exists():
+            return self.ghidra_home
+
+        search_paths = [
+            Path("/Applications/ghidra"),
+            Path("/Applications/Ghidra"),
+            Path.home() / "ghidra",
+        ]
+
+        # Check for versioned directories in common locations
+        for parent in [
+            Path("/Applications"),
+            Path("/opt/homebrew/Caskroom"),
+        ]:
+            if parent.exists():
+                for item in parent.iterdir():
+                    if item.is_dir() and "ghidra" in item.name.lower():
+                        search_paths.append(item)
+
+        # Homebrew formula installs to Cellar/<ver>/libexec/
+        cellar_dir = Path("/opt/homebrew/Cellar/ghidra")
+        if cellar_dir.exists():
+            for ver_dir in sorted(cellar_dir.iterdir(), reverse=True):
+                libexec = ver_dir / "libexec"
+                if libexec.is_dir():
+                    search_paths.append(libexec)
+
+        for path in search_paths:
+            headless = path / "support" / "analyzeHeadless"
+            if headless.exists():
+                return path
+
         return None
 
     def find_slipstream(self) -> Path | None:

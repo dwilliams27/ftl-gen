@@ -36,6 +36,10 @@ ui = [
     "uvicorn[standard]>=0.30.0",
     "sse-starlette>=2.0.0",
 ]
+binary = [
+    "lief>=0.15.0",
+    "capstone>=5.0.0",
+]
 
 [project.scripts]
 ftl-gen = "ftl_gen.cli:app"

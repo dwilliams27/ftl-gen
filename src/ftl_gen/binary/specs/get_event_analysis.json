@@ -1,0 +1,131 @@
+{
+  "goal_name": "get_event",
+  "conclusion": {
+    "get_event_addr": "0x10019f540",
+    "get_event_signature": "LocationEvent* __thiscall EventGenerator::GetEvent(const std::string& eventName, int worldLevelOrSector, bool param3)",
+    "get_event_purpose": "Looks up an event name in EventGenerator's internal maps; if known, repeatedly calls CreateEvent(...) until it returns a non-null LocationEvent*. If the name is unknown/nonexistent, logs an error and returns null.",
+    "callers": [
+      {
+        "name": "EventGenerator::GetBaseEvent",
+        "address": "0x10019f4e0",
+        "context": "Wrapper that optionally seeds RNG (param_4), sets a flag at this+0x214, then calls GetEvent(eventName,param_2,param_3). Used widely to fetch events with deterministic seeds."
+      },
+      {
+        "name": "TutorialManager::GetEvent",
+        "address": "0x100047ca0",
+        "context": "When tutorial is running and a one-shot flag at this+0x238 is set, constructs string \"TUTORIAL_MISSILE\" and calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1)."
+      },
+      {
+        "name": "BossShip::GetEvent",
+        "address": "0x100001e70",
+        "context": "Builds a boss event name by inserting an int-to-string into a base string, then calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); marks returned event as boss-related and pushes a StatusEffect."
+      },
+      {
+        "name": "BossShip::GetSubEvent",
+        "address": "0x1000021d0",
+        "context": "Chooses among boss subevent names (e.g., BOSS_* variants) based on boss stage/death state and calls EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1)."
+      },
+      {
+        "name": "WorldManager::OnLoop",
+        "address": "0x1001e4470",
+        "context": "Calls TutorialManager::GetEvent() to inject tutorial events during combat resolution; also calls EventGenerator::GetBaseEvent for many combat outcome events (escape, dead crew, destroyed, etc.)."
+      },
+      {
+        "name": "WorldManager::LoadGame",
+        "address": "0x1001da810",
+        "context": "After loading, if a flag indicates boss encounter, calls BossShip::GetEvent() and then CheckStatusEffects on the event's status effect vector."
+      }
+    ],
+    "function_prologue_bytes": "55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 28 41 89 ce 89 55 d4 49 89 f7 49 89 fc 49 8d bc",
+    "related_functions": "EventGenerator::GetBaseEvent @0x10019f4e0 (seeds RNG, sets flag this+0x214, calls GetEvent); BossShip::GetEvent @0x100001e70; BossShip::GetSubEvent @0x1000021d0; TutorialManager::GetEvent @0x100047ca0; WorldManager::OnLoop @0x1001e4470; WorldManager::LoadGame @0x1001da810",
+    "key_functions": [
+      {
+        "name": "EventGenerator::GetEvent",
+        "address": "0x10019f540",
+        "role": "Core event lookup/instantiation by name",
+        "pseudocode_summary": "Finds eventName in two unordered_maps at this+0x90 (string->EventTemplate*) and this+0x68 (string->vector<string>?), logs error if missing; otherwise loops: copy name to temp string; call CreateEvent(this,temp,param_2,param_3) until non-null; returns created event pointer."
+      },
+      {
+        "name": "EventGenerator::GetBaseEvent",
+        "address": "0x10019f4e0",
+        "role": "Wrapper around GetEvent with optional RNG seeding",
+        "pseudocode_summary": "If seed != -1, seeds RNG via _srandom32 or _srand depending on Globals::RNG; sets *(uint16*)(this+0x214)=1; calls GetEvent(this,name,param_2,param_3)."
+      },
+      {
+        "name": "BossShip::GetEvent",
+        "address": "0x100001e70",
+        "role": "Creates boss event and annotates it",
+        "pseudocode_summary": "Builds boss event name using to_string<int> and string::insert; calls EventGenerator::GetBaseEvent(&Generator,name,0,false,-1); sets event flags at +0x20 and +0x74c; pushes a StatusEffect into vector at +0x790."
+      },
+      {
+        "name": "BossShip::GetSubEvent",
+        "address": "0x1000021d0",
+        "role": "Boss subevent selection",
+        "pseudocode_summary": "If boss dead crew vs destroyed, selects among BOSS_* event names (e.g., BOSS_AUTO_DEFEATED, BOSS_ESCAPED, BOSS_DESTROYED, BOSS_LAST_STAND) and calls EventGenerator::GetBaseEvent; sets event flags at +0x20 and +0x420."
+      },
+      {
+        "name": "TutorialManager::GetEvent",
+        "address": "0x100047ca0",
+        "role": "Tutorial event injection",
+        "pseudocode_summary": "If one-shot flag at this+0x238 set, clears it and requests base event \"TUTORIAL_MISSILE\" via EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); else returns 0."
+      },
+      {
+        "name": "WorldManager::OnLoop",
+        "address": "0x1001e4470",
+        "role": "Main loop; triggers events based on combat outcomes and tutorial",
+        "pseudocode_summary": "During combat resolution, generates outcome events via EventGenerator::GetBaseEvent using stored string fields (this+0x15f0/0x1608/0x1620/0x1638/0x1650 etc.); if no event and tutorial running, calls TutorialManager::GetEvent and updates location with returned event."
+      },
+      {
+        "name": "WorldManager::LoadGame",
+        "address": "0x1001da810",
+        "role": "Load save; may trigger boss event",
+        "pseudocode_summary": "After loading boss state, if boss encounter flag set, clears environment, calls BossShip::GetEvent twice and then CheckStatusEffects on event's status effects vector."
+      }
+    ]
+  },
+  "key_functions": [
+    {
+      "name": "EventGenerator::GetEvent",
+      "address": "0x10019f540",
+      "role": "Core event lookup/instantiation by name",
+      "pseudocode_summary": "Finds eventName in two unordered_maps at this+0x90 (string->EventTemplate*) and this+0x68 (string->vector<string>?), logs error if missing; otherwise loops: copy name to temp string; call CreateEvent(this,temp,param_2,param_3) until non-null; returns created event pointer."
+    },
+    {
+      "name": "EventGenerator::GetBaseEvent",
+      "address": "0x10019f4e0",
+      "role": "Wrapper around GetEvent with optional RNG seeding",
+      "pseudocode_summary": "If seed != -1, seeds RNG via _srandom32 or _srand depending on Globals::RNG; sets *(uint16*)(this+0x214)=1; calls GetEvent(this,name,param_2,param_3)."
+    },
+    {
+      "name": "BossShip::GetEvent",
+      "address": "0x100001e70",
+      "role": "Creates boss event and annotates it",
+      "pseudocode_summary": "Builds boss event name using to_string<int> and string::insert; calls EventGenerator::GetBaseEvent(&Generator,name,0,false,-1); sets event flags at +0x20 and +0x74c; pushes a StatusEffect into vector at +0x790."
+    },
+    {
+      "name": "BossShip::GetSubEvent",
+      "address": "0x1000021d0",
+      "role": "Boss subevent selection",
+      "pseudocode_summary": "If boss dead crew vs destroyed, selects among BOSS_* event names (e.g., BOSS_AUTO_DEFEATED, BOSS_ESCAPED, BOSS_DESTROYED, BOSS_LAST_STAND) and calls EventGenerator::GetBaseEvent; sets event flags at +0x20 and +0x420."
+    },
+    {
+      "name": "TutorialManager::GetEvent",
+      "address": "0x100047ca0",
+      "role": "Tutorial event injection",
+      "pseudocode_summary": "If one-shot flag at this+0x238 set, clears it and requests base event \"TUTORIAL_MISSILE\" via EventGenerator::GetBaseEvent(&Generator, name, 0, false, -1); else returns 0."
+    },
+    {
+      "name": "WorldManager::OnLoop",
+      "address": "0x1001e4470",
+      "role": "Main loop; triggers events based on combat outcomes and tutorial",
+      "pseudocode_summary": "During combat resolution, generates outcome events via EventGenerator::GetBaseEvent using stored string fields (this+0x15f0/0x1608/0x1620/0x1638/0x1650 etc.); if no event and tutorial running, calls TutorialManager::GetEvent and updates location with returned event."
+    },
+    {
+      "name": "WorldManager::LoadGame",
+      "address": "0x1001da810",
+      "role": "Load save; may trigger boss event",
+      "pseudocode_summary": "After loading boss state, if boss encounter flag set, clears environment, calls BossShip::GetEvent twice and then CheckStatusEffects on event's status effects vector."
+    }
+  ],
+  "iterations_used": 8
+}
