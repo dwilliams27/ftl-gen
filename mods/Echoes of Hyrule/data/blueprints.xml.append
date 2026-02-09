@@ -108,6 +108,7 @@
   <droneBlueprint name="SHEIKAH_EYE_DRONE">
     <type>COMBAT</type>
     <title>Sheikah Eye Combat Drone</title>
+    <short>Sheikah</short>
     <desc>Advanced Sheikah combat drone featuring phase-shift plating and the iconic eye symbol. Rapidly targets enemy systems with precision energy bursts.</desc>
     <power>4</power>
     <cost>100</cost>
@@ -119,6 +120,7 @@
   <droneBlueprint name="GUARDIAN_DEFENSE_DRONE">
     <type>DEFENSE</type>
     <title>Guardian Defense Drone</title>
+    <short>Guardian</short>
     <desc>Autonomous defense system reverse-engineered from ancient Guardian technology. Intercepts incoming projectiles with concentrated laser fire.</desc>
     <power>2</power>
     <cost>60</cost>
@@ -128,6 +130,7 @@
   <droneBlueprint name="FAIRY_REPAIR_SWARM">
     <type>SHIP_REPAIR</type>
     <title>Fairy Repair Swarm</title>
+    <short>Fairy</short>
     <desc>Cluster of luminescent nano-repair units that rapidly patch hull breaches. Inspired by the healing properties of forest sprites, these drones work faster than standard repair systems.</desc>
     <power>2</power>
     <cost>50</cost>
@@ -137,6 +140,7 @@
   <droneBlueprint name="HOOKSHOT_BOARDING_DRONE">
     <type>BOARDER</type>
     <title>Hookshot Boarding Drone</title>
+    <short>Hookshot</short>
     <desc>Reinforced boarding drone equipped with rapid-breach technology. Launches quickly toward enemy ships and features enhanced armor plating for extended combat operations.</desc>
     <power>3</power>
     <cost>75</cost>

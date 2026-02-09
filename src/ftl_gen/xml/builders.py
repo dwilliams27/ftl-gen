@@ -184,8 +184,16 @@ class XMLBuilder:
 
         self._add_element(bp, "type", drone.type)
         self._add_element(bp, "title", drone.title)
-        if drone.short:
-            self._add_element(bp, "short", drone.short)
+        # Short name is REQUIRED for drones to display in the equipment list
+        # If not provided, generate from title (max 8 chars)
+        short_name = drone.short
+        if not short_name:
+            words = drone.title.split()
+            if len(words) == 1:
+                short_name = drone.title[:8]
+            else:
+                short_name = words[0][:8] if len(words[0]) <= 8 else "".join(w[0] for w in words[:4])
+        self._add_element(bp, "short", short_name)
         self._add_element(bp, "desc", drone.desc)
         self._add_element(bp, "power", str(drone.power))
         self._add_element(bp, "cost", str(drone.cost))
@@ -196,11 +204,11 @@ class XMLBuilder:
         if drone.speed:
             self._add_element(bp, "speed", str(drone.speed))
 
-        # Drone image - use custom if available, otherwise vanilla default
-        if drone.drone_image and drone.drone_image == drone.name.lower():
+        # Drone image — FTL looks for img/ship/drones/{value}_base.png and _on.png
+        if drone.drone_image:
             self._add_element(bp, "droneImage", drone.drone_image)
         else:
-            default_image = self.DRONE_IMAGES.get(drone.type, "drone_player_combat")
+            default_image = self.DRONE_IMAGES.get(drone.type, "drone_combat")
             self._add_element(bp, "droneImage", default_image)
 
         return bp

@@ -94,7 +94,6 @@ class ChaosRequest(BaseModel):
     level: float = 0.5
     seed: int | None = None
     unsafe: bool = False
-    mutate_sprites: bool = False
     name: str | None = None
     test_weapon: bool = False
     test_drone: bool = False

@@ -27,7 +27,6 @@ export function ChaosPage() {
         level: level / 100,
         seed: seed ? parseInt(seed) : undefined,
         unsafe,
-        mutate_sprites: false,
         name: name.trim() || undefined,
         test_weapon: false,
         test_drone: false,

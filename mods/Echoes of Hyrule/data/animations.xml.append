@@ -1,4 +1,5 @@
-<FTL><animSheet name="light_bow" w="192" h="60" fw="16" fh="60">weapons/light_bow_strip12.png</animSheet>
+<FTL>
+  <animSheet name="light_bow" w="192" h="60" fw="16" fh="60">weapons/light_bow_strip12.png</animSheet>
   <weaponAnim name="light_bow">
     <sheet>light_bow</sheet>
     <desc length="12" x="0" y="0"/>
@@ -34,28 +35,4 @@
     <firePoint x="11" y="30"/>
     <mountPoint x="0" y="30"/>
   </weaponAnim>
-<animSheet name="sheikah_eye_drone" w="200" h="20" fw="50" fh="20">drones/sheikah_eye_drone_sheet.png</animSheet>
-  <anim name="sheikah_eye_drone">
-    <sheet>sheikah_eye_drone</sheet>
-    <desc length="4" x="0" y="0"/>
-    <time>0.3</time>
-  </anim>
-  <animSheet name="guardian_defense_drone" w="200" h="20" fw="50" fh="20">drones/guardian_defense_drone_sheet.png</animSheet>
-  <anim name="guardian_defense_drone">
-    <sheet>guardian_defense_drone</sheet>
-    <desc length="4" x="0" y="0"/>
-    <time>0.3</time>
-  </anim>
-  <animSheet name="fairy_repair_swarm" w="200" h="20" fw="50" fh="20">drones/fairy_repair_swarm_sheet.png</animSheet>
-  <anim name="fairy_repair_swarm">
-    <sheet>fairy_repair_swarm</sheet>
-    <desc length="4" x="0" y="0"/>
-    <time>0.3</time>
-  </anim>
-  <animSheet name="hookshot_boarding_drone" w="200" h="20" fw="50" fh="20">drones/hookshot_boarding_drone_sheet.png</animSheet>
-  <anim name="hookshot_boarding_drone">
-    <sheet>hookshot_boarding_drone</sheet>
-    <desc length="4" x="0" y="0"/>
-    <time>0.3</time>
-  </anim>
 </FTL>

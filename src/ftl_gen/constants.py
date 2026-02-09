@@ -14,10 +14,14 @@ WEAPON_FRAME_WIDTH = 16
 WEAPON_FRAME_HEIGHT = 60
 WEAPON_FRAME_COUNT = 12
 
-# Drone sprites: wide and short, drone faces RIGHT
+# Drone sprites: wide and short, drone faces RIGHT (legacy animation sheet format)
 DRONE_FRAME_WIDTH = 50
 DRONE_FRAME_HEIGHT = 20
 DRONE_FRAME_COUNT = 4
+
+# Drone body images: 64x64 static PNGs used by FTL's drone renderer
+# Stored at img/ship/drones/{droneImage}_base.png and _on.png
+DRONE_BODY_SIZE = 64
 
 
 # --- Derived Balance Ranges ---
@@ -177,15 +181,16 @@ VANILLA_WEAPON_ASSETS = {
 
 # Default vanilla drone images by type
 VANILLA_DRONE_IMAGES = {
-    "COMBAT": "drone_player_combat",
-    "DEFENSE": "drone_player_defensive",
-    "SHIP_REPAIR": "drone_repair_ship",
-    "BOARDER": "drone_boarder",
-    "REPAIR": "drone_repair",
-    "BATTLE": "drone_player_battle",
-    "HACKING": "drone_hacking",
+    "COMBAT": "drone_combat",
+    "DEFENSE": "drone_defense",
+    "SHIP_REPAIR": "drone_shiprepair",
+    "BOARDER": "drone_combat",      # No dedicated boarder body image in vanilla
+    "REPAIR": "drone_combat",       # No dedicated repair body image in vanilla
+    "BATTLE": "drone_combat",       # No dedicated battle body image in vanilla
+    "HACKING": "drone_hack",
+    "SHIELD": "drone_shield",
 }
 
 # Valid blueprint types (static fallback; prefer get_weapon_types()/get_drone_types())
 WEAPON_TYPES = {"LASER", "MISSILES", "BEAM", "BOMB", "BURST", "ION"}
-DRONE_TYPES = {"COMBAT", "DEFENSE", "SHIP_REPAIR", "BOARDER", "REPAIR", "BATTLE", "HACKING"}
+DRONE_TYPES = {"COMBAT", "DEFENSE", "SHIP_REPAIR", "BOARDER", "REPAIR", "BATTLE", "HACKING", "SHIELD"}

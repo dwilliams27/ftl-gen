@@ -10,8 +10,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from ftl_gen import __version__
-from ftl_gen.chaos import ChaosConfig, SpriteMutator, randomize_all
-from ftl_gen.chaos.sprites import VanillaSpriteExtractor, mutate_vanilla_sprites
+from ftl_gen.chaos import ChaosConfig, randomize_all
 from ftl_gen.config import Settings, get_settings
 from ftl_gen.core.generator import ModGenerator
 from ftl_gen.core.mod_builder import ModBuilder
@@ -492,12 +491,37 @@ def _rebuild_mod(
         console.print(f"[red]Mod not found: {mod_name}[/]")
         raise typer.Exit(1)
 
-    # Collect sprite files
+    # Collect sprite files, converting old drone sheets and ensuring
+    # all three body images exist (_base, _on, _charged)
     sprite_files = {}
     for sprite_path in mod.sprite_files:
         data = reader.get_sprite_data(mod_name, sprite_path)
-        if data:
+        if not data:
+            continue
+        if sprite_path.startswith("drones/") and sprite_path.endswith("_sheet.png"):
+            from ftl_gen.images.sprites import SpriteProcessor
+            proc = SpriteProcessor()
+            drone_name = sprite_path.replace("drones/", "").replace("_sheet.png", "")
+            try:
+                body = proc.create_drone_body_images(data)
+                for suffix, img_data in body.items():
+                    sprite_files[f"ship/drones/{drone_name}{suffix}.png"] = img_data
+            except Exception:
+                pass
+        else:
             sprite_files[sprite_path] = data
+
+    # Ensure _charged.png exists for any drone that has _base.png
+    from ftl_gen.images.sprites import SpriteProcessor
+    base_drones = [p.replace("ship/drones/", "").replace("_base.png", "")
+                   for p in sprite_files if p.endswith("_base.png") and p.startswith("ship/drones/")]
+    for drone_name in base_drones:
+        charged_key = f"ship/drones/{drone_name}_charged.png"
+        if charged_key not in sprite_files:
+            base_key = f"ship/drones/{drone_name}_base.png"
+            proc = SpriteProcessor()
+            body = proc.create_drone_body_images(sprite_files[base_key])
+            sprite_files[charged_key] = body["_charged"]
 
     content = build_mod_content(
         mod_name=mod_name,
@@ -826,7 +850,6 @@ def chaos(
     level: Annotated[float, typer.Option("--level", "-l", help="Chaos level 0.0-1.0")] = 0.5,
     seed: Annotated[Optional[int], typer.Option("--seed", "-s", help="Random seed for reproducibility")] = None,
     unsafe: Annotated[bool, typer.Option("--unsafe", help="Remove safety bounds")] = False,
-    mutate_sprites: Annotated[bool, typer.Option("--mutate-sprites", help="Generate mutated placeholder sprites")] = False,
     name: Annotated[Optional[str], typer.Option("--name", "-n", help="Mod name")] = None,
     output: Annotated[Optional[Path], typer.Option("--output", "-o", help="Output directory")] = None,
     validate: Annotated[bool, typer.Option("--validate", help="Validate with Slipstream")] = False,
@@ -844,7 +867,7 @@ def chaos(
     Examples:
         ftl-gen chaos --level 0.5
         ftl-gen chaos --level 0.8 --seed 12345
-        ftl-gen chaos --level 1.0 --unsafe --mutate-sprites --validate --patch --run
+        ftl-gen chaos --level 1.0 --unsafe --validate --patch --run
     """
     if not 0.0 <= level <= 1.0:
         console.print("[red]Error: --level must be between 0.0 and 1.0[/]")
@@ -875,46 +898,6 @@ def chaos(
         console.print(f"  [green]Randomized {len(chaos_result.crew)} crew races[/]")
         console.print(f"  [dim]Seed used: {chaos_result.seed_used}[/]")
 
-        sprite_files: dict[str, bytes] = {}
-        if mutate_sprites:
-            console.print("\n[bold]Extracting and mutating vanilla sprites...[/]")
-
-            extractor = VanillaSpriteExtractor()
-            if not extractor.is_available:
-                console.print("[yellow]Warning: Slipstream not found, cannot extract vanilla sprites[/]")
-                console.print("[dim]Falling back to placeholder sprites[/]")
-                from ftl_gen.images.sprites import SpriteProcessor
-                sprite_processor = SpriteProcessor()
-                sprite_mutator = SpriteMutator(level, seed)
-
-                for w in chaos_result.weapons:
-                    filename = f"{w.name.lower()}_strip12.png"
-                    placeholder = sprite_processor.create_placeholder_sprite_sheet(w.name)
-                    mutated = sprite_mutator.mutate_sprite(placeholder)
-                    sprite_files[filename] = mutated
-                    w.weapon_art = w.name.lower()
-
-                console.print(f"  [yellow]Generated {len(sprite_files)} placeholder sprites[/]")
-            else:
-                import tempfile
-                temp_dir = Path(tempfile.mkdtemp(prefix="ftl_chaos_"))
-                console.print(f"  [dim]Extracting FTL resources to {temp_dir}...[/]")
-
-                weapon_sprites, drone_sprites = mutate_vanilla_sprites(
-                    chaos_level=level,
-                    seed=seed,
-                    slipstream_path=extractor.slipstream_path,
-                    temp_dir=temp_dir,
-                )
-
-                for sprite_path, sprite_data in weapon_sprites.items():
-                    sprite_files[sprite_path] = sprite_data
-                for sprite_path, sprite_data in drone_sprites.items():
-                    sprite_files[sprite_path] = sprite_data
-
-                console.print(f"  [magenta]Mutated {len(weapon_sprites)} weapon sprites[/]")
-                console.print(f"  [magenta]Mutated {len(drone_sprites)} drone sprites[/]")
-
         from ftl_gen.llm.parsers import build_mod_content
 
         content = build_mod_content(
@@ -929,7 +912,7 @@ def chaos(
 
         mod_builder = ModBuilder(settings.output_dir)
         ftl_path = mod_builder.build(
-            content, sprite_files if sprite_files else None,
+            content,
             test_weapon=test_weapon, test_drone=test_drone, test_augment=test_augment,
         )
 

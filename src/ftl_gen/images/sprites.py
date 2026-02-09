@@ -6,6 +6,7 @@ from pathlib import Path
 from PIL import Image
 
 from ftl_gen.constants import (
+    DRONE_BODY_SIZE,
     DRONE_FRAME_COUNT,
     DRONE_FRAME_HEIGHT,
     DRONE_FRAME_WIDTH,
@@ -177,6 +178,81 @@ class SpriteProcessor:
         frame = self._adjust_brightness(frame, pulse)
 
         return frame
+
+    def create_drone_body_images(
+        self,
+        image_data: bytes,
+    ) -> dict[str, bytes]:
+        """Convert a single image to FTL drone body images (_base, _on, _charged).
+
+        FTL drones use 64x64 static PNGs in img/ship/drones/, not animation sheets.
+        If the input looks like a sprite sheet (much wider than tall), extracts the
+        first frame before processing.
+
+        Returns:
+            Dict with "_base", "_on", and "_charged" keys mapping to PNG bytes.
+        """
+        source = Image.open(BytesIO(image_data)).convert("RGBA")
+
+        # Detect animation sheets: if width > 2x height, extract first frame
+        if source.width > source.height * 2:
+            frame_w = source.height  # Assume square-ish frames, or use known dims
+            # For known drone sheets (200x20 = 4 frames of 50x20)
+            if source.height == self.DRONE_FRAME_HEIGHT:
+                frame_w = self.DRONE_FRAME_WIDTH
+            source = source.crop((0, 0, frame_w, source.height))
+
+        source = self._remove_green_background(source)
+        source = self._crop_to_content(source)
+
+        # Resize to fit 64x64 frame
+        size = DRONE_BODY_SIZE
+        target = int(size * 0.9)
+        width_scale = target / source.width
+        height_scale = target / source.height
+        scale = min(width_scale, height_scale)
+        new_w = max(1, int(source.width * scale))
+        new_h = max(1, int(source.height * scale))
+        resized = source.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+        base = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        base.paste(resized, ((size - new_w) // 2, (size - new_h) // 2), resized)
+
+        # _on variant: slightly brighter (engine glow)
+        on_img = self._adjust_brightness(base.copy(), 1.3)
+
+        # _charged variant: slightly blue-tinted (weapon charge glow)
+        charged_img = self._adjust_brightness(base.copy(), 1.15)
+
+        result = {}
+        for suffix, img in [("_base", base), ("_on", on_img), ("_charged", charged_img)]:
+            buf = BytesIO()
+            img.save(buf, format="PNG")
+            result[suffix] = buf.getvalue()
+        return result
+
+    def create_placeholder_drone_body(self, drone_name: str) -> dict[str, bytes]:
+        """Create placeholder 64x64 drone body images for testing.
+
+        Returns:
+            Dict with "_base", "_on", and "_charged" keys mapping to PNG bytes.
+        """
+        size = DRONE_BODY_SIZE
+        result = {}
+        for suffix, brightness in [("_base", 90), ("_on", 130), ("_charged", 110)]:
+            img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+            pixels = img.load()
+            center = size // 2
+            for y in range(size):
+                for x in range(size):
+                    # Simple diamond/circle shape
+                    dist = abs(x - center) + abs(y - center)
+                    if dist < 24:
+                        pixels[x, y] = (brightness, brightness, brightness + 20, 255)
+            buf = BytesIO()
+            img.save(buf, format="PNG")
+            result[suffix] = buf.getvalue()
+        return result
 
     def create_placeholder_drone_sprite_sheet(self, drone_name: str) -> bytes:
         """Create a simple placeholder drone sprite sheet for testing."""

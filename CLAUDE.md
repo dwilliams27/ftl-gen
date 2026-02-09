@@ -193,7 +193,6 @@ ftl-gen mod "pirates" --chaos 0.5 -w2 -e0 -d0 -a0 -c0  # Chaotified vanilla + ne
 - Same names override vanilla items when patched
 - Seeded RNG for reproducible results (`--seed`)
 - `--unsafe` removes bounds (10%-500% range by default)
-- `--mutate-sprites` generates chaos-mutated placeholder sprites
 
 **What gets chaotified:**
 | Item | Stats |
@@ -202,17 +201,6 @@ ftl-gen mod "pirates" --chaos 0.5 -w2 -e0 -d0 -a0 -c0  # Chaotified vanilla + ne
 | Drones | power, cost, cooldown, speed |
 | Augments | cost, value |
 | Crew | maxHealth, moveSpeed, repairSpeed, damageMultiplier, cost |
-
-**Sprite mutations (--mutate-sprites):**
-| Transform | Effect |
-|-----------|--------|
-| Brightness | ±30% random per sprite |
-| Contrast | ±20% random per sprite |
-| Hue shift | 0-360° random rotation |
-| Saturation | ±40% random |
-| Color invert | 10% chance at high chaos |
-| Posterize | Reduce color depth at high chaos |
-| Noise | Random pixel noise at very high chaos |
 
 ## To be fully successful, this project needs
 

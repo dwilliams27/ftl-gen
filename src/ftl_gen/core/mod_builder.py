@@ -78,8 +78,7 @@ class ModBuilder:
         # Create directories
         (mod_dir / "data").mkdir(parents=True)
         (mod_dir / "img" / "weapons").mkdir(parents=True)
-        (mod_dir / "img" / "drones").mkdir(parents=True)
-        (mod_dir / "img" / "ship").mkdir(parents=True)  # For drone sprites in vanilla
+        (mod_dir / "img" / "ship" / "drones").mkdir(parents=True)
         (mod_dir / "mod-appendix").mkdir(parents=True)
 
     def _write_xml_files(
@@ -110,40 +109,13 @@ class ModBuilder:
             events_xml = self.xml_builder.build_events_append(content)
             (data_dir / "events.xml.append").write_text(events_xml)
 
-        # animations.xml.append - weapon sprites and drone sprites
+        # animations.xml.append - weapon sprites only
+        # (drones use static body images in img/ship/drones/, not animation sheets)
         weapon_names = [w.name for w in content.weapons] if content.weapons else []
-        drone_names = [d.name for d in content.drones if d.drone_image] if content.drones else []
 
-        if weapon_names or drone_names:
-            animations_parts = []
-
-            if weapon_names:
-                weapon_anim_xml = self.xml_builder.build_animations_append(weapon_names)
-                animations_parts.append(weapon_anim_xml)
-
-            if drone_names:
-                drone_anim_xml = self.xml_builder.build_drone_animations_append(drone_names)
-                animations_parts.append(drone_anim_xml)
-
-            # Combine animations (merge FTL root elements)
-            if len(animations_parts) == 1:
-                (data_dir / "animations.xml.append").write_text(animations_parts[0])
-            else:
-                # Both weapon and drone animations - combine them
-                combined = self._merge_ftl_xml(animations_parts)
-                (data_dir / "animations.xml.append").write_text(combined)
-
-    def _merge_ftl_xml(self, xml_parts: list[str]) -> str:
-        """Merge multiple FTL XML strings into one."""
-        from lxml import etree
-
-        root = etree.Element("FTL")
-        for part in xml_parts:
-            part_root = etree.fromstring(part.encode())
-            for child in part_root:
-                root.append(child)
-
-        return etree.tostring(root, pretty_print=True, encoding="unicode", xml_declaration=False)
+        if weapon_names:
+            weapon_anim_xml = self.xml_builder.build_animations_append(weapon_names)
+            (data_dir / "animations.xml.append").write_text(weapon_anim_xml)
 
     def _write_sprite_files(
         self,
@@ -154,19 +126,14 @@ class ModBuilder:
         """Write sprite files to img directory."""
         img_dir = mod_dir / "img"
         weapons_dir = img_dir / "weapons"
-        drones_dir = img_dir / "drones"
 
         for filename, data in sprite_files.items():
-            # Check if filename includes a path (e.g., "weapons/laser1.png" or "ship/drone.png")
+            # Check if filename includes a path (e.g., "ship/drones/x_base.png")
             if "/" in filename:
-                # Path-based filename - write to img/<path>
                 filepath = img_dir / filename
                 filepath.parent.mkdir(parents=True, exist_ok=True)
-            elif "_sheet.png" in filename:
-                # Drone sprite (legacy naming)
-                filepath = drones_dir / filename
             else:
-                # Weapon sprite (legacy naming)
+                # Weapon sprite (flat filename)
                 filepath = weapons_dir / filename
             filepath.write_bytes(data)
 

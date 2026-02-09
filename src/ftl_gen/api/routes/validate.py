@@ -63,12 +63,37 @@ def _rebuild_mod(
     if not mod:
         raise HTTPException(status_code=404, detail=f"Mod not found: {name}")
 
-    # Collect sprite files from the existing mod
+    # Collect sprite files, converting old drone sheets and ensuring
+    # all three body images exist (_base, _on, _charged)
     sprite_files = {}
     for sprite_path in mod.sprite_files:
         data = reader.get_sprite_data(name, sprite_path)
-        if data:
+        if not data:
+            continue
+        if sprite_path.startswith("drones/") and sprite_path.endswith("_sheet.png"):
+            from ftl_gen.images.sprites import SpriteProcessor
+            proc = SpriteProcessor()
+            drone_name = sprite_path.replace("drones/", "").replace("_sheet.png", "")
+            try:
+                body = proc.create_drone_body_images(data)
+                for suffix, img_data in body.items():
+                    sprite_files[f"ship/drones/{drone_name}{suffix}.png"] = img_data
+            except Exception:
+                pass
+        else:
             sprite_files[sprite_path] = data
+
+    # Ensure _charged.png exists for any drone that has _base.png
+    from ftl_gen.images.sprites import SpriteProcessor
+    base_drones = [p.replace("ship/drones/", "").replace("_base.png", "")
+                   for p in sprite_files if p.endswith("_base.png") and p.startswith("ship/drones/")]
+    for drone_name in base_drones:
+        charged_key = f"ship/drones/{drone_name}_charged.png"
+        if charged_key not in sprite_files:
+            base_key = f"ship/drones/{drone_name}_base.png"
+            proc = SpriteProcessor()
+            body = proc.create_drone_body_images(sprite_files[base_key])
+            sprite_files[charged_key] = body["_charged"]
 
     content = build_mod_content(
         mod_name=name,

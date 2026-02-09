@@ -422,9 +422,9 @@ class ModGenerator:
             drone_sprites = self._generate_drone_sprites(llm_drones, use_cache)
             sprite_files.update(drone_sprites)
             progress.remove_task(task)
-            console.print(f"  [green]Generated {len(drone_sprites)} drone sprites[/]")
+            console.print(f"  [green]Generated {len(llm_drones)} drone body images[/]")
 
-            # Link drone image to sprite animations
+            # Link drone image name (FTL looks up img/ship/drones/{name}_base.png)
             for drone in llm_drones:
                 drone.drone_image = drone.name.lower()
 
@@ -501,44 +501,41 @@ class ModGenerator:
         drones: list[DroneBlueprint],
         use_cache: bool = False,
     ) -> dict[str, bytes]:
-        """Generate sprite sheets for drones."""
+        """Generate 64x64 body images for drones (_base.png + _on.png).
+
+        FTL drones use static body images in img/ship/drones/, not animation sheets.
+        """
         sprite_files = {}
         cache_dir = self._get_cache_dir() if use_cache else None
 
         for drone in drones:
-            # FTL drone naming: dronename_sheet.png (4 frames of 50x20)
-            filename = f"{drone.name.lower()}_sheet.png"
+            name_lower = drone.name.lower()
             cache_key = self._get_drone_cache_key(drone) if use_cache else None
             cached_path = cache_dir / f"{cache_key}.png" if cache_dir and cache_key else None
 
-            # Check cache first
-            if cached_path and cached_path.exists():
-                console.print(f"  [dim]Using cached sprite for {drone.name}[/]")
-                sprite_files[filename] = cached_path.read_bytes()
-                continue
-
             try:
-                # Generate base image
-                image_data = self.image_client.generate_drone_sprite(
-                    drone_name=drone.name,
-                    drone_type=drone.type,
-                    description=drone.desc,
-                )
+                # Check cache first (cache stores the raw generated image)
+                if cached_path and cached_path.exists():
+                    console.print(f"  [dim]Using cached sprite for {drone.name}[/]")
+                    image_data = cached_path.read_bytes()
+                else:
+                    image_data = self.image_client.generate_drone_sprite(
+                        drone_name=drone.name,
+                        drone_type=drone.type,
+                        description=drone.desc,
+                    )
+                    if cached_path:
+                        cached_path.write_bytes(image_data)
 
-                # Create sprite sheet
-                sheet_data = self.sprite_processor.create_drone_sprite_sheet(image_data)
-
-                # Cache the result
-                if cached_path:
-                    cached_path.write_bytes(sheet_data)
-
-                sprite_files[filename] = sheet_data
+                body_images = self.sprite_processor.create_drone_body_images(image_data)
 
             except Exception as e:
                 console.print(f"[yellow]Warning: Could not generate sprite for {drone.name}: {e}[/]")
-                # Use placeholder
-                sheet_data = self.sprite_processor.create_placeholder_drone_sprite_sheet(drone.name)
-                sprite_files[filename] = sheet_data
+                body_images = self.sprite_processor.create_placeholder_drone_body(drone.name)
+
+            # Place in img/ship/drones/ (the mod builder handles path-based keys)
+            for suffix, data in body_images.items():
+                sprite_files[f"ship/drones/{name_lower}{suffix}.png"] = data
 
         return sprite_files
 
