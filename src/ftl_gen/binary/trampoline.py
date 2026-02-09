@@ -32,14 +32,15 @@ logger = logging.getLogger(__name__)
 HAS_AUGMENTATION_VA = 0x1000A2740  # ShipObject::HasAugmentation
 GET_AUGMENTATION_VALUE_VA = 0x1000A2870  # ShipObject::GetAugmentationValue
 
-# Number of prologue bytes to displace (must cover complete instructions)
+# Number of prologue bytes to displace (must land on an instruction boundary!)
 # These are verified against the actual binary before patching.
-# ShipObject::HasAugmentation prologue (14 bytes):
-#   push rbp; mov rbp, rsp; push r15; push r14; push rbx; sub rsp, 0x28
-HAS_AUG_DISPLACED_SIZE = 14
-# ShipObject::GetAugmentationValue prologue (14 bytes):
-#   push rbp; mov rbp, rsp; push r15; push r14; push rbx; sub rsp, 0x28
-GET_AUG_VAL_DISPLACED_SIZE = 14
+# ShipObject::HasAugmentation prologue (13 bytes):
+#   push rbp; mov rbp,rsp; push r14; push rbx; sub rsp,0x20; xor eax,eax
+# Next instruction at +13: cmp dword [rdi+8], 0 (4 bytes) — do NOT split it.
+HAS_AUG_DISPLACED_SIZE = 13
+# ShipObject::GetAugmentationValue prologue (13 bytes):
+#   push rbp; mov rbp,rsp; push r14; push rbx; sub rsp,0x20; xor eax,eax
+GET_AUG_VAL_DISPLACED_SIZE = 13
 
 # Maximum custom augment name length (SSO limit)
 MAX_AUG_NAME_LEN = 22
@@ -103,8 +104,11 @@ class TrampolineBuilder:
 
     The trampoline intercepts the std::string* argument (RSI) before
     HasAugmentation/GetAugmentationValue processes it. If the string
-    matches a custom augment name, RSI is redirected to point to an
-    SSO string in the code cave containing the vanilla name.
+    matches a vanilla augment name, RSI is redirected to point to an
+    SSO string containing the custom name (what's actually on the ship).
+
+    This makes the function search for the custom name in the ship's
+    augment list, so custom-named augments inherit vanilla effects.
 
     Layout of generated code in the cave:
 
@@ -112,8 +116,8 @@ class TrampolineBuilder:
             save registers
             extract C string pointer from RSI (SSO-aware)
             for each mapping:
-                compare with custom name
-                if match: lea rsi, [vanilla_sso_string]
+                compare with vanilla name (what the game looks for)
+                if match: lea rsi, [custom_sso_string] (what's on the ship)
             restore registers
             displaced prologue instructions
             jmp back to original+N
@@ -122,8 +126,8 @@ class TrampolineBuilder:
             (same structure)
 
         [data section]
-            custom_name_1: db "CUSTOM_NAME", 0    (C strings for comparison)
-            vanilla_sso_1: <24 bytes SSO string>   (replacement strings)
+            vanilla_name_1: db "WEAPON_PREIGNITE", 0  (C strings to match against)
+            custom_sso_1: <24 bytes SSO string>        (replacement: custom name)
             ...
     """
 
@@ -277,19 +281,23 @@ class TrampolineBuilder:
         Returns (cave_bytes, has_trampoline_offset, get_trampoline_offset).
         Offsets are relative to start of cave.
         """
-        # Phase 1: Build the data section (custom C-strings + vanilla SSO strings)
+        # Phase 1: Build the data section
         # We need to know data offsets to generate RIP-relative LEA instructions.
-        # Strategy: build code first with placeholder offsets, then fix up.
-        # Simpler: pre-compute data layout, then generate code with known offsets.
-
-        # Data layout: for each mapping, we store:
-        #   - C string of custom name (NUL-terminated, for byte-by-byte compare)
-        #   - SSO string of vanilla name (24 bytes, the replacement std::string)
+        #
+        # The game calls HasAugmentation("VANILLA_NAME") to check for effects.
+        # The ship's augment list contains "CUSTOM_NAME" (our modded augment).
+        # So the trampoline must:
+        #   - MATCH the function argument against the VANILLA name
+        #   - SUBSTITUTE RSI with the CUSTOM name (so the function finds it in the list)
+        #
+        # Data layout per mapping:
+        #   - C string of vanilla name (NUL-terminated, for byte-by-byte compare)
+        #   - SSO string of custom name (24 bytes, the replacement std::string*)
         data_entries: list[tuple[bytes, bytes]] = []
         for m in mappings:
-            custom_cstr = m.custom_name.encode("ascii") + b"\x00"
-            vanilla_sso = encode_sso_string(m.vanilla_name)
-            data_entries.append((custom_cstr, vanilla_sso))
+            vanilla_cstr = m.vanilla_name.encode("ascii") + b"\x00"
+            custom_sso = encode_sso_string(m.custom_name)
+            data_entries.append((vanilla_cstr, custom_sso))
 
         # Estimate trampoline code size to place data after both trampolines
         # Each trampoline: ~60 bytes base + ~40 bytes per mapping + displaced prologue + jmp
@@ -305,24 +313,24 @@ class TrampolineBuilder:
 
         # Build data section
         data_section = bytearray()
-        # Track offsets of each custom C-string and vanilla SSO within the data section
-        custom_str_offsets: list[int] = []
-        vanilla_sso_offsets: list[int] = []
-        for custom_cstr, vanilla_sso in data_entries:
-            custom_str_offsets.append(data_offset + len(data_section))
-            data_section.extend(custom_cstr)
+        # Track offsets of each vanilla C-string and custom SSO within the data section
+        match_str_offsets: list[int] = []  # vanilla C-strings to match against
+        subst_sso_offsets: list[int] = []  # custom SSO strings to substitute
+        for vanilla_cstr, custom_sso in data_entries:
+            match_str_offsets.append(data_offset + len(data_section))
+            data_section.extend(vanilla_cstr)
             # Align SSO string to 8 bytes
             while len(data_section) % 8 != 0:
                 data_section.append(0)
-            vanilla_sso_offsets.append(data_offset + len(data_section))
-            data_section.extend(vanilla_sso)
+            subst_sso_offsets.append(data_offset + len(data_section))
+            data_section.extend(custom_sso)
 
         # Now generate the two trampolines
         has_tramp = self._generate_trampoline(
             cave_va=cave_va,
             tramp_offset=has_tramp_offset,
-            custom_str_offsets=custom_str_offsets,
-            vanilla_sso_offsets=vanilla_sso_offsets,
+            match_str_offsets=match_str_offsets,
+            subst_sso_offsets=subst_sso_offsets,
             displaced_prologue=has_aug_prologue,
             return_va=HAS_AUGMENTATION_VA + HAS_AUG_DISPLACED_SIZE,
             target_size=one_tramp_size,
@@ -331,8 +339,8 @@ class TrampolineBuilder:
         get_tramp = self._generate_trampoline(
             cave_va=cave_va,
             tramp_offset=get_tramp_offset,
-            custom_str_offsets=custom_str_offsets,
-            vanilla_sso_offsets=vanilla_sso_offsets,
+            match_str_offsets=match_str_offsets,
+            subst_sso_offsets=subst_sso_offsets,
             displaced_prologue=get_aug_val_prologue,
             return_va=GET_AUGMENTATION_VALUE_VA + GET_AUG_VAL_DISPLACED_SIZE,
             target_size=one_tramp_size,
@@ -350,8 +358,8 @@ class TrampolineBuilder:
         self,
         cave_va: int,
         tramp_offset: int,
-        custom_str_offsets: list[int],
-        vanilla_sso_offsets: list[int],
+        match_str_offsets: list[int],
+        subst_sso_offsets: list[int],
         displaced_prologue: bytes,
         return_va: int,
         target_size: int,
@@ -361,16 +369,18 @@ class TrampolineBuilder:
         The trampoline:
         1. Saves scratch registers
         2. Reads the C string from the std::string* in RSI (SSO-aware)
-        3. For each mapping, compares and optionally redirects RSI
+        3. For each mapping, compares argument against vanilla name;
+           if match, redirects RSI to custom name SSO string
         4. Restores scratch registers
         5. Executes displaced prologue
         6. JMPs back to original function + N
 
         Register usage:
             RSI = std::string* argument (what we want to swap)
-            RAX = scratch (C string pointer, then comparison result)
-            RCX = scratch (pointer to custom name C-string in cave)
-            RDX = saved across comparison
+            RAX = scratch (C string pointer extraction)
+            RCX = scratch (pointer to match C-string in cave)
+            RDX = scratch (comparison pointer)
+            R8  = preserved C string pointer across comparisons
         """
         code = bytearray()
         tramp_va = cave_va + tramp_offset
@@ -381,218 +391,7 @@ class TrampolineBuilder:
         def emit(data: bytes) -> None:
             code.extend(data)
 
-        # --- Save scratch registers ---
-        emit(b"\x50")          # push rax
-        emit(b"\x51")          # push rcx
-        emit(b"\x52")          # push rdx
-
-        # --- Extract C string pointer from std::string* in RSI ---
-        # libc++ SSO: if (byte[0] & 1) == 0 → short string, data at RSI+1
-        #             if (byte[0] & 1) == 1 → long string, pointer at RSI+16
-        emit(b"\x48\x89\xf0")                 # mov rax, rsi
-        emit(b"\xf6\x00\x01")                 # test byte [rax], 1
-        # jz .inline (short string) — we'll patch the offset
-        jz_pos = len(code)
-        emit(b"\x74\x00")                     # jz .inline (placeholder)
-        # Long string: load heap pointer
-        emit(b"\x48\x8b\x40\x10")             # mov rax, [rax + 16]
-        # jmp .compare
-        jmp_pos = len(code)
-        emit(b"\xeb\x00")                     # jmp .compare (placeholder)
-        # .inline:
-        inline_target = len(code)
-        emit(b"\x48\x83\xc0\x01")             # add rax, 1  (inline data at offset 1)
-        # .compare:
-        compare_target = len(code)
-
-        # Patch the jz and jmp offsets
-        code[jz_pos + 1] = inline_target - (jz_pos + 2)
-        code[jmp_pos + 1] = compare_target - (jmp_pos + 2)
-
-        # RAX now points to the C string data.
-        # --- For each mapping: compare and conditionally redirect ---
-        for i, (custom_off, vanilla_off) in enumerate(
-            zip(custom_str_offsets, vanilla_sso_offsets)
-        ):
-            # lea rcx, [rip + custom_name_cstr]
-            # RIP-relative: target = cave_va + custom_off
-            # RIP at this instruction = current_va() + 7 (lea is 7 bytes)
-            lea_va = current_va()
-            target_va = cave_va + custom_off
-            rel = target_va - (lea_va + 7)
-            emit(b"\x48\x8d\x0d")             # lea rcx, [rip + rel32]
-            emit(struct.pack("<i", rel))
-
-            # Inline byte-by-byte string compare (RAX vs RCX)
-            # Save RAX (we need to preserve the original pointer)
-            emit(b"\x52")                      # push rdx (save)
-            emit(b"\x48\x89\xc2")             # mov rdx, rax  (copy to rdx for compare)
-
-            # .loop_N:
-            loop_start = len(code)
-            emit(b"\x8a\x02")                 # mov al, [rdx]
-            emit(b"\x3a\x01")                 # cmp al, [rcx]
-            # jne .next_N
-            jne_pos = len(code)
-            emit(b"\x75\x00")                 # jne .next (placeholder)
-            # test al, al (check for NUL terminator = match!)
-            emit(b"\x84\xc0")                 # test al, al
-            # je .match_N
-            je_pos = len(code)
-            emit(b"\x74\x00")                 # je .match (placeholder)
-            # Advance pointers
-            emit(b"\x48\xff\xc2")             # inc rdx
-            emit(b"\x48\xff\xc1")             # inc rcx
-            # jmp .loop_N
-            loop_back = loop_start - (len(code) + 2)
-            emit(b"\xeb")
-            emit(struct.pack("<b", loop_back))
-
-            # .match_N: redirect RSI to vanilla SSO string in cave
-            match_target = len(code)
-            code[je_pos + 1] = match_target - (je_pos + 2)
-
-            emit(b"\x5a")                      # pop rdx (restore)
-            # Restore RAX from what we pushed before
-            # Actually we need to restore the original RAX. Let's use the stack.
-            # lea rsi, [rip + vanilla_sso]
-            lea2_va = current_va()
-            vanilla_va = cave_va + vanilla_off
-            rel2 = vanilla_va - (lea2_va + 7)
-            emit(b"\x48\x8d\x35")             # lea rsi, [rip + rel32]
-            emit(struct.pack("<i", rel2))
-            # jmp .done (skip remaining comparisons)
-            jmp_done_pos = len(code)
-            emit(b"\xe9\x00\x00\x00\x00")     # jmp .done (placeholder, rel32)
-            # We'll patch this after we know .done's position
-
-            # .next_N: not a match, continue to next mapping
-            next_target = len(code)
-            code[jne_pos + 1] = next_target - (jne_pos + 2)
-            emit(b"\x5a")                      # pop rdx (restore)
-
-        # .done: restore registers, execute displaced prologue, jmp back
-        done_target = len(code)
-
-        # Patch all jmp .done instructions
-        # Walk backwards looking for our jmp placeholders
-        # Each mapping emits a jmp rel32 at jmp_done positions
-        # We need to go back and fix them. Let's do it by re-scanning.
-        # Actually, let's track them.
-        # Re-scan: we stored jmp_done_pos for the last mapping.
-        # We need to track all of them. Let me refactor.
-
-        # We'll collect jmp_done positions and patch them after the loop.
-        # Since we can't easily go back, let's use a different approach:
-        # track positions as we go.
-
-        # Hmm, we already emitted the code. Let me patch them now.
-        # The pattern is: \xe9\x00\x00\x00\x00 (5 bytes) for jmp .done
-        # We need to find all of them. But we only saved the last one.
-        # Let me fix this by re-generating with proper tracking.
-        pass
-
-        # OK — I realize the approach above doesn't properly track the jmp .done
-        # positions. Let me restart the per-mapping loop with proper tracking.
-        # But we already emitted code... Let me use a cleaner approach.
-
-        # Let's rebuild using a two-pass approach. First pass collects offsets,
-        # second pass generates code. For now, with the code already emitted,
-        # let me just re-implement cleanly.
-
-        # Clear and restart from save registers
-        code.clear()
-
-        # This time, track jmp_done positions properly
         jmp_done_positions: list[int] = []
-
-        # --- Save scratch registers ---
-        emit(b"\x50")          # push rax
-        emit(b"\x51")          # push rcx
-        emit(b"\x52")          # push rdx
-
-        # --- Extract C string pointer from std::string* in RSI ---
-        emit(b"\x48\x89\xf0")                 # mov rax, rsi
-        emit(b"\xf6\x00\x01")                 # test byte [rax], 1
-        jz_pos = len(code)
-        emit(b"\x74\x00")                     # jz .inline (placeholder)
-        emit(b"\x48\x8b\x40\x10")             # mov rax, [rax + 16]
-        jmp_pos = len(code)
-        emit(b"\xeb\x00")                     # jmp .compare (placeholder)
-        inline_target = len(code)
-        emit(b"\x48\x83\xc0\x01")             # add rax, 1
-        compare_target = len(code)
-        code[jz_pos + 1] = inline_target - (jz_pos + 2)
-        code[jmp_pos + 1] = compare_target - (jmp_pos + 2)
-
-        # --- Per-mapping comparison ---
-        for i, (custom_off, vanilla_off) in enumerate(
-            zip(custom_str_offsets, vanilla_sso_offsets)
-        ):
-            # lea rcx, [rip + custom_name]
-            lea_va = current_va()
-            target_va = cave_va + custom_off
-            rel = target_va - (lea_va + 7)
-            emit(b"\x48\x8d\x0d")
-            emit(struct.pack("<i", rel))
-
-            # Save rax for use as compare pointer
-            emit(b"\x48\x89\xc2")             # mov rdx, rax
-
-            # Inline strcmp loop
-            loop_start = len(code)
-            emit(b"\x0f\xb6\x02")             # movzx eax, byte [rdx]  (zero-extend)
-            emit(b"\x3a\x01")                 # cmp al, [rcx]
-            jne_pos = len(code)
-            emit(b"\x75\x00")                 # jne .next (placeholder)
-            emit(b"\x84\xc0")                 # test al, al
-            je_pos = len(code)
-            emit(b"\x74\x00")                 # je .match (placeholder)
-            emit(b"\x48\xff\xc2")             # inc rdx
-            emit(b"\x48\xff\xc1")             # inc rcx
-            loop_back = loop_start - (len(code) + 2)
-            emit(b"\xeb")
-            emit(struct.pack("<b", loop_back))
-
-            # .match: redirect RSI
-            match_target = len(code)
-            code[je_pos + 1] = match_target - (je_pos + 2)
-
-            lea2_va = current_va()
-            vanilla_va = cave_va + vanilla_off
-            rel2 = vanilla_va - (lea2_va + 7)
-            emit(b"\x48\x8d\x35")             # lea rsi, [rip + rel32]
-            emit(struct.pack("<i", rel2))
-
-            jmp_done_positions.append(len(code))
-            emit(b"\xe9\x00\x00\x00\x00")     # jmp .done (placeholder)
-
-            # .next: not a match
-            next_target = len(code)
-            code[jne_pos + 1] = next_target - (jne_pos + 2)
-
-            # Restore rax from rdx for next comparison (mov rax, rdx not needed
-            # since we preserved original rax meaning via rdx copy — but we
-            # clobbered eax with movzx. Reload from the SSO extraction.)
-            # Actually, let me re-extract: the original C-string pointer was in RAX
-            # before we did mov rdx, rax. We clobbered RAX in the loop. Let's
-            # restore it from RDX which still holds the original start.
-            # Wait — RDX was advanced by inc. We need a different approach.
-
-            # Fix: save original RAX on stack before each comparison
-            # This means we need to push/pop around each mapping check.
-            # Let me restructure to save/restore rax properly.
-
-        # Hmm, there's a register allocation issue. RAX gets clobbered in the
-        # compare loop (movzx eax) and RDX gets incremented. For the next mapping
-        # we need the original C-string pointer again.
-        #
-        # Solution: Use R8 to hold the original C-string pointer (callee must save
-        # it, but we save/restore all our scratch regs anyway).
-        # Let me redo this cleanly one more time.
-
-        code.clear()
-        jmp_done_positions.clear()
 
         # --- Save registers (including R8 as our scratch) ---
         emit(b"\x50")                         # push rax
@@ -620,12 +419,12 @@ class TrampolineBuilder:
 
         # R8 = pointer to C string data (preserved across comparisons)
 
-        for i, (custom_off, vanilla_off) in enumerate(
-            zip(custom_str_offsets, vanilla_sso_offsets)
+        for i, (match_off, subst_off) in enumerate(
+            zip(match_str_offsets, subst_sso_offsets)
         ):
-            # lea rcx, [rip + custom_name]
+            # lea rcx, [rip + match_name] (vanilla name to compare against)
             lea_va = current_va()
-            rel = (cave_va + custom_off) - (lea_va + 7)
+            rel = (cave_va + match_off) - (lea_va + 7)
             emit(b"\x48\x8d\x0d")
             emit(struct.pack("<i", rel))
 
@@ -647,12 +446,12 @@ class TrampolineBuilder:
             emit(b"\xeb")
             emit(struct.pack("<b", loop_back))
 
-            # .match: redirect RSI to vanilla SSO string
+            # .match: redirect RSI to custom SSO string (what's on the ship)
             match_target = len(code)
             code[je_pos + 1] = match_target - (je_pos + 2)
 
             lea2_va = current_va()
-            rel2 = (cave_va + vanilla_off) - (lea2_va + 7)
+            rel2 = (cave_va + subst_off) - (lea2_va + 7)
             emit(b"\x48\x8d\x35")             # lea rsi, [rip + rel32]
             emit(struct.pack("<i", rel2))
 

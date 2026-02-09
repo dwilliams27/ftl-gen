@@ -1537,13 +1537,23 @@ def binary_patch_generate(
         Optional[Path],
         typer.Option("--output", "-o", help="Output path for patch spec JSON"),
     ] = None,
+    map_augments: Annotated[
+        Optional[list[str]],
+        typer.Option("--map", help="Explicit augment mapping CUSTOM:VANILLA (repeatable, highest priority)"),
+    ] = None,
 ):
     """Generate a binary patch spec for a mod's augments.
 
     Scans the mod for augments with effect_source set, and builds a
     patch spec that remaps custom augment names to vanilla effects.
 
-    Example: ftl-gen binary-patch generate "My Mod" -o patch.json
+    Use --map for explicit mappings (highest priority), then effect_source,
+    then auto-suggestion from description.
+
+    Examples:
+        ftl-gen binary-patch generate "My Mod" -o patch.json
+        ftl-gen binary-patch generate "My Mod" --map "CUSTOM_AUG:WEAPON_PREIGNITE" -o patch.json
+        ftl-gen binary-patch generate "My Mod" --map "AUG1:SCRAP_COLLECTOR" --map "AUG2:AUTO_COOLDOWN"
     """
     try:
         from ftl_gen.binary.effects import AugmentEffectMapper
@@ -1572,27 +1582,62 @@ def binary_patch_generate(
         console.print(f"[red]Mod not found: {mod_name}[/]")
         raise typer.Exit(1)
 
-    # Collect augment mappings
+    # Parse --map flags first (highest priority)
+    explicit_mappings: dict[str, str] = {}
+    if map_augments:
+        for entry in map_augments:
+            if ":" not in entry:
+                console.print(f"[red]Invalid --map format: {entry} (expected CUSTOM:VANILLA)[/]")
+                raise typer.Exit(1)
+            custom, vanilla = entry.split(":", 1)
+            explicit_mappings[custom.strip()] = vanilla.strip()
+
+    # Collect augment mappings: --map > effect_source > auto-suggestion
     mappings: list[AugmentMapping] = []
     mapper = AugmentEffectMapper()
+    mapped_names: set[str] = set()
 
+    # 1. Explicit --map flags (match by augment name in mod)
     for aug in mod.augments:
+        if aug.name in explicit_mappings:
+            mappings.append(AugmentMapping(
+                custom_name=aug.name, vanilla_name=explicit_mappings[aug.name],
+            ))
+            mapped_names.add(aug.name)
+            console.print(f"  [cyan]--map:[/] {aug.name} → {explicit_mappings[aug.name]}")
+
+    # Also add --map entries that don't match any mod augment (user knows the name)
+    for custom, vanilla in explicit_mappings.items():
+        if custom not in mapped_names:
+            mappings.append(AugmentMapping(custom_name=custom, vanilla_name=vanilla))
+            mapped_names.add(custom)
+            console.print(f"  [cyan]--map:[/] {custom} → {vanilla}")
+
+    # 2. effect_source on augment schema
+    for aug in mod.augments:
+        if aug.name in mapped_names:
+            continue
         effect = getattr(aug, "effect_source", None)
         if effect:
             mappings.append(AugmentMapping(custom_name=aug.name, vanilla_name=effect))
-        else:
-            # Try auto-suggestion from description
-            suggested = mapper.suggest_mapping(aug.desc)
-            if suggested:
-                console.print(
-                    f"  [dim]Auto-mapped: {aug.name} → {suggested} "
-                    f"(based on description)[/]"
-                )
-                mappings.append(AugmentMapping(custom_name=aug.name, vanilla_name=suggested))
+            mapped_names.add(aug.name)
+
+    # 3. Auto-suggestion from description
+    for aug in mod.augments:
+        if aug.name in mapped_names:
+            continue
+        suggested = mapper.suggest_mapping(aug.desc)
+        if suggested:
+            console.print(
+                f"  [dim]Auto-mapped: {aug.name} → {suggested} "
+                f"(based on description)[/]"
+            )
+            mappings.append(AugmentMapping(custom_name=aug.name, vanilla_name=suggested))
+            mapped_names.add(aug.name)
 
     if not mappings:
-        console.print("[yellow]No augments with effect_source found in this mod.[/]")
-        console.print("[dim]Set effect_source on augments to map them to vanilla effects.[/]")
+        console.print("[yellow]No augment mappings found.[/]")
+        console.print("[dim]Use --map CUSTOM:VANILLA, set effect_source on augments, or add descriptive text.[/]")
         raise typer.Exit(0)
 
     console.print(f"[bold]Generating patch spec for {len(mappings)} augment mapping(s):[/]")

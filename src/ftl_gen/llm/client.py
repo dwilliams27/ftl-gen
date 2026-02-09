@@ -17,6 +17,7 @@ MODEL_PRICING: dict[str, dict[str, float]] = {
     # Claude 4.5 series (current)
     "claude-opus-4-5-20251101": {"input": 5.0, "output": 25.0},
     "claude-sonnet-4-5-20251101": {"input": 3.0, "output": 15.0},
+    "claude-sonnet-4-5-20250929": {"input": 3.0, "output": 15.0},
     "claude-haiku-4-5-20251101": {"input": 1.0, "output": 5.0},
     # Claude 4 series (legacy)
     "claude-sonnet-4-20250514": {"input": 3.0, "output": 15.0},

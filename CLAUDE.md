@@ -117,10 +117,13 @@ ui/                     # React frontend (Vite + TypeScript + Tailwind)
 
 ## Binary Patching (Augment Effects)
 
-Custom augment names are cosmetic by default (effects hardcoded in FTL binary). The binary patcher intercepts `HasAugmentation`/`GetAugmentationValue` via x86_64 trampolines to remap custom names → vanilla names at runtime.
+Custom augment names are cosmetic by default (effects hardcoded in FTL binary). The binary patcher intercepts `HasAugmentation`/`GetAugmentationValue` via x86_64 trampolines to remap custom names → vanilla names at runtime. **E2E verified:** custom "PREIGNITION_MATRIX" augment successfully inherits WEAPON_PREIGNITE effect (weapons start fully charged).
 
 ```bash
-# Generate a patch spec for a mod's augments
+# Generate a patch spec with explicit mapping
+ftl-gen binary-patch generate "My Mod" --map "CUSTOM_AUG:WEAPON_PREIGNITE" -o patch.json
+
+# Or auto-detect from effect_source / description
 ftl-gen binary-patch generate "My Mod" -o patch.json
 
 # Apply patch to FTL binary (creates .ftlgen.bak backup)
@@ -134,18 +137,41 @@ ftl-gen binary-patch revert
 ```
 
 **How it works:**
-1. Reads augments with `effect_source` set (or auto-suggests from description)
+1. Reads augments via `--map` flags (highest priority), `effect_source` field, or auto-suggestion from description
 2. Generates x86_64 trampoline code in a code cave (NUL region in `__TEXT`)
-3. Overwrites function prologues with JMP to trampoline
-4. Trampoline: compares `std::string` arg → if custom name, swaps RSI to point to SSO string of vanilla name
+3. Overwrites function prologues (13 bytes) with JMP to trampoline
+4. Trampoline: when game checks for a vanilla augment name, swaps RSI to point to SSO string of the custom name (so the function finds it in the ship's augment list)
 5. Executes displaced prologue, JMPs back
 
 **Key addresses (from Ghidra analysis):**
-- `ShipObject::HasAugmentation` @ `0x1000a2740`
-- `ShipObject::GetAugmentationValue` @ `0x1000a2870`
+- `ShipObject::HasAugmentation` @ `0x1000a2740` (13-byte prologue)
+- `ShipObject::GetAugmentationValue` @ `0x1000a2870` (13-byte prologue)
 - Both use System V AMD64 ABI: `this` in RDI, `std::string*` in RSI
 
-**Safety:** Backup before patch, all-or-nothing verification, atomic write, ad-hoc code re-signing.
+**Safety:** Backup before patch, all-or-nothing verification, atomic write, ad-hoc code re-signing. Works under Rosetta 2 on Apple Silicon.
+
+## TODO: Hook Catalog / Registry
+
+The current binary patcher hardcodes augment-specific constants (function addresses, prologue sizes) directly in `trampoline.py`. The vision is to generalize this into a catalog of known hook targets discovered via Ghidra analysis.
+
+**Target architecture:**
+- `binary/hooks/` — per-capability modules (`augments.py`, `events.py`, `crew.py`)
+- Each module defines `HookSite` entries (function VA, prologue size, ABI details, displaced bytes)
+- `trampoline.py` provides generic primitives: `HookSite`, `StringRemap`, prologue displacement, JMP generation
+- Domain logic (what to remap, how to match) lives in the capability modules
+- Each mod composes the binary patches it needs by declaring capabilities
+
+**Enables:**
+- Custom augment effects (done — `binary/hooks/augments.py` equivalent is current `trampoline.py`)
+- Event injection — hook event loading to register custom events without freezing
+- Crew spawn pools — hook spawn logic to include custom races
+- Custom system behaviors — intercept system update functions
+
+**Migration path:**
+1. Extract `HAS_AUGMENTATION_VA`, `GET_AUGMENTATION_VALUE_VA`, prologue sizes into a `HookSite` dataclass
+2. Move augment-specific logic from `trampoline.py` → `binary/hooks/augments.py`
+3. Keep `TrampolineBuilder` as the generic code generator, parameterized by `HookSite` + `StringRemap` lists
+4. Add new hook targets as Ghidra analysis discovers them
 
 ## Debugging Toolkit
 
