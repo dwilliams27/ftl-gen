@@ -91,7 +91,8 @@ ui/                     # React frontend (Vite + TypeScript + Tailwind)
 
 ## What works
 
-- Weapon/drone/augment/crew generation with valid XML
+- Weapon/drone/crew generation with valid XML
+- Augment generation (store appearance only — effects are hardcoded in binary, see docs/xml-modding-limits.md)
 - Event generation with choices and outcomes
 - Weapon sprites (12 frames, 16x60) and drone sprites (4 frames, 50x20)
 - Green screen background removal for Gemini-generated images
@@ -129,9 +130,10 @@ ftl-gen diagnose "ModName" --launch
 
 ## What's limited
 
-- **Events don't trigger** - defined but not hooked into sectors (see docs/game-integration.md)
+- **Augments are cosmetic** - custom augment names have no mechanical effect (hardcoded in binary). Only workaround: reskin vanilla augments. See [docs/xml-modding-limits.md](docs/xml-modding-limits.md)
+- **Events don't trigger** - generated but not written to .ftl (causes freeze). See `PATCH_EVENTS=1` guard in `core/mod_builder.py`
 - **Ships need layouts** - blueprint only, no room/sprite files
-- **Crew won't spawn** - not integrated into spawn pools
+- **Crew won't spawn** - not integrated into spawn pools (hardcoded in binary)
 - **No Hyperspace support** - advanced modding features unavailable
 
 ## To run
@@ -235,3 +237,5 @@ Hyperspace is an FTL hard-coded modding API that extends capabilities far beyond
 - Would need Wine setup instructions for Mac users
 - Generate Hyperspace-specific XML tags for advanced features
 - Could enable truly unique weapon mechanics beyond stat modifications
+
+**Alternative: Native macOS deep modding** — see [docs/deep-modding-research.md](docs/deep-modding-research.md) for DYLD interception and static binary patching research approaches that could work without Wine/Windows.
