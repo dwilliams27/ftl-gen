@@ -1352,6 +1352,271 @@ def ghidra_analyze(
         raise typer.Exit(1)
 
 
+binary_patch_app = typer.Typer(
+    name="binary-patch",
+    help="Binary patching commands for augment effect mapping",
+    no_args_is_help=True,
+)
+app.add_typer(binary_patch_app, name="binary-patch")
+
+
+@binary_patch_app.command("apply")
+def binary_patch_apply(
+    spec_path: Annotated[Path, typer.Argument(help="Path to patch spec JSON file")],
+    binary_path: Annotated[
+        Optional[Path],
+        typer.Option("--binary", "-b", help="Path to FTL binary (auto-detected if omitted)"),
+    ] = None,
+):
+    """Apply a binary patch spec to the FTL executable.
+
+    Creates a backup before patching and re-signs the binary.
+
+    Example: ftl-gen binary-patch apply augment_patch.json
+    """
+    try:
+        from ftl_gen.binary.patcher import BinaryPatcher
+    except ImportError:
+        console.print("[red]Binary patching dependencies not installed.[/]")
+        console.print("Install with: [bold]pip install -e \".[binary]\"[/]")
+        raise typer.Exit(1)
+
+    if binary_path is None:
+        settings = get_settings()
+        binary_path = settings.find_ftl_executable()
+        if binary_path is None:
+            console.print("[red]FTL binary not found. Specify with --binary[/]")
+            raise typer.Exit(1)
+
+    if not spec_path.exists():
+        console.print(f"[red]Spec file not found: {spec_path}[/]")
+        raise typer.Exit(1)
+
+    try:
+        patcher = BinaryPatcher(binary_path)
+        spec = BinaryPatcher.load_spec(spec_path)
+
+        console.print(f"[bold]Applying patch:[/] {spec.description}")
+        console.print(f"  [dim]Binary: {binary_path}[/]")
+        console.print(f"  [dim]Patches: {len(spec.patches)}[/]")
+
+        result = patcher.apply(spec)
+
+        if result.success:
+            console.print(f"\n[bold green]Success![/] {result.patches_applied} patches applied")
+            if result.backup_path:
+                console.print(f"  [dim]Backup: {result.backup_path}[/]")
+            if result.errors:
+                for err in result.errors:
+                    console.print(f"  [yellow]Warning: {err}[/]")
+        else:
+            console.print("\n[red]Patch failed:[/]")
+            for err in result.errors:
+                console.print(f"  [red]{err}[/]")
+            raise typer.Exit(1)
+
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/]")
+        raise typer.Exit(1)
+
+
+@binary_patch_app.command("revert")
+def binary_patch_revert(
+    binary_path: Annotated[
+        Optional[Path],
+        typer.Option("--binary", "-b", help="Path to FTL binary (auto-detected if omitted)"),
+    ] = None,
+):
+    """Revert the FTL binary to its original (pre-patch) state.
+
+    Restores from the .ftlgen.bak backup file.
+
+    Example: ftl-gen binary-patch revert
+    """
+    try:
+        from ftl_gen.binary.patcher import BinaryPatcher
+    except ImportError:
+        console.print("[red]Binary patching dependencies not installed.[/]")
+        console.print("Install with: [bold]pip install -e \".[binary]\"[/]")
+        raise typer.Exit(1)
+
+    if binary_path is None:
+        settings = get_settings()
+        binary_path = settings.find_ftl_executable()
+        if binary_path is None:
+            console.print("[red]FTL binary not found. Specify with --binary[/]")
+            raise typer.Exit(1)
+
+    try:
+        patcher = BinaryPatcher(binary_path)
+
+        if not patcher.backup_path.exists():
+            console.print("[yellow]No backup found — binary has not been patched.[/]")
+            raise typer.Exit(0)
+
+        console.print(f"[bold]Reverting binary:[/] {binary_path}")
+        if patcher.revert():
+            console.print("[bold green]Binary reverted to original.[/]")
+        else:
+            console.print("[red]Revert failed.[/]")
+            raise typer.Exit(1)
+
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/]")
+        raise typer.Exit(1)
+
+
+@binary_patch_app.command("status")
+def binary_patch_status(
+    binary_path: Annotated[
+        Optional[Path],
+        typer.Option("--binary", "-b", help="Path to FTL binary (auto-detected if omitted)"),
+    ] = None,
+):
+    """Show the current binary patch state.
+
+    Example: ftl-gen binary-patch status
+    """
+    try:
+        from ftl_gen.binary.patcher import BinaryPatcher
+    except ImportError:
+        console.print("[red]Binary patching dependencies not installed.[/]")
+        console.print("Install with: [bold]pip install -e \".[binary]\"[/]")
+        raise typer.Exit(1)
+
+    if binary_path is None:
+        settings = get_settings()
+        binary_path = settings.find_ftl_executable()
+        if binary_path is None:
+            console.print("[red]FTL binary not found. Specify with --binary[/]")
+            raise typer.Exit(1)
+
+    try:
+        patcher = BinaryPatcher(binary_path)
+        state = patcher.get_state()
+
+        if state is None:
+            console.print("[dim]No patches currently applied.[/]")
+            if patcher.backup_path.exists():
+                console.print(f"  [dim]Backup exists: {patcher.backup_path}[/]")
+            return
+
+        table = Table(title="Binary Patch State")
+        table.add_column("Property", style="cyan")
+        table.add_column("Value")
+        table.add_row("Description", state.get("spec_description", "Unknown"))
+        table.add_row("Applied At", state.get("applied_at", "Unknown"))
+        table.add_row("Patches Applied", str(state.get("patches_applied", 0)))
+        table.add_row("Patch IDs", ", ".join(state.get("patch_ids", [])))
+        table.add_row("Original SHA256", state.get("binary_sha256_original", "")[:16] + "...")
+        table.add_row("Patched SHA256", state.get("binary_sha256_patched", "")[:16] + "...")
+
+        # Show augment mappings if present
+        mappings = state.get("metadata", {}).get("augment_mappings", [])
+        if mappings:
+            table.add_row("", "")
+            table.add_row("[bold]Augment Mappings[/]", "")
+            for m in mappings:
+                table.add_row(f"  {m['custom']}", f"→ {m['vanilla']}")
+
+        console.print(table)
+
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/]")
+        raise typer.Exit(1)
+
+
+@binary_patch_app.command("generate")
+def binary_patch_generate(
+    mod_name: Annotated[str, typer.Argument(help="Mod name to generate patch spec for")],
+    binary_path: Annotated[
+        Optional[Path],
+        typer.Option("--binary", "-b", help="Path to FTL binary (auto-detected if omitted)"),
+    ] = None,
+    output: Annotated[
+        Optional[Path],
+        typer.Option("--output", "-o", help="Output path for patch spec JSON"),
+    ] = None,
+):
+    """Generate a binary patch spec for a mod's augments.
+
+    Scans the mod for augments with effect_source set, and builds a
+    patch spec that remaps custom augment names to vanilla effects.
+
+    Example: ftl-gen binary-patch generate "My Mod" -o patch.json
+    """
+    try:
+        from ftl_gen.binary.effects import AugmentEffectMapper
+        from ftl_gen.binary.patcher import BinaryPatcher
+        from ftl_gen.binary.recon import BinaryRecon
+        from ftl_gen.binary.trampoline import AugmentMapping
+    except ImportError:
+        console.print("[red]Binary patching dependencies not installed.[/]")
+        console.print("Install with: [bold]pip install -e \".[binary]\"[/]")
+        raise typer.Exit(1)
+
+    settings = get_settings()
+
+    if binary_path is None:
+        binary_path = settings.find_ftl_executable()
+        if binary_path is None:
+            console.print("[red]FTL binary not found. Specify with --binary[/]")
+            raise typer.Exit(1)
+
+    # Find the mod and its augments
+    from ftl_gen.api.services import ModReader
+
+    reader = ModReader(settings.output_dir)
+    mod = reader.get_mod(mod_name)
+    if not mod:
+        console.print(f"[red]Mod not found: {mod_name}[/]")
+        raise typer.Exit(1)
+
+    # Collect augment mappings
+    mappings: list[AugmentMapping] = []
+    mapper = AugmentEffectMapper()
+
+    for aug in mod.augments:
+        effect = getattr(aug, "effect_source", None)
+        if effect:
+            mappings.append(AugmentMapping(custom_name=aug.name, vanilla_name=effect))
+        else:
+            # Try auto-suggestion from description
+            suggested = mapper.suggest_mapping(aug.desc)
+            if suggested:
+                console.print(
+                    f"  [dim]Auto-mapped: {aug.name} → {suggested} "
+                    f"(based on description)[/]"
+                )
+                mappings.append(AugmentMapping(custom_name=aug.name, vanilla_name=suggested))
+
+    if not mappings:
+        console.print("[yellow]No augments with effect_source found in this mod.[/]")
+        console.print("[dim]Set effect_source on augments to map them to vanilla effects.[/]")
+        raise typer.Exit(0)
+
+    console.print(f"[bold]Generating patch spec for {len(mappings)} augment mapping(s):[/]")
+    for m in mappings:
+        console.print(f"  {m.custom_name} → {m.vanilla_name}")
+
+    try:
+        recon = BinaryRecon(binary_path)
+        binary_info = recon.analyze()
+        binary_data = binary_path.read_bytes()
+
+        spec = mapper.build_patch_spec(mappings, binary_info, binary_data)
+
+        output_path = output or (settings.output_dir / f"{mod_name}_patch.json")
+        BinaryPatcher.save_spec(spec, output_path)
+
+        console.print(f"\n[bold green]Patch spec saved:[/] {output_path}")
+        console.print(f"  [dim]Apply with: ftl-gen binary-patch apply {output_path}[/]")
+
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/]")
+        raise typer.Exit(1)
+
+
 @app.command("diagnose")
 def diagnose_mod(
     mod_name: Annotated[str, typer.Argument(help="Mod name")],

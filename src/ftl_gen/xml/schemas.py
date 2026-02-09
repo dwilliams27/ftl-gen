@@ -108,6 +108,10 @@ class AugmentBlueprint(BlueprintBase):
     cost: int = Field(..., ge=0, description="Scrap cost")
     stackable: bool = Field(default=False, description="Can have multiple")
     value: float | None = Field(None, description="Effect magnitude")
+    effect_source: str | None = Field(
+        None,
+        description="Vanilla augment whose mechanical effect to use (requires binary patch)",
+    )
 
 
 class CrewBlueprint(BlueprintBase):

@@ -317,6 +317,38 @@ class BinaryRecon:
             logger.warning("codesign not available, skipping signing check")
             return False, False, None
 
+    @staticmethod
+    def va_to_file_offset(binary_info: BinaryInfo, va: int) -> int:
+        """Convert a virtual address to a file offset using segment info.
+
+        Ghidra and disassemblers report virtual addresses. Binary patching
+        operates on file offsets. This bridges the two.
+
+        Raises ValueError if the VA doesn't fall in any segment.
+        """
+        for seg in binary_info.segments:
+            seg_end = seg.virtual_address + seg.virtual_size
+            if seg.virtual_address <= va < seg_end:
+                return va - seg.virtual_address + seg.file_offset
+        raise ValueError(
+            f"VA 0x{va:x} not in any segment. "
+            f"Segments: {[(s.name, hex(s.virtual_address)) for s in binary_info.segments]}"
+        )
+
+    @staticmethod
+    def file_offset_to_va(binary_info: BinaryInfo, file_offset: int) -> int:
+        """Convert a file offset to a virtual address using segment info.
+
+        Raises ValueError if the offset doesn't fall in any segment.
+        """
+        for seg in binary_info.segments:
+            seg_end = seg.file_offset + seg.file_size
+            if seg.file_offset <= file_offset < seg_end:
+                return file_offset - seg.file_offset + seg.virtual_address
+        raise ValueError(
+            f"File offset 0x{file_offset:x} not in any segment."
+        )
+
     def _get_linked_libraries(self) -> list[str]:
         """Get linked libraries using `otool -L`."""
         try:

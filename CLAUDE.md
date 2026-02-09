@@ -54,6 +54,16 @@ src/ftl_gen/
 │   ├── schemas.py      # Pydantic models (BlueprintBase -> Weapon/Drone/Augment/Crew/Ship)
 │   ├── builders.py     # XML generation (Kestrel test loadout opt-in via --test-loadout)
 │   └── validators.py   # Structural XML validation (range checking in Pydantic)
+├── binary/             # Binary analysis and patching
+│   ├── recon.py        # BinaryRecon: Mach-O analysis, segments, augment strings, code caves
+│   ├── patcher.py      # BinaryPatcher: safe patch apply/revert with backup + resign
+│   ├── trampoline.py   # TrampolineBuilder: x86_64 code gen for augment name interception
+│   ├── effects.py      # AugmentEffectMapper: custom→vanilla augment name mapping
+│   └── ghidra/         # Agentic Ghidra analysis (OpenAI function calling)
+│       ├── agent.py    # GhidraAgent: LLM-driven RE loop
+│       ├── headless.py # GhidraHeadless: headless script execution
+│       ├── validator.py # FindingValidator: capstone-based finding verification
+│       └── scripts/    # Ghidra Python scripts (decompile, xrefs, strings, bytes)
 ├── balance/
 │   └── constraints.py  # Balance validation (ranges from constants.py)
 └── data/
@@ -92,7 +102,7 @@ ui/                     # React frontend (Vite + TypeScript + Tailwind)
 ## What works
 
 - Weapon/drone/crew generation with valid XML
-- Augment generation (store appearance only — effects are hardcoded in binary, see docs/xml-modding-limits.md)
+- Augment generation with optional binary-patched effects (set `effect_source` to inherit vanilla mechanics)
 - Event generation with choices and outcomes
 - Weapon sprites (12 frames, 16x60) and drone sprites (4 frames, 50x20)
 - Green screen background removal for Gemini-generated images
@@ -103,6 +113,39 @@ ui/                     # React frontend (Vite + TypeScript + Tailwind)
 - **Chaos mode** - randomize vanilla game data (FREE, no LLM calls)
 - **Debugging toolkit** - event loop detection, crash pattern checks, monitored FTL launch, crash reporting
 - **Web UI** - local mod browser, generator, chaos mode, diagnose/validate/patch/run (http://localhost:8421)
+- **Binary patching** - x86_64 trampoline injection for augment effect remapping
+
+## Binary Patching (Augment Effects)
+
+Custom augment names are cosmetic by default (effects hardcoded in FTL binary). The binary patcher intercepts `HasAugmentation`/`GetAugmentationValue` via x86_64 trampolines to remap custom names → vanilla names at runtime.
+
+```bash
+# Generate a patch spec for a mod's augments
+ftl-gen binary-patch generate "My Mod" -o patch.json
+
+# Apply patch to FTL binary (creates .ftlgen.bak backup)
+ftl-gen binary-patch apply patch.json
+
+# Check what's patched
+ftl-gen binary-patch status
+
+# Revert to original binary
+ftl-gen binary-patch revert
+```
+
+**How it works:**
+1. Reads augments with `effect_source` set (or auto-suggests from description)
+2. Generates x86_64 trampoline code in a code cave (NUL region in `__TEXT`)
+3. Overwrites function prologues with JMP to trampoline
+4. Trampoline: compares `std::string` arg → if custom name, swaps RSI to point to SSO string of vanilla name
+5. Executes displaced prologue, JMPs back
+
+**Key addresses (from Ghidra analysis):**
+- `ShipObject::HasAugmentation` @ `0x1000a2740`
+- `ShipObject::GetAugmentationValue` @ `0x1000a2870`
+- Both use System V AMD64 ABI: `this` in RDI, `std::string*` in RSI
+
+**Safety:** Backup before patch, all-or-nothing verification, atomic write, ad-hoc code re-signing.
 
 ## Debugging Toolkit
 
@@ -130,7 +173,7 @@ ftl-gen diagnose "ModName" --launch
 
 ## What's limited
 
-- **Augments are cosmetic** - custom augment names have no mechanical effect (hardcoded in binary). Only workaround: reskin vanilla augments. See [docs/xml-modding-limits.md](docs/xml-modding-limits.md)
+- **Augments need binary patch** - custom augment names have no mechanical effect by default (hardcoded in binary). Use `ftl-gen binary-patch generate` to create a patch that remaps custom names → vanilla effects via x86_64 trampoline. Set `effect_source` on `AugmentBlueprint` to specify which vanilla effect to inherit. See [docs/xml-modding-limits.md](docs/xml-modding-limits.md)
 - **Events don't trigger** - generated but not written to .ftl (causes freeze). See `PATCH_EVENTS=1` guard in `core/mod_builder.py`
 - **Ships need layouts** - blueprint only, no room/sprite files
 - **Crew won't spawn** - not integrated into spawn pools (hardcoded in binary)

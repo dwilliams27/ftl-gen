@@ -57,3 +57,6 @@ select = ["E", "F", "I", "N", "W"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+    "integration: marks tests requiring real FTL binary (deselect with '-m \"not integration\"')",
+]
